@@ -1,0 +1,55 @@
+<?xml version="1.0"?>
+<parameters>
+
+    <!-- Connection details -->
+    <type>POSTGRES</type>
+    <driver>org.postgresql.Driver</driver>
+    <url>jdbc:postgresql://localhost:5432/benchbase?sslmode=disable&amp;ApplicationName=resourcestresser&amp;reWriteBatchedInserts=true</url>
+    <username>admin</username>
+    <password>password</password>
+    <reconnectOnConnectionFailure>true</reconnectOnConnectionFailure>
+    <isolation>TRANSACTION_READ_COMMITTED</isolation>
+    <batchsize>128</batchsize>
+
+    <!-- INCREASED scalefactor for more data -->
+    <scalefactor>2</scalefactor>
+
+    <!-- The workload - HIGH LOAD CONFIGURATION -->
+    <!-- 10 terminals for high stress without excessive deadlocks -->
+    <terminals>10</terminals>
+    <works>
+        <work>
+            <!-- Duration in seconds -->
+            <time>60</time>
+            <!-- HIGH target rate for maximum throughput -->
+            <rate>50000</rate>
+            <!-- Weights: CPU1, CPU2, IO1, IO2, Contention1, Contention2 -->
+            <!-- Equal distribution: ~16.67% each for balanced stress testing -->
+            <weights>16.66,16.66,16.66,16.66,16.66,16.7</weights>
+        </work>
+    </works>
+
+    <!-- ResourceStresser Procedures Declaration -->
+    <!-- Tests CPU, I/O, and Lock Contention -->
+    <transactiontypes>
+        <transactiontype>
+            <name>CPU1</name>
+        </transactiontype>
+        <transactiontype>
+            <name>CPU2</name>
+        </transactiontype>
+        <transactiontype>
+            <name>IO1</name>
+        </transactiontype>
+        <transactiontype>
+            <name>IO2</name>
+        </transactiontype>
+        <transactiontype>
+            <name>Contention1</name>
+        </transactiontype>
+        <transactiontype>
+            <name>Contention2</name>
+        </transactiontype>
+    </transactiontypes>
+
+</parameters>

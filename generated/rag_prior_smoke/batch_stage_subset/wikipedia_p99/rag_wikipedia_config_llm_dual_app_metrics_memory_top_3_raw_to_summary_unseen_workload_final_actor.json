@@ -1,0 +1,98 @@
+{
+  "benchmark": "wikipedia",
+  "pin_to_cores": "0-9",
+  "benchbase_jar_path": "deps/benchbase/target/benchbase-postgres/benchbase.jar",
+  "benchbase_config_file": "config/benchbase/postgres/wikipedia_highload_config.xml",
+  "tuner_type": "llm",
+  "parameter_ranges": {
+    "min_granularity_ns": [
+      100000,
+      100000000
+    ],
+    "latency_ns": [
+      100000,
+      100000000
+    ],
+    "cstate_max": [
+      "POLL",
+      "C6",
+      "C3",
+      "C1E",
+      "C1"
+    ],
+    "napi_busy_poll": [
+      0,
+      1000
+    ],
+    "wakeup_granularity_ns": [
+      100000,
+      100000000
+    ],
+    "migration_cost_ns": [
+      100000,
+      100000000
+    ],
+    "max_perf_pct": [
+      0,
+      100
+    ],
+    "min_perf_pct": [
+      0,
+      100
+    ]
+  },
+  "parameters_to_tune": [
+    "min_granularity_ns",
+    "latency_ns",
+    "cstate_max",
+    "napi_busy_poll",
+    "wakeup_granularity_ns",
+    "migration_cost_ns",
+    "max_perf_pct",
+    "min_perf_pct"
+  ],
+  "optimization_metric": "latency_p99",
+  "optimization_goal": "minimize",
+  "max_iterations": 30,
+  "window_duration": 10,
+  "tuning_mode": "in-window",
+  "continuous_apply": false,
+  "results_dir": "results/wikipedia_p99/rag_llm_dual_app_metrics_memory_top_3_raw_to_summary_unseen_workload_final_actor/",
+  "llm_api_key": null,
+  "llm_actor_model": "gemini-2.5-flash",
+  "llm_speculator_model": "gemini-2.5-flash-lite",
+  "use_indirect_optimization": false,
+  "llm_full_metrics_prompt_mode": true,
+  "llm_full_metrics_explicit_signature_compare": false,
+  "llm_additional_metrics": [
+    "throughput",
+    "goodput",
+    "latency_avg",
+    "latency_p95",
+    "latency_p99",
+    "queries_per_hour"
+  ],
+  "post_tuning_windows": 20,
+  "llm_measure_default_before_tuning": true,
+  "llm_explore_until_last_iteration": true,
+  "dual_loop_actor_only_final": false,
+  "dual_loop_force_final_actor_before_stable": true,
+  "llm_force_final_freeze_before_stable": false,
+  "llm_actor_additional_metrics": [
+    "throughput",
+    "goodput",
+    "latency_avg",
+    "latency_p95",
+    "latency_p99",
+    "queries_per_hour"
+  ],
+  "llm_speculator_additional_metrics": [
+    "throughput",
+    "goodput",
+    "latency_avg",
+    "latency_p95",
+    "latency_p99",
+    "queries_per_hour"
+  ],
+  "previous_run_gist": "For minimizing latency_p99, a warm-start prior suggests focusing on configurations that maintain high CPU utilization and utilize POLL C-state.\n\n**Promising Parameter Regions:**\n*   **latency_ns, min_granularity_ns, wakeup_granularity_ns:** Consensus points towards higher values, with specific ranges like 400,000 ns (from summary 1) and 1,000,000 ns (from summary 2) being explored. Summary 3, while focused on throughput, suggests a broad range of 1.8M-1.9M ns for these parameters, indicating a potential trade-off or a need to re-evaluate this range for latency.\n*   **migration_cost_ns:** Values around 180,000 ns (summary 1) and 1,000,000 ns (summary 2) have shown promise. Summary 3 suggests 600K-650K ns for throughput, which might be a region to cautiously explore or revalidate for latency.\n*   **napi_busy_poll:** A value of 500 ns appears consistently promising across summaries. Higher values (e.g., 1000 ns) were noted as risky in summary 1.\n*   **min_perf_pct, max_perf_pct:** Setting these to 100% is generally associated with better performance, as indicated by summary 1 and 2. Initial exploration with 0% was risky.\n\n**Risky Parameter Regions & Early Validation Guidance:**\n*   **C-state:** While POLL C-state is consistently associated with good latency performance (summaries 1 & 2), summary 3 found C3 to be optimal for throughput. This presents a potential conflict: **early validation should confirm if POLL C-state is indeed superior for latency, or if C3 offers a competitive latency profile.**\n*   **Granularity/Latency Ranges:** Summary 3 identified very wide ranges (<1.5M or >2.5M ns) for latency and granularity as risky for throughput. While these specific ranges might not directly apply to latency optimization, they highlight the sensitivity of these parameters. **Early iterations should cautiously explore values outside the 400K-1M ns range observed in summaries 1 & 2, and be prepared to revert if latency increases.**\n*   **Initial Aggressive Low-Latency:** Summary 1 and 3 noted that starting with very aggressive low-latency settings (e.g., low ns values, min_perf_pct=0) can initially lead to higher latency or zero throughput. **Start with moderate latency and granularity settings, and gradually increase them, monitoring latency_p99 closely.**\n\n**Promising System Signatures:**\n*   **cstate_poll_pct:** Consistently high (100%) across summaries, indicating active core states are beneficial.\n*   **cpus_utilized / cpu_load:** High CPU utilization (around 95-100%) is a strong indicator of a system ready for low-latency operation.\n\n**Transferable Parameter Relationships:**\n*   Maintaining high CPU utilization and POLL C-state seems to be a foundational requirement for achieving low p99 latency.\n*   There's a clear trade-off or interaction between latency/granularity parameters and migration costs.\n*   The `napi_busy_poll` parameter is sensitive; 500 ns is a good starting point, and higher values should be approached with caution.\n\n**Overall Guidance:**\nBegin with configurations that maintain high CPU utilization and POLL C-state, using `napi_busy_poll` around 500 ns. Explore higher values for `latency_ns`, `min_granularity_ns`, and `wakeup_granularity_ns` in the range of 400,000-1,000,000 ns, and `migration_cost_ns` around 180,000-1,000,000 ns. Pay close attention to the C-state conflict: prioritize POLL C-state for latency, but be open to re-evaluating if C3 offers a viable alternative. Monitor for increases in latency_p99 when deviating significantly from these promising regions."
+}

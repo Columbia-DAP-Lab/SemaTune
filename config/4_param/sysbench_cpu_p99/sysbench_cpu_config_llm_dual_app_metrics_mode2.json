@@ -1,0 +1,57 @@
+{
+  "benchmark": "sysbench_cpu",
+  "pin_to_cores": "0-9",
+  "sysbench_threads": 40,
+  "sysbench_cpu_max_prime": 50000,
+  "tuner_type": "llm",
+  "parameter_ranges": {
+    "min_granularity_ns": [
+      100000,
+      100000000
+    ],
+    "latency_ns": [
+      100000,
+      100000000
+    ],
+    "wakeup_granularity_ns": [
+      100000,
+      100000000
+    ],
+    "cstate_max": [
+      "POLL",
+      "C6",
+      "C3",
+      "C1E",
+      "C1"
+    ]
+  },
+  "parameters_to_tune": [
+    "min_granularity_ns",
+    "latency_ns",
+    "wakeup_granularity_ns",
+    "cstate_max"
+  ],
+  "fixed_parameters": {},
+  "optimization_metric": "latency_p99",
+  "optimization_goal": "minimize",
+  "max_iterations": 60,
+  "window_duration": 10,
+  "tuning_mode": "in-window",
+  "continuous_apply": false,
+  "results_dir": "results/sysbench_cpu_p99/llm_gemini_2_5_flash_lite_llm_dual_app_metrics_mode2/",
+  "llm_api_key": null,
+  "llm_actor_model": "gemini-2.5-flash",
+  "llm_speculator_model": "gemini-2.5-flash-lite",
+  "use_indirect_optimization": false,
+  "llm_full_metrics_prompt_mode": true,
+  "llm_full_metrics_explicit_signature_compare": false,
+  "llm_additional_metrics": [
+    "throughput",
+    "goodput",
+    "latency_avg",
+    "latency_p95",
+    "latency_p99",
+    "queries_per_hour"
+  ],
+  "post_tuning_windows": 20
+}

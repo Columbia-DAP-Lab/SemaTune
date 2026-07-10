@@ -1,0 +1,133 @@
+{
+  "benchmark": "tpcc",
+  "pin_to_cores": "0-9",
+  "benchbase_jar_path": "deps/benchbase/target/benchbase-postgres/benchbase.jar",
+  "benchbase_config_file": "config/benchbase/postgres/sample_tpcc_hi.xml",
+  "tuner_type": "llm",
+  "llm_api_key": null,
+  "parameter_ranges": {
+    "min_granularity_ns": [
+      100000,
+      100000000
+    ],
+    "latency_ns": [
+      100000,
+      100000000
+    ],
+    "cstate_max": [
+      "POLL",
+      "C6",
+      "C3",
+      "C1E",
+      "C1"
+    ],
+    "napi_busy_poll": [
+      0,
+      1000
+    ],
+    "wakeup_granularity_ns": [
+      100000,
+      100000000
+    ],
+    "migration_cost_ns": [
+      100000,
+      100000000
+    ],
+    "max_perf_pct": [
+      0,
+      100
+    ],
+    "min_perf_pct": [
+      0,
+      100
+    ]
+  },
+  "parameters_to_tune": [
+    "min_granularity_ns",
+    "latency_ns",
+    "cstate_max",
+    "napi_busy_poll",
+    "wakeup_granularity_ns",
+    "migration_cost_ns",
+    "max_perf_pct",
+    "min_perf_pct"
+  ],
+  "fixed_parameters": {},
+  "optimization_metric": "latency_p99",
+  "optimization_goal": "minimize",
+  "max_iterations": 30,
+  "window_duration": 10,
+  "tuning_mode": "in-window",
+  "results_dir": "results/tpcc_hi_p99/rag_llm_dual_indirect_all_mode3_memory_last_1_raw_to_summary_final_actor/",
+  "continuous_apply": false,
+  "llm_actor_model": "gemini-2.5-flash",
+  "llm_speculator_model": "gemini-2.5-flash-lite",
+  "use_indirect_optimization": true,
+  "llm_indirect_history_show_all_metrics": true,
+  "llm_additional_metrics": [
+    "instructions_per_cycle",
+    "cycles",
+    "instructions",
+    "branch_misses",
+    "branch_miss_rate_pct",
+    "page_faults",
+    "context_switches_per_sec",
+    "cpu_migrations_per_sec",
+    "branches_per_sec",
+    "power_socket0_watts",
+    "power_ram_watts",
+    "cstate_poll_pct",
+    "cstate_c1_pct",
+    "cstate_c1e_pct",
+    "cstate_c6_pct",
+    "cpu_load_cores_pct",
+    "cpu_load_socket0_pct"
+  ],
+  "llm_indirect_prompt_style": "signature_compare",
+  "llm_measure_default_before_tuning": true,
+  "post_tuning_windows": 20,
+  "llm_explore_until_last_iteration": true,
+  "dual_loop_actor_only_final": false,
+  "dual_loop_force_final_actor_before_stable": true,
+  "llm_force_final_freeze_before_stable": false,
+  "llm_actor_additional_metrics": [
+    "instructions_per_cycle",
+    "cycles",
+    "instructions",
+    "branch_misses",
+    "branch_miss_rate_pct",
+    "page_faults",
+    "context_switches_per_sec",
+    "cpu_migrations_per_sec",
+    "branches_per_sec",
+    "power_socket0_watts",
+    "power_ram_watts",
+    "cstate_poll_pct",
+    "cstate_c1_pct",
+    "cstate_c1e_pct",
+    "cstate_c6_pct",
+    "cpu_load_cores_pct",
+    "cpu_load_socket0_pct"
+  ],
+  "llm_speculator_additional_metrics": [
+    "instructions_per_cycle",
+    "cycles",
+    "instructions",
+    "branch_misses",
+    "branch_miss_rate_pct",
+    "page_faults",
+    "context_switches_per_sec",
+    "cpu_migrations_per_sec",
+    "branches_per_sec",
+    "power_socket0_watts",
+    "power_ram_watts",
+    "cstate_poll_pct",
+    "cstate_c1_pct",
+    "cstate_c1e_pct",
+    "cstate_c6_pct",
+    "cpu_load_cores_pct",
+    "cpu_load_socket0_pct"
+  ],
+  "omit_explicit_pairwise_comparison_instruction": false,
+  "previous_run_gist": "Hidden primary-metric values from the prior run have been redacted. Use the qualitative parameter patterns and configuration hints below.\n\nThis prior is based on a previous tuning run focused on minimizing hidden primary metric. The previous run indicated that aggressive settings for latency and granularity parameters, combined with keeping the CPU in a non-sleep state, were key to achieving low latency.\n\n**Parameter Relationships & Promising Regions:**\n\n*   **Latency & Granularity:** Lower values for `latency_ns`, `min_granularity_ns`, and `wakeup_granularity_ns` appear to be strongly correlated with reduced hidden primary metric. The promising range observed was approximately `latency_ns` (4M-10M), `min_granularity_ns` (2.5M-5M), and `wakeup_granularity_ns` (2.5M-5M).\n*   **CPU Sleep States:** Setting `cstate_max` to `POLL` was consistently associated with the best latency results. Deeper sleep states (C1, C1E, C3, C6) showed higher latency in early explorations.\n*   **Busy Polling:** High values for `napi_busy_poll` (e.g., 900-1000) were beneficial, likely by reducing interrupt overhead.\n*   **CPU Migration:** `migration_cost_ns` in the range of 5M-10M was found to be promising.\n\n**Risky Regions & Potential Trade-offs:**\n\n*   **Extreme Latency/Granularity:** Very high values for `latency_ns`, `min_granularity_ns`, and `wakeup_granularity_ns` (e.g., 50M+) are likely to increase latency.\n*   **Deep Sleep States:** Enabling deeper CPU sleep states (`cstate_max` other than `POLL`) can negatively impact latency.\n*   **Overly Aggressive Granularity:** While low granularity is good, extremely low settings (e.g., 2.5M-3M) might lead to increased context switches, suggesting a potential overhead trade-off.\n\n**System Signatures to Monitor:**\n\n*   **Promising:** Low `page_faults_per_sec` (near 0), low `context_switches_per_sec` (< 700), low `cpu_migrations_per_sec` (< 200), and high `cstate_poll_pct` (near 100%).\n*   **Risky:** High `page_faults_per_sec` (> 100), high `context_switches_per_sec` (> 800), high `cpu_migrations_per_sec` (> 200), and high `cstate_c6_pct`.\n\n**Early Validation Guidance:**\n\n*   **Initial Cycles:** Expect latency to decrease as `latency_ns` and `min_granularity_ns` are reduced, and `cstate_max` moves towards `POLL`.\n*   **Monitor Overhead:** Pay attention to `context_switches_per_sec` and `cpu_migrations_per_sec` as latency and granularity are aggressively reduced. If these metrics spike significantly, it may indicate diminishing returns or negative side effects.\n*   **C-State Behavior:** Early in the run, verify that `cstate_max` set to `POLL` is indeed yielding lower latency than configurations attempting deeper sleep.\n\n**Confidence Notes & Transferability:**\n\nThis prior is considered low-confidence due to the \"far-away\" retrieval distance and the absence of explicit hidden-score signal signals during the previous run. The tuning relied on inferred hidden-score signals from system metrics, which may not perfectly correlate with the true `hidden primary metric`. Therefore, while the observed parameter relationships are informative, they should be treated as hypotheses to be validated in the new environment. The extensive exploration in the previous run suggests the identified regions are likely robust, but the exact optimal values may shift."
+}

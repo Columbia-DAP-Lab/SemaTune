@@ -1,0 +1,104 @@
+{
+  "benchmark": "tailbench",
+  "tailbench_app": "silo",
+  "pin_to_cores": "0-9",
+  "tailbench_threads": 40,
+  "tailbench_qps": 2700,
+  "tailbench_metrics_interval_sec": 1,
+  "tailbench_maxreqs": 2000000000,
+  "tailbench_warmupreqs": 2700,
+  "tailbench_minsleepns": 0,
+  "tuner_type": "llm",
+  "llm_api_key": null,
+  "parameter_ranges": {
+    "min_granularity_ns": [
+      100000,
+      100000000
+    ],
+    "latency_ns": [
+      100000,
+      100000000
+    ],
+    "cstate_max": [
+      "POLL",
+      "C6",
+      "C3",
+      "C1E",
+      "C1"
+    ],
+    "napi_busy_poll": [
+      0,
+      1000
+    ],
+    "wakeup_granularity_ns": [
+      100000,
+      100000000
+    ],
+    "migration_cost_ns": [
+      100000,
+      100000000
+    ],
+    "max_perf_pct": [
+      0,
+      100
+    ],
+    "min_perf_pct": [
+      0,
+      100
+    ]
+  },
+  "parameters_to_tune": [
+    "min_granularity_ns",
+    "latency_ns",
+    "cstate_max",
+    "napi_busy_poll",
+    "wakeup_granularity_ns",
+    "migration_cost_ns",
+    "max_perf_pct",
+    "min_perf_pct"
+  ],
+  "fixed_parameters": {},
+  "optimization_metric": "latency_p99",
+  "optimization_goal": "minimize",
+  "max_iterations": 30,
+  "window_duration": 10,
+  "tuning_mode": "in-window",
+  "results_dir": "results/silo_hi_p99/rag_llm_dual_app_metrics_memory_last_1_raw_to_summary_final_actor/",
+  "continuous_apply": false,
+  "llm_actor_model": "gemini-2.5-flash",
+  "llm_speculator_model": "gemini-2.5-flash-lite",
+  "use_indirect_optimization": false,
+  "llm_full_metrics_prompt_mode": true,
+  "llm_full_metrics_explicit_signature_compare": false,
+  "llm_additional_metrics": [
+    "throughput",
+    "goodput",
+    "latency_avg",
+    "latency_p95",
+    "latency_p99",
+    "queries_per_hour"
+  ],
+  "post_tuning_windows": 20,
+  "llm_measure_default_before_tuning": true,
+  "llm_explore_until_last_iteration": true,
+  "dual_loop_actor_only_final": false,
+  "dual_loop_force_final_actor_before_stable": true,
+  "llm_force_final_freeze_before_stable": false,
+  "llm_actor_additional_metrics": [
+    "throughput",
+    "goodput",
+    "latency_avg",
+    "latency_p95",
+    "latency_p99",
+    "queries_per_hour"
+  ],
+  "llm_speculator_additional_metrics": [
+    "throughput",
+    "goodput",
+    "latency_avg",
+    "latency_p95",
+    "latency_p99",
+    "queries_per_hour"
+  ],
+  "previous_run_gist": "Prior for minimizing latency_p99.\n\nThis prior is based on a previous tuning run that explored a wide parameter space. While informative, the run was intentionally distant and should be treated with caution. Parameter relationships may not transfer perfectly.\n\n**Key Parameter Relationships & Promising Regions:**\n\n*   **Scheduling Granularity:** `min_granularity_ns` and `latency_ns` appear to strongly influence latency. Lower values (around 100000) were consistently optimal. Higher values (e.g., 10000000) are risky and likely to increase latency.\n*   **CPU Power Management:** `cstate_max` set to `POLL` and `max_perf_pct` at 100 were associated with good latency. Disabling deep C-states was an initial strategy.\n*   **Interrupt Handling:** `napi_busy_poll` showed a significant impact. A range of 700-850 appears promising. Extremes (0-250) are risky.\n*   **Performance Tuning:** `min_perf_pct` at 0 and `migration_cost_ns` at 100000 were part of the best configuration.\n\n**Risky Parameter Regions (to avoid or explore cautiously):**\n\n*   `latency_ns` and `min_granularity_ns` above 1000000.\n*   `napi_busy_poll` below 250.\n*   High values for `cstate_c1_pct`, `cstate_c1e_pct`, `cstate_c6_pct`.\n*   High `cpu_load_cores_pct` (>94).\n*   High `context_switches_per_sec` (>6.0720).\n*   High `page_faults_per_sec` (>343.8750).\n\n**Early Validation Guidance:**\n\n*   **Initial Check:** Monitor `latency_p99` closely in early iterations. High initial values (e.g., >30) might indicate suboptimal settings for `latency_ns`, `min_granularity_ns`, or `napi_busy_poll`.\n*   **CPU State:** Expect `cstate_max` to remain `POLL` and `max_perf_pct` to be 100. Deviations here might be worth investigating if latency increases.\n*   **Granularity Impact:** Early exploration of increased `latency_ns` and `min_granularity_ns` led to worse latency. Prioritize keeping these low.\n*   **`napi_busy_poll` Sensitivity:** This parameter is critical. Observe its impact carefully. Values in the 700-850 range are a good starting point.\n\n**Uncertainty/Low Confidence Transfer:**\n\n*   The previous run showed some noise, particularly in early iterations. This suggests that the exact optimal point for `napi_busy_poll` might vary slightly.\n*   System signatures like `cpus_utilized` and `cpu_load_cores_pct` were generally stable in the promising regions, but their direct transferability to a new environment is not guaranteed.\n*   The relationship between `page_faults_per_sec` and latency was broad; focus on keeping it low but don't expect a precise correlation.\n\n**Recommended Starting Point:**\n\nBegin with `min_granularity_ns=100000`, `latency_ns=100000`, `wakeup_granularity_ns=100000`, `cstate_max=POLL`, `max_perf_pct=100`, and `napi_busy_poll` around 750. Adjust `napi_busy_poll` within the 700-850 range based on early results."
+}

@@ -1,0 +1,50 @@
+<?xml version="1.0"?>
+<parameters>
+
+    <!-- Connection details -->
+    <type>POSTGRES</type>
+    <driver>org.postgresql.Driver</driver>
+    <url>jdbc:postgresql://localhost:5432/benchbase?sslmode=disable&amp;ApplicationName=wikipedia&amp;reWriteBatchedInserts=true</url>
+    <username>admin</username>
+    <password>password</password>
+    <reconnectOnConnectionFailure>true</reconnectOnConnectionFailure>
+    <isolation>TRANSACTION_READ_COMMITTED</isolation>
+    <batchsize>128</batchsize>
+
+    <!-- INCREASED scalefactor for more data -->
+    <scalefactor>2</scalefactor>
+
+    <!-- The workload - HIGH LOAD CONFIGURATION -->
+    <!-- 25 terminals to maximize CPU utilization on cores 10-19 -->
+    <terminals>25</terminals>
+    <works>
+        <work>
+            <!-- Duration in seconds -->
+            <time>60</time>
+            <!-- HIGH target rate for maximum throughput -->
+            <rate>50000</rate>
+            <!-- Weights: AddWatchList, RemoveWatchList, UpdatePage, GetPageAnonymous, GetPageAuthenticated -->
+            <!-- Default distribution: mostly reads (GetPageAnonymous=90%), some updates (7%), minimal writes (1% each) -->
+            <weights>1,1,7,90,1</weights>
+        </work>
+    </works>
+
+    <!-- Wikipedia Procedures Declaration -->
+    <transactiontypes>
+        <transactiontype>
+            <name>AddWatchList</name>
+        </transactiontype>
+        <transactiontype>
+            <name>RemoveWatchList</name>
+        </transactiontype>
+        <transactiontype>
+            <name>UpdatePage</name>
+        </transactiontype>
+        <transactiontype>
+            <name>GetPageAnonymous</name>
+        </transactiontype>
+        <transactiontype>
+            <name>GetPageAuthenticated</name>
+        </transactiontype>
+    </transactiontypes>
+</parameters>

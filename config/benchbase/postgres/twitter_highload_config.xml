@@ -1,0 +1,52 @@
+<?xml version="1.0"?>
+<parameters>
+
+    <!-- Connection details -->
+    <type>POSTGRES</type>
+    <driver>org.postgresql.Driver</driver>
+    <url>jdbc:postgresql://localhost:5432/benchbase?sslmode=disable&amp;ApplicationName=twitter&amp;reWriteBatchedInserts=true</url>
+    <username>admin</username>
+    <password>password</password>
+    <reconnectOnConnectionFailure>true</reconnectOnConnectionFailure>
+    <isolation>TRANSACTION_READ_COMMITTED</isolation>
+    <batchsize>128</batchsize>
+
+    <!-- INCREASED scalefactor for more data (2 * 500 = 1000 users) -->
+    <scalefactor>2</scalefactor>
+
+    <!-- Trace files for Twitter -->
+    <tracefile>data/twitter/twitter_tweetids.txt</tracefile>
+    <tracefile2>data/twitter/twitter_user_ids.txt</tracefile2>
+    <base_ip>10.1.</base_ip>
+
+    <!-- The workload - HIGH LOAD CONFIGURATION -->
+    <terminals>25</terminals>
+    <works>
+        <work>
+            <time>60</time>
+            <!-- HIGH target rate for maximum throughput -->
+            <rate>50000</rate>
+            <!-- Weights: GetTweet, GetTweetsFromFollowing, GetFollowers, GetUserTweets, InsertTweet -->
+            <weights>1,1,7,90,1</weights>
+        </work>
+    </works>
+
+    <!-- Twitter Procedures declaration -->
+    <transactiontypes>
+        <transactiontype>
+            <name>GetTweet</name>
+        </transactiontype>
+        <transactiontype>
+            <name>GetTweetsFromFollowing</name>
+        </transactiontype>
+        <transactiontype>
+            <name>GetFollowers</name>
+        </transactiontype>
+        <transactiontype>
+            <name>GetUserTweets</name>
+        </transactiontype>
+        <transactiontype>
+            <name>InsertTweet</name>
+        </transactiontype>
+    </transactiontypes>
+</parameters>

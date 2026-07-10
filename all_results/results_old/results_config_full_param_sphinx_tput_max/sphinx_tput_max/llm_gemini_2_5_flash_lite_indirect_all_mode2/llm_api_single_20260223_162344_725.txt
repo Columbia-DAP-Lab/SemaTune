@@ -1,0 +1,252 @@
+============================================================
+ LLM API REQUEST - SINGLE AGENT
+ Iteration: 34
+ Timestamp: 2026-02-23 16:23:44.725526
+ Metrics Aggregation Interval: 5.00s
+============================================================
+
+--- REQUEST (exact context sent to LLM API) ---
+
+contents (list of strings, in order):
+
+--- content[0] ---
+You are a Linux kernel scheduler tuning expert with deep knowledge of OS performance optimization.
+
+TASK: Optimize OS parameters to MAXIMIZE throughput. Additional observability metrics included: instructions_per_cycle, cycles, instructions, branch_misses, branch_miss_rate_pct, page_faults, context_switches_per_sec, cpu_migrations_per_sec, branches_per_sec, power_socket0_watts, power_ram_watts, cstate_poll_pct, cstate_c1_pct, cstate_c1e_pct, cstate_c6_pct, cpu_load_cores_pct, cpu_load_socket0_pct. IMPORTANT: The primary optimization metric is NOISY or HIDDEN.
+
+MEASUREMENTS: The workload performance metrics are NOISY due to system variability.
+
+TUNABLE PARAMETERS:
+
+CONTINUOUS/DISCRETE PARAMETERS:
+- min_granularity_ns (continuous): 100,000 to 100,000,000 - Minimum scheduling granularity in nanoseconds
+- latency_ns (continuous): 100,000 to 100,000,000 - CFS scheduler latency in nanoseconds
+- napi_busy_poll (continuous): 0 to 1,000 [PER-CORE] - Alias for busy_poll (net.core.busy_poll)
+- wakeup_granularity_ns (continuous): 100,000 to 100,000,000 - Wakeup granularity in nanoseconds
+- migration_cost_ns (continuous): 100,000 to 100,000,000 - Migration cost in nanoseconds
+- max_perf_pct (continuous): 0 to 100 [PER-CORE] - Maximum performance percentage (0-100)
+- min_perf_pct (continuous): 0 to 100 [PER-CORE] - Minimum performance percentage (0-100)
+
+CATEGORICAL PARAMETERS:
+- cstate_max (categorical): [POLL, C6, C3, C1E, C1] [PER-CORE] - Maximum C-state allowed (unlimited=all enabled, none=poll only, poll=POLL, C1=C1, C1E=C1E, C2=C2, C6=C6, C6only=C6 only)
+
+
+
+OPTIMIZATION STRATEGY:
+1. EARLY CYCLES: Prioritize EXPLORATION - try diverse values across the full range to map the space but avoid values that will likely be catastrophic.
+2. LATER CYCLES: Shift to EXPLOITATION - refine around promising regions.
+3. If a new configuration yields significantly better results, react by exploring nearby values.
+4. Monitor for workload changes (e.g., sudden goodput drop or latency spike).
+5. Aim for stability: After finding a good region, test variations to confirm robustness.
+6. Always consider noise - don't overreact to single measurements.
+
+Performance data will be provided in future calls. Respond ONLY in the format shown below:
+Analysis: <Your one or two-sentence decision reasoning>
+Config: { "parameter_name": <value> }
+
+Also include a "converged" boolean field in your JSON response indicating whether you believe the optimization has converged (True if further changes are unlikely to yield meaningful improvement, False otherwise).
+
+
+--- content[1] ---
+History summary (metric=throughput, goal=maximize):
+- Current best value: HIDDEN
+- Recent 33 trials (oldest → newest):
+  * iter 1: throughput=HIDDEN, instructions_per_cycle=0.66, cycles=71,544,168,037.00, instructions=47,327,695,687.00, branch_misses=326,173,374.00, branch_miss_rate_pct=3.74, page_faults=77,577.00, context_switches_per_sec=338.79, cpu_migrations_per_sec=77.45, branches_per_sec=287.94 with {latency_ns=24000000, min_granularity_ns=3000000, wakeup_granularity_ns=4000000, migration_cost_ns=500000, min_perf_pct=0, max_perf_pct=100, cstate_max=unlimited}
+  * iter 2: throughput=HIDDEN, instructions_per_cycle=0.61, cycles=74,124,395,123.00, instructions=45,206,797,024.00, branch_misses=312,646,721.00, branch_miss_rate_pct=3.74, page_faults=48,165.00, context_switches_per_sec=250.86, cpu_migrations_per_sec=25.50, branches_per_sec=277.32 with {latency_ns=20000000, min_granularity_ns=5000000, wakeup_granularity_ns=5000000, migration_cost_ns=400000, min_perf_pct=0, max_perf_pct=100, cstate_max=unlimited}
+  * iter 3: throughput=HIDDEN, instructions_per_cycle=0.61, cycles=75,102,499,501.00, instructions=45,727,648,769.00, branch_misses=316,731,520.00, branch_miss_rate_pct=3.75, page_faults=128,926.00, context_switches_per_sec=192.57, cpu_migrations_per_sec=4.75, branches_per_sec=280.87 with {latency_ns=22000000, min_granularity_ns=4000000, wakeup_granularity_ns=4000000, migration_cost_ns=450000, min_perf_pct=0, max_perf_pct=100, cstate_max=unlimited}
+  * iter 4: throughput=HIDDEN, instructions_per_cycle=0.62, cycles=75,160,660,452.00, instructions=46,676,779,384.00, branch_misses=319,950,061.00, branch_miss_rate_pct=3.71, page_faults=50,847.00, context_switches_per_sec=226.53, cpu_migrations_per_sec=17.20, branches_per_sec=285.59 with {latency_ns=21000000, min_granularity_ns=3500000, wakeup_granularity_ns=3500000, migration_cost_ns=425000, min_perf_pct=0, max_perf_pct=100, cstate_max=unlimited}
+  * iter 5: throughput=HIDDEN, instructions_per_cycle=0.63, cycles=73,347,146,687.00, instructions=46,404,104,635.00, branch_misses=322,284,449.00, branch_miss_rate_pct=3.76, page_faults=39,606.00, context_switches_per_sec=333.23, cpu_migrations_per_sec=49.81, branches_per_sec=285.00 with {latency_ns=20000000, min_granularity_ns=3200000, wakeup_granularity_ns=3200000, migration_cost_ns=400000, min_perf_pct=0, max_perf_pct=100, cstate_max=unlimited}
+  * iter 6: throughput=HIDDEN, instructions_per_cycle=0.60, cycles=75,662,365,998.00, instructions=45,479,833,815.00, branch_misses=313,691,816.00, branch_miss_rate_pct=3.73, page_faults=79,667.00, context_switches_per_sec=203.58, cpu_migrations_per_sec=1.45, branches_per_sec=277.93 with {latency_ns=20000000, min_granularity_ns=3200000, wakeup_granularity_ns=3200000, migration_cost_ns=400000, min_perf_pct=0, max_perf_pct=100, cstate_max=unlimited}
+  * iter 7: throughput=HIDDEN, instructions_per_cycle=0.62, cycles=73,384,533,119.00, instructions=45,511,011,113.00, branch_misses=317,054,821.00, branch_miss_rate_pct=3.77, page_faults=92,129.00, context_switches_per_sec=288.26, cpu_migrations_per_sec=39.58, branches_per_sec=278.13 with {latency_ns=20000000, min_granularity_ns=3200000, wakeup_granularity_ns=3200000, migration_cost_ns=400000, min_perf_pct=0, max_perf_pct=100, cstate_max=unlimited}
+  * iter 8: throughput=HIDDEN, instructions_per_cycle=0.60, cycles=75,385,569,336.00, instructions=45,186,042,608.00, branch_misses=314,049,767.00, branch_miss_rate_pct=3.75, page_faults=89,371.00, context_switches_per_sec=193.45, cpu_migrations_per_sec=0.96, branches_per_sec=277.60 with {latency_ns=21000000, min_granularity_ns=3000000, wakeup_granularity_ns=3000000, migration_cost_ns=410000, min_perf_pct=0, max_perf_pct=100, cstate_max=unlimited}
+  * iter 9: throughput=HIDDEN, instructions_per_cycle=0.61, cycles=75,182,928,401.00, instructions=45,902,225,995.00, branch_misses=319,974,398.00, branch_miss_rate_pct=3.77, page_faults=40,709.00, context_switches_per_sec=203.59, cpu_migrations_per_sec=5.95, branches_per_sec=281.89 with {latency_ns=21000000, min_granularity_ns=3500000, wakeup_granularity_ns=3500000, migration_cost_ns=425000, min_perf_pct=0, max_perf_pct=100, cstate_max=unlimited}
+  * iter 10: throughput=HIDDEN, instructions_per_cycle=0.60, cycles=75,588,313,655.00, instructions=45,232,335,697.00, branch_misses=316,198,720.00, branch_miss_rate_pct=3.77, page_faults=46,483.00, context_switches_per_sec=198.28, cpu_migrations_per_sec=1.49, branches_per_sec=277.07 with {latency_ns=20500000, min_granularity_ns=3300000, wakeup_granularity_ns=3300000, migration_cost_ns=410000, min_perf_pct=0, max_perf_pct=100, cstate_max=unlimited}
+  * iter 11: throughput=HIDDEN, instructions_per_cycle=0.60, cycles=75,716,557,756.00, instructions=45,256,854,328.00, branch_misses=315,291,584.00, branch_miss_rate_pct=3.76, page_faults=52,406.00, context_switches_per_sec=195.41, cpu_migrations_per_sec=1.42, branches_per_sec=276.55 with {latency_ns=20750000, min_granularity_ns=3400000, wakeup_granularity_ns=3400000, migration_cost_ns=417500, min_perf_pct=0, max_perf_pct=100, cstate_max=unlimited}
+  * iter 12: throughput=HIDDEN, instructions_per_cycle=0.59, cycles=75,682,256,571.00, instructions=44,841,923,191.00, branch_misses=307,314,303.00, branch_miss_rate_pct=3.69, page_faults=85,748.00, context_switches_per_sec=198.25, cpu_migrations_per_sec=2.21, branches_per_sec=275.17 with {latency_ns=20500000, min_granularity_ns=3300000, wakeup_granularity_ns=3300000, migration_cost_ns=410000, min_perf_pct=0, max_perf_pct=100, cstate_max=unlimited}
+  * iter 13: throughput=HIDDEN, instructions_per_cycle=0.61, cycles=75,149,092,753.00, instructions=45,993,353,441.00, branch_misses=324,233,067.00, branch_miss_rate_pct=3.84, page_faults=70,116.00, context_switches_per_sec=198.29, cpu_migrations_per_sec=1.46, branches_per_sec=280.88 with {latency_ns=20500000, min_granularity_ns=3400000, wakeup_granularity_ns=3400000, migration_cost_ns=410000, min_perf_pct=0, max_perf_pct=100, cstate_max=unlimited}
+  * iter 14: throughput=HIDDEN, instructions_per_cycle=0.59, cycles=75,546,476,177.00, instructions=44,666,444,720.00, branch_misses=311,369,816.00, branch_miss_rate_pct=3.78, page_faults=81,093.00, context_switches_per_sec=200.32, cpu_migrations_per_sec=1.26, branches_per_sec=272.79 with {latency_ns=20250000, min_granularity_ns=3300000, wakeup_granularity_ns=3300000, migration_cost_ns=405000, min_perf_pct=0, max_perf_pct=100, cstate_max=unlimited}
+  * iter 15: throughput=HIDDEN, instructions_per_cycle=0.58, cycles=75,523,145,204.00, instructions=43,837,279,281.00, branch_misses=303,888,210.00, branch_miss_rate_pct=3.74, page_faults=63,920.00, context_switches_per_sec=199.17, cpu_migrations_per_sec=2.22, branches_per_sec=269.00 with {latency_ns=20375000, min_granularity_ns=3350000, wakeup_granularity_ns=3350000, migration_cost_ns=407500, min_perf_pct=0, max_perf_pct=100, cstate_max=unlimited}
+  * iter 16: throughput=HIDDEN, instructions_per_cycle=0.60, cycles=75,617,660,187.00, instructions=45,456,013,938.00, branch_misses=318,432,592.00, branch_miss_rate_pct=3.80, page_faults=40,002.00, context_switches_per_sec=200.41, cpu_migrations_per_sec=1.22, branches_per_sec=276.96 with {latency_ns=20250000, min_granularity_ns=3300000, wakeup_granularity_ns=3300000, migration_cost_ns=405000, min_perf_pct=0, max_perf_pct=100, cstate_max=unlimited}
+  * iter 17: throughput=HIDDEN, instructions_per_cycle=0.58, cycles=75,453,784,195.00, instructions=43,494,348,273.00, branch_misses=302,325,580.00, branch_miss_rate_pct=3.73, page_faults=59,373.00, context_switches_per_sec=200.27, cpu_migrations_per_sec=2.09, branches_per_sec=268.51 with {latency_ns=20250000, min_granularity_ns=3300000, wakeup_granularity_ns=3300000, migration_cost_ns=405000, min_perf_pct=0, max_perf_pct=100, cstate_max=unlimited}
+  * iter 18: throughput=HIDDEN, instructions_per_cycle=0.62, cycles=75,550,887,257.00, instructions=46,628,370,779.00, branch_misses=320,653,242.00, branch_miss_rate_pct=3.71, page_faults=44,913.00, context_switches_per_sec=200.87, cpu_migrations_per_sec=1.22, branches_per_sec=286.12 with {latency_ns=20250000, min_granularity_ns=3300000, wakeup_granularity_ns=3300000, migration_cost_ns=405000, min_perf_pct=0, max_perf_pct=100, cstate_max=unlimited}
+  * iter 19: throughput=HIDDEN, instructions_per_cycle=0.60, cycles=75,587,332,055.00, instructions=44,994,480,266.00, branch_misses=315,281,786.00, branch_miss_rate_pct=3.80, page_faults=72,966.00, context_switches_per_sec=200.15, cpu_migrations_per_sec=1.62, branches_per_sec=274.58 with {latency_ns=20250000, min_granularity_ns=3300000, wakeup_granularity_ns=3300000, migration_cost_ns=405000, min_perf_pct=0, max_perf_pct=100, cstate_max=unlimited}
+  * iter 20: throughput=HIDDEN, instructions_per_cycle=0.59, cycles=75,371,203,637.00, instructions=44,238,778,380.00, branch_misses=311,893,324.00, branch_miss_rate_pct=3.81, page_faults=43,862.00, context_switches_per_sec=200.16, cpu_migrations_per_sec=1.49, branches_per_sec=271.18 with {latency_ns=20250000, min_granularity_ns=3300000, wakeup_granularity_ns=3300000, migration_cost_ns=405000, min_perf_pct=0, max_perf_pct=100, cstate_max=unlimited}
+  * iter 21: throughput=HIDDEN, instructions_per_cycle=0.59, cycles=75,240,737,993.00, instructions=44,472,232,250.00, branch_misses=310,728,796.00, branch_miss_rate_pct=3.79, page_faults=57,055.00, context_switches_per_sec=202.37, cpu_migrations_per_sec=1.53, branches_per_sec=272.64 with {latency_ns=20000000, min_granularity_ns=3200000, wakeup_granularity_ns=3200000, migration_cost_ns=400000, min_perf_pct=0, max_perf_pct=100, cstate_max=unlimited}
+  * iter 22: throughput=HIDDEN, instructions_per_cycle=0.60, cycles=75,624,804,665.00, instructions=45,513,018,245.00, branch_misses=317,950,781.00, branch_miss_rate_pct=3.80, page_faults=47,687.00, context_switches_per_sec=201.71, cpu_migrations_per_sec=1.69, branches_per_sec=276.78 with {latency_ns=20125000, min_granularity_ns=3250000, wakeup_granularity_ns=3250000, migration_cost_ns=402500, min_perf_pct=0, max_perf_pct=100, cstate_max=unlimited}
+  * iter 23: throughput=HIDDEN, instructions_per_cycle=0.58, cycles=75,477,028,936.00, instructions=43,659,836,413.00, branch_misses=300,762,641.00, branch_miss_rate_pct=3.71, page_faults=26,867.00, context_switches_per_sec=202.51, cpu_migrations_per_sec=1.69, branches_per_sec=268.18 with {latency_ns=20000000, min_granularity_ns=3200000, wakeup_granularity_ns=3200000, migration_cost_ns=400000, min_perf_pct=0, max_perf_pct=100, cstate_max=unlimited}
+  * iter 24: throughput=HIDDEN, instructions_per_cycle=0.59, cycles=75,695,427,950.00, instructions=44,825,315,129.00, branch_misses=314,736,412.00, branch_miss_rate_pct=3.79, page_faults=44,328.00, context_switches_per_sec=202.67, cpu_migrations_per_sec=1.19, branches_per_sec=274.08 with {latency_ns=20000000, min_granularity_ns=3200000, wakeup_granularity_ns=3200000, migration_cost_ns=400000, min_perf_pct=0, max_perf_pct=100, cstate_max=unlimited}
+  * iter 25: throughput=HIDDEN, instructions_per_cycle=0.62, cycles=75,219,455,564.00, instructions=46,390,769,560.00, branch_misses=319,992,160.00, branch_miss_rate_pct=3.74, page_faults=44,725.00, context_switches_per_sec=201.93, cpu_migrations_per_sec=2.16, branches_per_sec=284.40 with {latency_ns=20125000, min_granularity_ns=3250000, wakeup_granularity_ns=3250000, migration_cost_ns=402500, min_perf_pct=0, max_perf_pct=100, cstate_max=unlimited}
+  * iter 26: throughput=HIDDEN, instructions_per_cycle=0.61, cycles=75,507,797,232.00, instructions=45,771,899,670.00, branch_misses=313,882,694.00, branch_miss_rate_pct=3.73, page_faults=38,938.00, context_switches_per_sec=201.08, cpu_migrations_per_sec=1.59, branches_per_sec=278.77 with {latency_ns=20125000, min_granularity_ns=3250000, wakeup_granularity_ns=3250000, migration_cost_ns=402500, min_perf_pct=0, max_perf_pct=100, cstate_max=unlimited}
+  * iter 27: throughput=HIDDEN, instructions_per_cycle=0.62, cycles=75,481,765,697.00, instructions=46,651,444,645.00, branch_misses=331,028,134.00, branch_miss_rate_pct=3.87, page_faults=39,141.00, context_switches_per_sec=202.50, cpu_migrations_per_sec=1.03, branches_per_sec=283.13 with {latency_ns=20000000, min_granularity_ns=3200000, wakeup_granularity_ns=3200000, migration_cost_ns=400000, min_perf_pct=0, max_perf_pct=100, cstate_max=unlimited}
+  * iter 28: throughput=HIDDEN, instructions_per_cycle=0.58, cycles=75,621,200,263.00, instructions=44,202,235,293.00, branch_misses=311,540,400.00, branch_miss_rate_pct=3.82, page_faults=18,154.00, context_switches_per_sec=202.77, cpu_migrations_per_sec=3.24, branches_per_sec=269.53 with {latency_ns=20000000, min_granularity_ns=3200000, wakeup_granularity_ns=3200000, migration_cost_ns=400000, min_perf_pct=0, max_perf_pct=100, cstate_max=unlimited}
+  * iter 29: throughput=HIDDEN, instructions_per_cycle=0.60, cycles=75,447,166,879.00, instructions=45,579,016,268.00, branch_misses=317,229,455.00, branch_miss_rate_pct=3.78, page_faults=36,978.00, context_switches_per_sec=202.45, cpu_migrations_per_sec=1.13, branches_per_sec=278.18 with {latency_ns=20000000, min_granularity_ns=3300000, wakeup_granularity_ns=3300000, migration_cost_ns=400000, min_perf_pct=0, max_perf_pct=100, cstate_max=unlimited}
+  * iter 30: throughput=HIDDEN, instructions_per_cycle=0.59, cycles=75,362,406,933.00, instructions=44,710,187,119.00, branch_misses=312,886,793.00, branch_miss_rate_pct=3.79, page_faults=6,971.00, context_switches_per_sec=201.16, cpu_migrations_per_sec=1.36, branches_per_sec=273.84 with {latency_ns=20125000, min_granularity_ns=3250000, wakeup_granularity_ns=3250000, migration_cost_ns=402500, min_perf_pct=0, max_perf_pct=100, cstate_max=unlimited}
+  * iter 31: throughput=HIDDEN, instructions_per_cycle=0.61, cycles=75,558,126,835.00, instructions=45,748,380,595.00, branch_misses=320,834,506.00, branch_miss_rate_pct=3.81, page_faults=41,602.00, context_switches_per_sec=200.86, cpu_migrations_per_sec=1.49, branches_per_sec=278.44 with {latency_ns=20125000, min_granularity_ns=3250000, wakeup_granularity_ns=3250000, migration_cost_ns=402500, min_perf_pct=0, max_perf_pct=100, cstate_max=unlimited}
+  * iter 32: throughput=HIDDEN, instructions_per_cycle=0.59, cycles=75,195,929,315.00, instructions=44,137,495,710.00, branch_misses=305,273,101.00, branch_miss_rate_pct=3.74, page_faults=34,082.00, context_switches_per_sec=202.95, cpu_migrations_per_sec=1.00, branches_per_sec=271.30 with {latency_ns=20000000, min_granularity_ns=3200000, wakeup_granularity_ns=3200000, migration_cost_ns=400000, min_perf_pct=0, max_perf_pct=100, cstate_max=unlimited}
+  * iter 33: throughput=HIDDEN, instructions_per_cycle=0.61, cycles=75,461,631,480.00, instructions=46,194,104,367.00, branch_misses=324,672,630.00, branch_miss_rate_pct=3.83, page_faults=16,398.00, context_switches_per_sec=200.74, cpu_migrations_per_sec=1.66, branches_per_sec=281.00 with {latency_ns=20125000, min_granularity_ns=3250000, wakeup_granularity_ns=3250000, migration_cost_ns=402500, min_perf_pct=0, max_perf_pct=100, cstate_max=unlimited}
+
+Current iteration:
+- Iteration #33: throughput=HIDDEN, instructions_per_cycle=0.61, cycles=75,461,631,480.00, instructions=46,194,104,367.00, branch_misses=324,672,630.00, branch_miss_rate_pct=3.83, page_faults=16,398.00, context_switches_per_sec=200.74, cpu_migrations_per_sec=1.66, branches_per_sec=281.00, power_socket0_watts=61.33, power_ram_watts=12.20, cpu_load_cores_pct=100.00, cpu_load_socket0_pct=50.00 (mean over past 5.0s)
+- Parameters used: latency_ns=20,125,000, min_granularity_ns=3,250,000, wakeup_granularity_ns=3,250,000, migration_cost_ns=402,500, min_perf_pct=0, max_perf_pct=100, cstate_max="unlimited"
+Next step:
+- Propose parameters for iteration #34.
+- Return a JSON object with:
+  - Only the parameters you want to change
+  - If a parameter is not included it will retain its last value (unchanged).
+  - A "justification" field with 1–2 sentences explaining your reasoning.
+
+Valid parameter ranges:
+- min_granularity_ns (continuous, integer) in [100,000, 100,000,000]
+- latency_ns (continuous, integer) in [100,000, 100,000,000]
+- cstate_max (categorical) ∈ [POLL, C6, C3, C1E, C1]
+- napi_busy_poll (continuous, integer) in [0, 1,000]
+- wakeup_granularity_ns (continuous, integer) in [100,000, 100,000,000]
+- migration_cost_ns (continuous, integer) in [100,000, 100,000,000]
+- max_perf_pct (continuous, integer) in [0, 100]
+- min_perf_pct (continuous, integer) in [0, 100]
+
+TOP 3 CONFIGURATIONS SO FAR:
+(NOTE: These configs may not be global optima. Your goal is to make nuanced decisions to reach a global optimum region given the noise.)
+1. Iter 33: {latency_ns=20125000, min_granularity_ns=3250000, wakeup_granularity_ns=3250000, migration_cost_ns=402500, min_perf_pct=0, max_perf_pct=100, cstate_max=unlimited} -> throughput=HIDDEN
+2. Iter 16: {latency_ns=20250000, min_granularity_ns=3300000, wakeup_granularity_ns=3300000, migration_cost_ns=405000, min_perf_pct=0, max_perf_pct=100, cstate_max=unlimited} -> throughput=HIDDEN
+3. Iter 13: {latency_ns=20500000, min_granularity_ns=3400000, wakeup_granularity_ns=3400000, migration_cost_ns=410000, min_perf_pct=0, max_perf_pct=100, cstate_max=unlimited} -> throughput=HIDDEN
+
+
+--- generation_config ---
+{
+  "temperature": 0.7,
+  "response_mime_type": "application/json",
+  "response_schema": {
+    "type": "object",
+    "properties": {
+      "min_granularity_ns": {
+        "type": "integer",
+        "description": "Minimum scheduling granularity in nanoseconds"
+      },
+      "latency_ns": {
+        "type": "integer",
+        "description": "CFS scheduler latency in nanoseconds"
+      },
+      "cstate_max": {
+        "type": "string",
+        "enum": [
+          "POLL",
+          "C6",
+          "C3",
+          "C1E",
+          "C1"
+        ],
+        "description": "Maximum C-state allowed (unlimited=all enabled, none=poll only, poll=POLL, C1=C1, C1E=C1E, C2=C2, C6=C6, C6only=C6 only)"
+      },
+      "napi_busy_poll": {
+        "type": "integer",
+        "description": "Alias for busy_poll (net.core.busy_poll)"
+      },
+      "wakeup_granularity_ns": {
+        "type": "integer",
+        "description": "Wakeup granularity in nanoseconds"
+      },
+      "migration_cost_ns": {
+        "type": "integer",
+        "description": "Migration cost in nanoseconds"
+      },
+      "max_perf_pct": {
+        "type": "integer",
+        "description": "Maximum performance percentage (0-100)"
+      },
+      "min_perf_pct": {
+        "type": "integer",
+        "description": "Minimum performance percentage (0-100)"
+      },
+      "justification": {
+        "type": "string",
+        "description": "Brief 1-2 sentence justification explaining the reasoning behind the parameter changes"
+      },
+      "converged": {
+        "type": "boolean",
+        "description": "True if optimization has converged (further changes unlikely to yield meaningful improvement), False otherwise"
+      }
+    },
+    "propertyOrdering": [
+      "min_granularity_ns",
+      "latency_ns",
+      "cstate_max",
+      "napi_busy_poll",
+      "wakeup_granularity_ns",
+      "migration_cost_ns",
+      "max_perf_pct",
+      "min_perf_pct",
+      "justification",
+      "converged"
+    ],
+    "description": "Configuration parameters for OS tuning with justification and convergence flag"
+  }
+}
+
+--- RESPONSE (exact data returned from LLM API) ---
+
+response.text:
+{
+  "min_granularity_ns": 3200000,
+  "latency_ns": 20000000,
+  "wakeup_granularity_ns": 3200000,
+  "migration_cost_ns": 400000,
+  "justification": "The current parameters have been stable for many iterations with no significant improvement. We will slightly adjust latency_ns and granularity to explore a very narrow band around the current best configuration to see if minor gains can be made before declaring convergence.",
+  "converged": false
+}
+
+response.parsed:
+{
+  "min_granularity_ns": 3200000,
+  "latency_ns": 20000000,
+  "wakeup_granularity_ns": 3200000,
+  "migration_cost_ns": 400000
+}
+
+response (raw repr):
+GenerateContentResponse(
+  automatic_function_calling_history=[],
+  candidates=[
+    Candidate(
+      content=Content(
+        parts=[
+          Part(
+            text="""{
+  "min_granularity_ns": 3200000,
+  "latency_ns": 20000000,
+  "wakeup_granularity_ns": 3200000,
+  "migration_cost_ns": 400000,
+  "justification": "The current parameters have been stable for many iterations with no significant improvement. We will slightly adjust latency_ns and granularity to explore a very narrow band around the current best configuration to see if minor gains can be made before declaring convergence.",
+  "converged": false
+}"""
+          ),
+        ],
+        role='model'
+      ),
+      finish_reason=<FinishReason.STOP: 'STOP'>,
+      index=0
+    ),
+  ],
+  model_version='gemini-2.5-flash-lite',
+  parsed={
+    'latency_ns': 20000000,
+    'migration_cost_ns': 400000,
+    'min_granularity_ns': 3200000,
+    'wakeup_granularity_ns': 3200000
+  },
+  response_id='cdOcafahHbjWjMcPx6qlqA8',
+  sdk_http_response=HttpResponse(
+    headers=<dict len=11>
+  ),
+  usage_metadata=GenerateContentResponseUsageMetadata(
+    candidates_token_count=135,
+    prompt_token_count=9559,
+    prompt_tokens_details=[
+      ModalityTokenCount(
+        modality=<MediaModality.TEXT: 'TEXT'>,
+        token_count=9559
+      ),
+    ],
+    total_token_count=9694
+  )
+)

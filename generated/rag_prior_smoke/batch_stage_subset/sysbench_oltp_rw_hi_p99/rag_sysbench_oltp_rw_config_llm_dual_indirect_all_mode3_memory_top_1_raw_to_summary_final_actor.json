@@ -1,0 +1,132 @@
+{
+  "benchmark": "sysbench_oltp",
+  "pin_to_cores": "0-9",
+  "sysbench_threads": 40,
+  "tuner_type": "llm",
+  "llm_api_key": null,
+  "parameter_ranges": {
+    "min_granularity_ns": [
+      100000,
+      100000000
+    ],
+    "latency_ns": [
+      100000,
+      100000000
+    ],
+    "cstate_max": [
+      "POLL",
+      "C6",
+      "C3",
+      "C1E",
+      "C1"
+    ],
+    "napi_busy_poll": [
+      0,
+      1000
+    ],
+    "wakeup_granularity_ns": [
+      100000,
+      100000000
+    ],
+    "migration_cost_ns": [
+      100000,
+      100000000
+    ],
+    "max_perf_pct": [
+      0,
+      100
+    ],
+    "min_perf_pct": [
+      0,
+      100
+    ]
+  },
+  "parameters_to_tune": [
+    "min_granularity_ns",
+    "latency_ns",
+    "cstate_max",
+    "napi_busy_poll",
+    "wakeup_granularity_ns",
+    "migration_cost_ns",
+    "max_perf_pct",
+    "min_perf_pct"
+  ],
+  "fixed_parameters": {},
+  "optimization_metric": "latency_p99",
+  "optimization_goal": "minimize",
+  "max_iterations": 30,
+  "window_duration": 10,
+  "tuning_mode": "in-window",
+  "results_dir": "results/sysbench_oltp_rw_hi_p99/rag_llm_dual_indirect_all_mode3_memory_top_1_raw_to_summary_final_actor/",
+  "continuous_apply": false,
+  "llm_actor_model": "gemini-2.5-flash",
+  "llm_speculator_model": "gemini-2.5-flash-lite",
+  "use_indirect_optimization": true,
+  "llm_indirect_history_show_all_metrics": true,
+  "llm_additional_metrics": [
+    "instructions_per_cycle",
+    "cycles",
+    "instructions",
+    "branch_misses",
+    "branch_miss_rate_pct",
+    "page_faults",
+    "context_switches_per_sec",
+    "cpu_migrations_per_sec",
+    "branches_per_sec",
+    "power_socket0_watts",
+    "power_ram_watts",
+    "cstate_poll_pct",
+    "cstate_c1_pct",
+    "cstate_c1e_pct",
+    "cstate_c6_pct",
+    "cpu_load_cores_pct",
+    "cpu_load_socket0_pct"
+  ],
+  "llm_indirect_prompt_style": "signature_compare",
+  "llm_measure_default_before_tuning": true,
+  "post_tuning_windows": 20,
+  "llm_explore_until_last_iteration": true,
+  "dual_loop_actor_only_final": false,
+  "dual_loop_force_final_actor_before_stable": true,
+  "llm_force_final_freeze_before_stable": false,
+  "llm_actor_additional_metrics": [
+    "instructions_per_cycle",
+    "cycles",
+    "instructions",
+    "branch_misses",
+    "branch_miss_rate_pct",
+    "page_faults",
+    "context_switches_per_sec",
+    "cpu_migrations_per_sec",
+    "branches_per_sec",
+    "power_socket0_watts",
+    "power_ram_watts",
+    "cstate_poll_pct",
+    "cstate_c1_pct",
+    "cstate_c1e_pct",
+    "cstate_c6_pct",
+    "cpu_load_cores_pct",
+    "cpu_load_socket0_pct"
+  ],
+  "llm_speculator_additional_metrics": [
+    "instructions_per_cycle",
+    "cycles",
+    "instructions",
+    "branch_misses",
+    "branch_miss_rate_pct",
+    "page_faults",
+    "context_switches_per_sec",
+    "cpu_migrations_per_sec",
+    "branches_per_sec",
+    "power_socket0_watts",
+    "power_ram_watts",
+    "cstate_poll_pct",
+    "cstate_c1_pct",
+    "cstate_c1e_pct",
+    "cstate_c6_pct",
+    "cpu_load_cores_pct",
+    "cpu_load_socket0_pct"
+  ],
+  "omit_explicit_pairwise_comparison_instruction": false,
+  "previous_run_gist": "Hidden primary-metric values from the prior run have been redacted. Use the qualitative parameter patterns and configuration hints below.\n\nPrior for new tuning run:\n\nObjective: Minimize hidden primary metric.\n\nParameter Relationships & Promising Regions:\n- Focus on C6 C-state for improved efficiency.\n- Explore latency_ns, min_granularity_ns, and wakeup_granularity_ns in the range of 75,000,000 ns (75ms). This region showed promise in a previous run.\n- Consider napi_busy_poll around 750.\n- Investigate max_perf_pct around 90 and min_perf_pct around 30.\n\nRisky Regions to Avoid Initially:\n- Very low granularities (20-30ms) led to increased context switches and reduced IPC in prior exploration.\n- Aggressive C1/C1E C-states were associated with higher overhead.\n\nEarly Validation Guidance:\n- Monitor cstate_c6_pct for high values (approaching 99%) and low cstate_c1_pct/cstate_c1e_pct.\n- Aim for high cpu_load_cores_pct (around 100%).\n- Observe instructions_per_cycle (IPC) to be in a moderate range (around 0.65-0.70). Avoid very low IPC.\n- Keep context_switches_per_sec and cpu_migrations_per_sec low.\n- Initial iterations might show high CPU load without immediate metric improvement. A shift towards C6 and higher granularities (around 75ms) is a positive sign.\n\nConfidence Notes:\n- Prior runs focused on throughput maximization, so direct transfer of optimal parameter values to latency minimization might require adjustment. The identified parameter relationships and regions are a good starting point, but expect some divergence.\n- The previous run relied on metric signatures due to lack of direct hidden-score signal visibility. This means the \"best\" configurations were inferred. Proceed with caution and validate against the hidden primary metric objective.\n- The trade-off between responsiveness and overhead is key. The prior suggests higher granularities were beneficial for overall performance, which may translate to reduced latency by avoiding excessive context switching."
+}

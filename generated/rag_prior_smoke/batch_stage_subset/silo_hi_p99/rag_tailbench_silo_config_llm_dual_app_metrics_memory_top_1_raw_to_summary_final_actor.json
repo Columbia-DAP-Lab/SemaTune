@@ -1,0 +1,104 @@
+{
+  "benchmark": "tailbench",
+  "tailbench_app": "silo",
+  "pin_to_cores": "0-9",
+  "tailbench_threads": 40,
+  "tailbench_qps": 2700,
+  "tailbench_metrics_interval_sec": 1,
+  "tailbench_maxreqs": 2000000000,
+  "tailbench_warmupreqs": 2700,
+  "tailbench_minsleepns": 0,
+  "tuner_type": "llm",
+  "llm_api_key": null,
+  "parameter_ranges": {
+    "min_granularity_ns": [
+      100000,
+      100000000
+    ],
+    "latency_ns": [
+      100000,
+      100000000
+    ],
+    "cstate_max": [
+      "POLL",
+      "C6",
+      "C3",
+      "C1E",
+      "C1"
+    ],
+    "napi_busy_poll": [
+      0,
+      1000
+    ],
+    "wakeup_granularity_ns": [
+      100000,
+      100000000
+    ],
+    "migration_cost_ns": [
+      100000,
+      100000000
+    ],
+    "max_perf_pct": [
+      0,
+      100
+    ],
+    "min_perf_pct": [
+      0,
+      100
+    ]
+  },
+  "parameters_to_tune": [
+    "min_granularity_ns",
+    "latency_ns",
+    "cstate_max",
+    "napi_busy_poll",
+    "wakeup_granularity_ns",
+    "migration_cost_ns",
+    "max_perf_pct",
+    "min_perf_pct"
+  ],
+  "fixed_parameters": {},
+  "optimization_metric": "latency_p99",
+  "optimization_goal": "minimize",
+  "max_iterations": 30,
+  "window_duration": 10,
+  "tuning_mode": "in-window",
+  "results_dir": "results/silo_hi_p99/rag_llm_dual_app_metrics_memory_top_1_raw_to_summary_final_actor/",
+  "continuous_apply": false,
+  "llm_actor_model": "gemini-2.5-flash",
+  "llm_speculator_model": "gemini-2.5-flash-lite",
+  "use_indirect_optimization": false,
+  "llm_full_metrics_prompt_mode": true,
+  "llm_full_metrics_explicit_signature_compare": false,
+  "llm_additional_metrics": [
+    "throughput",
+    "goodput",
+    "latency_avg",
+    "latency_p95",
+    "latency_p99",
+    "queries_per_hour"
+  ],
+  "post_tuning_windows": 20,
+  "llm_measure_default_before_tuning": true,
+  "llm_explore_until_last_iteration": true,
+  "dual_loop_actor_only_final": false,
+  "dual_loop_force_final_actor_before_stable": true,
+  "llm_force_final_freeze_before_stable": false,
+  "llm_actor_additional_metrics": [
+    "throughput",
+    "goodput",
+    "latency_avg",
+    "latency_p95",
+    "latency_p99",
+    "queries_per_hour"
+  ],
+  "llm_speculator_additional_metrics": [
+    "throughput",
+    "goodput",
+    "latency_avg",
+    "latency_p95",
+    "latency_p99",
+    "queries_per_hour"
+  ],
+  "previous_run_gist": "For a new tuning run targeting latency_p99 minimization, consider the following warm-start prior based on previous exploration:\n\n**Parameter Relationships & Promising Regions:**\nThe previous run indicated that parameters related to latency, granularity, and migration cost are highly influential. Specifically, ranges around:\n- `latency_ns`: 1.8M to 1.9M\n- `min_granularity_ns`: 1.8M to 1.9M\n- `wakeup_granularity_ns`: 1.8M to 1.9M\n- `migration_cost_ns`: 600K to 650K\nshowed promise in a related objective. The C-state `C3` was also a favorable setting.\n\n**Risky Regions & Cautionary Notes:**\nConversely, extreme values for these parameters, such as `latency_ns`, `min_granularity_ns`, and `wakeup_granularity_ns` outside of the 1.5M to 2.5M range, and `migration_cost_ns` outside of 500K to 1M, were associated with decreased performance. The `POLL` C-state was observed to be detrimental in the previous context.\n\n**Early Validation Guidance:**\nGiven the previous run's initial iterations showed zero performance, be vigilant for similar early behavior. A rapid shift in C-state, particularly away from `C1` or `POLL` towards `C3`, might be an early indicator of a promising direction. High CPU utilization (approaching 100%) was a consistent signature of high performance in the previous run, so monitor this closely. If early iterations show very high average latency, this might be a sign of parameters being far from optimal for the current objective.\n\n**Transferability Considerations:**\nWhile the previous run focused on throughput maximization, the identified parameter ranges and their sensitivities are likely transferable to latency optimization. However, the specific optimal values might differ. The strong correlation between high CPU utilization and performance suggests that the system is capable of high activity, and tuning is about finding the right configuration for low latency. Be aware that the \"stable\" iterations in the previous run might indicate a plateau, and further exploration could yield diminishing returns or increased variance. The initial zero performance could be due to cold start or parameters being far from optimal, so early results should be interpreted with caution."
+}

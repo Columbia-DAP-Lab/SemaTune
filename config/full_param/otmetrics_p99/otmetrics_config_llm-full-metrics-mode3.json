@@ -1,0 +1,87 @@
+{
+  "benchmark": "otmetrics",
+  "pin_to_cores": "0-9",
+  "benchbase_jar_path": "deps/benchbase/target/benchbase-postgres/benchbase.jar",
+  "benchbase_config_file": "config/benchbase/postgres/otmetrics_highload_config.xml",
+  "tuner_type": "llm",
+  "parameter_ranges": {
+    "min_granularity_ns": [
+      100000,
+      100000000
+    ],
+    "latency_ns": [
+      100000,
+      100000000
+    ],
+    "cstate_max": [
+      "POLL",
+      "C6",
+      "C3",
+      "C1E",
+      "C1"
+    ],
+    "napi_busy_poll": [
+      0,
+      1000
+    ],
+    "wakeup_granularity_ns": [
+      100000,
+      100000000
+    ],
+    "migration_cost_ns": [
+      100000,
+      100000000
+    ],
+    "max_perf_pct": [
+      0,
+      100
+    ],
+    "min_perf_pct": [
+      0,
+      100
+    ]
+  },
+  "parameters_to_tune": [
+    "min_granularity_ns",
+    "latency_ns",
+    "cstate_max",
+    "napi_busy_poll",
+    "wakeup_granularity_ns",
+    "migration_cost_ns",
+    "max_perf_pct",
+    "min_perf_pct"
+  ],
+  "optimization_metric": "latency_p99",
+  "optimization_goal": "minimize",
+  "max_iterations": 60,
+  "window_duration": 10,
+  "tuning_mode": "outside-of-window",
+  "continuous_apply": false,
+  "results_dir": "results/otmetrics_p99/llm_full_metrics_mode3/",
+  "llm_model_name": "gemini-2.5-flash-lite",
+  "llm_api_key": null,
+  "use_indirect_optimization": false,
+  "llm_indirect_history_show_all_metrics": true,
+  "llm_additional_metrics": [
+    "instructions_per_cycle",
+    "cycles",
+    "instructions",
+    "branch_misses",
+    "branch_miss_rate_pct",
+    "page_faults",
+    "context_switches_per_sec",
+    "cpu_migrations_per_sec",
+    "branches_per_sec",
+    "power_socket0_watts",
+    "power_ram_watts",
+    "cstate_poll_pct",
+    "cstate_c1_pct",
+    "cstate_c1e_pct",
+    "cstate_c6_pct",
+    "cpu_load_cores_pct",
+    "cpu_load_socket0_pct",
+    "latency_p99"
+  ],
+  "llm_full_metrics_prompt_mode": true,
+  "llm_full_metrics_explicit_signature_compare": true
+}

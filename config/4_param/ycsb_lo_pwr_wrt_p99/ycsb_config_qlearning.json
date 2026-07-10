@@ -1,0 +1,45 @@
+{
+  "benchmark": "ycsb",
+  "pin_to_cores": "0-9",
+  "benchbase_jar_path": "deps/benchbase/target/benchbase-postgres/benchbase.jar",
+  "benchbase_config_file": "config/benchbase/postgres/sample_ycsb_lo.xml",
+  "tuner_type": "qlearning",
+  "parameter_ranges": {
+    "min_granularity_ns": [
+      100000,
+      100000000
+    ],
+    "latency_ns": [
+      100000,
+      100000000
+    ],
+    "cstate_max": [
+      "POLL",
+      "C6",
+      "C3",
+      "C1E",
+      "C1"
+    ],
+    "max_perf_pct": [
+      0,
+      100
+    ]
+  },
+  "parameters_to_tune": [
+    "min_granularity_ns",
+    "latency_ns",
+    "cstate_max",
+    "max_perf_pct"
+  ],
+  "fixed_parameters": {},
+  "optimization_metric": "power_socket0_watts",
+  "optimization_goal": "minimize",
+  "constraint_metric": "latency_p99",
+  "constraint_threshold": 7.0,
+  "constraint_direction": "less_than",
+  "max_iterations": 60,
+  "window_duration": 10,
+  "tuning_mode": "outside-of-window",
+  "results_dir": "results/ycsb_lo_pwr_wrt_p99/qlearning/",
+  "continuous_apply": false
+}

@@ -1,0 +1,4423 @@
+{
+  "config": {
+    "benchmark": "ycsb",
+    "pin_to_cores": "0-9",
+    "sysbench_script": "/usr/share/sysbench/oltp_read_write.lua",
+    "sysbench_host": "127.0.0.1",
+    "sysbench_port": 5432,
+    "sysbench_user": "admin",
+    "sysbench_password": "",
+    "sysbench_db": "benchdb",
+    "sysbench_tables": 4,
+    "sysbench_table_size": 100000,
+    "sysbench_threads": 16,
+    "sysbench_rate": null,
+    "sysbench_cpu_max_prime": null,
+    "benchbase_jar_path": "deps/benchbase/target/benchbase-postgres/benchbase.jar",
+    "benchbase_config_file": "config/benchbase/postgres/sample_ycsb_hi.xml",
+    "benchbase_timeout_buffer_seconds": 40,
+    "benchbase_timeout_retries": 1,
+    "mutilate_client_host": null,
+    "mutilate_target": "127.0.0.1:11211",
+    "mutilate_threads": 8,
+    "mutilate_clients": 8,
+    "mutilate_qps": 500000,
+    "mutilate_iadist": "fixed:0",
+    "mutilate_depth": 1,
+    "mutilate_bin_path": "~/mutilate/mutilate",
+    "mutilate_memcached_bin": "memcached",
+    "tailbench_app": "masstree",
+    "tailbench_root": "deps/Tailbench/tailbench",
+    "tailbench_data_root": "deps/Tailbench/tailbench.inputs",
+    "tailbench_qps": null,
+    "tailbench_threads": null,
+    "tailbench_warmupreqs": null,
+    "tailbench_maxreqs": 1000000000,
+    "tailbench_minsleepns": 10000,
+    "tailbench_metrics_interval_sec": 1,
+    "tailbench_output_dir": null,
+    "tailbench_jdk_path": "/usr/lib/jvm/java-8-openjdk-amd64",
+    "tailbench_xapian_db_path": null,
+    "tailbench_silo_scale_factor": null,
+    "tailbench_sphinx_audio_samples": null,
+    "dcperf_path": null,
+    "dcperf_benchmark_name": null,
+    "dcperf_worker_cores": null,
+    "dcperf_max_runtime": 3600,
+    "django_backend_cores": null,
+    "django_client_cores": null,
+    "tuner_type": "llm",
+    "parameter_ranges": {
+      "min_granularity_ns": [
+        100000,
+        100000000
+      ],
+      "latency_ns": [
+        100000,
+        100000000
+      ],
+      "cstate_max": [
+        "POLL",
+        "C6",
+        "C3",
+        "C1E",
+        "C1"
+      ],
+      "napi_busy_poll": [
+        0,
+        1000
+      ],
+      "wakeup_granularity_ns": [
+        100000,
+        100000000
+      ],
+      "migration_cost_ns": [
+        100000,
+        100000000
+      ],
+      "max_perf_pct": [
+        0,
+        100
+      ],
+      "min_perf_pct": [
+        0,
+        100
+      ]
+    },
+    "parameter_types": null,
+    "parameters_to_tune": [
+      "min_granularity_ns",
+      "latency_ns",
+      "cstate_max",
+      "napi_busy_poll",
+      "wakeup_granularity_ns",
+      "migration_cost_ns",
+      "max_perf_pct",
+      "min_perf_pct"
+    ],
+    "fixed_parameters": {},
+    "optimization_metric": "latency_p99",
+    "optimization_goal": "minimize",
+    "max_iterations": 30,
+    "post_tuning_windows": 20,
+    "window_duration": 5,
+    "respect_config_window_duration": false,
+    "continuous_apply": false,
+    "tuning_mode": "in-window",
+    "experiment_profile": "tuxbot_app_dual_30_20_final_actor",
+    "constraint_metric": null,
+    "constraint_threshold": null,
+    "constraint_direction": "less_than",
+    "constraint_penalty": 10.0,
+    "results_dir": "results_config_full_param_ycsb_hi_p99_20260306_020958/ycsb_hi_p99/llm_dual_app_metrics_final_actor/",
+    "llm_api_key": null,
+    "openrouter_api_key": null,
+    "llm_model_name": "gemini-2.5-flash",
+    "llm_secondary_model": "gemini-2.5-flash-lite",
+    "llm_replay_file": null,
+    "llm_actor_model": "gemini-2.5-flash",
+    "llm_speculator_model": "gemini-2.5-flash-lite",
+    "llm_thinking_level": null,
+    "llm_thinking_budget": null,
+    "llm_temperature": 0.7,
+    "workload_description": null,
+    "llm_additional_metrics": [
+      "throughput",
+      "goodput",
+      "latency_avg",
+      "latency_p95",
+      "latency_p99",
+      "queries_per_hour"
+    ],
+    "llm_actor_additional_metrics": [
+      "throughput",
+      "goodput",
+      "latency_avg",
+      "latency_p95",
+      "latency_p99",
+      "queries_per_hour"
+    ],
+    "llm_speculator_additional_metrics": [
+      "throughput",
+      "goodput",
+      "latency_avg",
+      "latency_p95",
+      "latency_p99",
+      "queries_per_hour"
+    ],
+    "llm_speculator_hide_primary_metric": false,
+    "llm_speculator_aggregation_interval_s": null,
+    "dual_loop_actor_only_final": false,
+    "dual_loop_force_final_actor_before_stable": true,
+    "llm_explore_until_last_iteration": true,
+    "trimming_enabled": false,
+    "trimming_cycles": 5,
+    "trimming_model_name": null,
+    "trimming_strategy": "single_loop",
+    "trimming_suggest_params": true,
+    "trimming_aggressiveness": "normal",
+    "use_perf_stat": true,
+    "use_indirect_optimization": false,
+    "llm_indirect_history_show_all_metrics": true,
+    "llm_indirect_prompt_style": "signature_compare",
+    "omit_explicit_pairwise_comparison_instruction": false,
+    "llm_full_metrics_prompt_mode": true,
+    "llm_full_metrics_explicit_signature_compare": false,
+    "previous_run_gist": null,
+    "workload_change_type": null,
+    "workload_change_interval": null,
+    "workload_change_param": null
+  },
+  "best_parameters": {
+    "min_granularity_ns": 100000,
+    "latency_ns": 100000,
+    "cstate_max": {
+      "value": "POLL",
+      "cores": "0-9"
+    },
+    "napi_busy_poll": {
+      "value": 500,
+      "cores": "0-9"
+    },
+    "wakeup_granularity_ns": 100000,
+    "migration_cost_ns": 250000,
+    "max_perf_pct": {
+      "value": 100,
+      "cores": "0-9"
+    },
+    "min_perf_pct": {
+      "value": 100,
+      "cores": "0-9"
+    }
+  },
+  "best_reward": 3.871,
+  "iterations": 50,
+  "total_time": 438.6399369239807,
+  "history": [
+    {
+      "iteration": 1,
+      "timestamp": 1772791943.8190742,
+      "parameters": {
+        "min_granularity_ns": 1000000,
+        "latency_ns": 2000000,
+        "cstate_max": {
+          "value": "POLL",
+          "cores": "0-9"
+        },
+        "napi_busy_poll": {
+          "value": 100,
+          "cores": "0-9"
+        },
+        "wakeup_granularity_ns": 1000000,
+        "migration_cost_ns": 250000,
+        "max_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        },
+        "min_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        }
+      },
+      "metrics": {
+        "throughput": 51513.67874009391,
+        "goodput": 51517.27871764301,
+        "latency_avg": 0.616,
+        "latency_p95": 1.539,
+        "measured_requests": 257570,
+        "duration_seconds": 5.000031182,
+        "p_99_latency": 7629.0,
+        "latency_p99": 7.629,
+        "elapsed_time_ns": 5000031182,
+        "latency_median": 274.0,
+        "latency_min": 81.0,
+        "latency_max": 131330.0,
+        "p_25_latency": 177.0,
+        "p_75_latency": 508.0,
+        "p_90_latency": 1002.0,
+        "all_quick_tuner_timings": [
+          {
+            "tuner_call_time": 1772791935.2156758,
+            "tuner_response_time": 1772791936.8355699,
+            "tuner_duration": 1.619894027709961,
+            "tuner_response_time_ms": 1619.894027709961,
+            "tuner_type": "speculator_quick",
+            "parameters_applied": true,
+            "parameters_applied_timestamp": 1772791938.4000878,
+            "proposed_parameters": {
+              "min_granularity_ns": 100000,
+              "latency_ns": 100000,
+              "cstate_max": "C1",
+              "napi_busy_poll": 10,
+              "wakeup_granularity_ns": 100000,
+              "migration_cost_ns": 100000,
+              "max_perf_pct": 100,
+              "min_perf_pct": 10
+            },
+            "justification": "Starting with aggressive low latency settings. This initial configuration prioritizes responsiveness by setting low granularity, latency, and wakeup values, while enabling a more power-efficient C1 state. Busy poll is set to a low value to avoid excessive CPU wakeups for network activity.",
+            "token_metrics": {
+              "input_tokens": 826,
+              "output_tokens": 184,
+              "total_tokens": 1012
+            },
+            "response_number": 1
+          }
+        ],
+        "quick_response_count": 1
+      },
+      "reward": 7.629,
+      "tuner_timing": {
+        "quick": {
+          "tuner_call_time": 1772791935.2156758,
+          "tuner_response_time": 1772791936.8355699,
+          "tuner_duration": 1.619894027709961,
+          "tuner_response_time_ms": 1619.894027709961,
+          "tuner_type": "speculator_quick",
+          "parameters_applied": true,
+          "parameters_applied_timestamp": 1772791938.4000878,
+          "proposed_parameters": {
+            "min_granularity_ns": 100000,
+            "latency_ns": 100000,
+            "cstate_max": "C1",
+            "napi_busy_poll": 10,
+            "wakeup_granularity_ns": 100000,
+            "migration_cost_ns": 100000,
+            "max_perf_pct": 100,
+            "min_perf_pct": 10
+          },
+          "justification": "Starting with aggressive low latency settings. This initial configuration prioritizes responsiveness by setting low granularity, latency, and wakeup values, while enabling a more power-efficient C1 state. Busy poll is set to a low value to avoid excessive CPU wakeups for network activity.",
+          "token_metrics": {
+            "input_tokens": 826,
+            "output_tokens": 184,
+            "total_tokens": 1012
+          },
+          "response_number": 1
+        },
+        "reasoning": {
+          "tuner_call_time": 1772791935.2231631,
+          "tuner_start_iteration": 1,
+          "tuner_response_time": 1772791939.40212,
+          "tuner_duration": 4.178956985473633,
+          "tuner_response_time_ms": 4178.956985473633,
+          "tuner_type": "actor_reasoning",
+          "parameters_applied": true,
+          "parameters_applied_timestamp": 1772791941.113447,
+          "proposed_parameters": {
+            "min_granularity_ns": 1000000,
+            "latency_ns": 2000000,
+            "cstate_max": "POLL",
+            "napi_busy_poll": 100,
+            "wakeup_granularity_ns": 1000000,
+            "migration_cost_ns": 250000,
+            "max_perf_pct": 100,
+            "min_perf_pct": 100
+          },
+          "justification": "For initial exploration, parameters are set to aggressive low-latency values. This includes disabling deep C-states, enabling NAPI busy-polling, and setting scheduler granularities and performance percentages to favor immediate responsiveness and high CPU frequency.",
+          "token_metrics": {
+            "input_tokens": 847,
+            "output_tokens": 182,
+            "total_tokens": 1655
+          }
+        }
+      },
+      "post_tuning_phase": false,
+      "system_metrics": {
+        "window_start_time": 1772791935.2387967,
+        "window_end_time": 1772791943.7506301,
+        "perf_start_time": null,
+        "perf_end_time": null,
+        "system_metrics_start_time": 1772791936.240383,
+        "system_metrics_end_time": 1772791939.2387967,
+        "power_socket0_watts": 50.05073466666666,
+        "power_ram_watts": 10.002191333333334,
+        "cstate_poll_pct": 2.534090889120552,
+        "cstate_c1_pct": 68.79769324277812,
+        "cstate_c1e_pct": 11.392851919855858,
+        "cstate_c6_pct": 17.27536394824546,
+        "cpu_load_cores_pct": 59.496086963175436,
+        "cpu_load_socket0_pct": 31.077027058469245
+      }
+    },
+    {
+      "iteration": 2,
+      "timestamp": 1772791951.8794103,
+      "parameters": {
+        "min_granularity_ns": 500000,
+        "latency_ns": 1000000,
+        "cstate_max": {
+          "value": "POLL",
+          "cores": "0-9"
+        },
+        "napi_busy_poll": {
+          "value": 200,
+          "cores": "0-9"
+        },
+        "wakeup_granularity_ns": 500000,
+        "migration_cost_ns": 250000,
+        "max_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        },
+        "min_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        }
+      },
+      "metrics": {
+        "throughput": 48837.56155590737,
+        "goodput": 48843.561502042256,
+        "latency_avg": 0.65,
+        "latency_p95": 1.825,
+        "measured_requests": 244190,
+        "duration_seconds": 5.000044888,
+        "p_99_latency": 4908.0,
+        "latency_p99": 4.908,
+        "elapsed_time_ns": 5000044888,
+        "latency_median": 285.0,
+        "latency_min": 82.0,
+        "latency_max": 88387.0,
+        "p_25_latency": 175.0,
+        "p_75_latency": 736.0,
+        "p_90_latency": 1305.0,
+        "all_quick_tuner_timings": [
+          {
+            "tuner_call_time": 1772791943.8191504,
+            "tuner_response_time": 1772791944.9239635,
+            "tuner_duration": 1.1048130989074707,
+            "tuner_response_time_ms": 1104.8130989074707,
+            "tuner_type": "speculator_quick",
+            "parameters_applied": true,
+            "parameters_applied_timestamp": 1772791946.5144181,
+            "proposed_parameters": {
+              "min_granularity_ns": 500000,
+              "latency_ns": 1000000,
+              "cstate_max": "C1",
+              "napi_busy_poll": 50,
+              "wakeup_granularity_ns": 500000,
+              "migration_cost_ns": 250000,
+              "max_perf_pct": 100,
+              "min_perf_pct": 100
+            },
+            "justification": "Reducing min_granularity_ns and latency_ns may decrease latency. Shifting to C1 state aims to reduce power consumption while maintaining responsiveness, and slightly lowering napi_busy_poll is a safe exploration step.",
+            "token_metrics": {
+              "input_tokens": 1349,
+              "output_tokens": 177,
+              "total_tokens": 1528
+            },
+            "response_number": 1
+          }
+        ],
+        "quick_response_count": 1
+      },
+      "reward": 4.908,
+      "tuner_timing": {
+        "quick": {
+          "tuner_call_time": 1772791943.8191504,
+          "tuner_response_time": 1772791944.9239635,
+          "tuner_duration": 1.1048130989074707,
+          "tuner_response_time_ms": 1104.8130989074707,
+          "tuner_type": "speculator_quick",
+          "parameters_applied": true,
+          "parameters_applied_timestamp": 1772791946.5144181,
+          "proposed_parameters": {
+            "min_granularity_ns": 500000,
+            "latency_ns": 1000000,
+            "cstate_max": "C1",
+            "napi_busy_poll": 50,
+            "wakeup_granularity_ns": 500000,
+            "migration_cost_ns": 250000,
+            "max_perf_pct": 100,
+            "min_perf_pct": 100
+          },
+          "justification": "Reducing min_granularity_ns and latency_ns may decrease latency. Shifting to C1 state aims to reduce power consumption while maintaining responsiveness, and slightly lowering napi_busy_poll is a safe exploration step.",
+          "token_metrics": {
+            "input_tokens": 1349,
+            "output_tokens": 177,
+            "total_tokens": 1528
+          },
+          "response_number": 1
+        },
+        "reasoning": {
+          "tuner_call_time": 1772791943.8194265,
+          "tuner_start_iteration": 2,
+          "tuner_response_time": 1772791948.9190397,
+          "tuner_duration": 5.099613189697266,
+          "tuner_response_time_ms": 5099.613189697266,
+          "tuner_type": "actor_reasoning",
+          "parameters_applied": true,
+          "parameters_applied_timestamp": 1772791950.375921,
+          "proposed_parameters": {
+            "min_granularity_ns": 500000,
+            "latency_ns": 1000000,
+            "cstate_max": "POLL",
+            "napi_busy_poll": 200,
+            "wakeup_granularity_ns": 500000,
+            "migration_cost_ns": 250000,
+            "max_perf_pct": 100,
+            "min_perf_pct": 100
+          },
+          "justification": "Exploring lower scheduling granularities and increased busy polling to further reduce p99 latency by enhancing scheduler responsiveness and minimizing network processing delays.",
+          "token_metrics": {
+            "input_tokens": 1370,
+            "output_tokens": 160,
+            "total_tokens": 2457
+          }
+        }
+      },
+      "post_tuning_phase": false,
+      "system_metrics": {
+        "window_start_time": 1772791943.8272488,
+        "window_end_time": 1772791951.838498,
+        "perf_start_time": null,
+        "perf_end_time": null,
+        "system_metrics_start_time": 1772791944.8284647,
+        "system_metrics_end_time": 1772791947.8272488,
+        "power_socket0_watts": 56.607887,
+        "power_ram_watts": 10.687616,
+        "cstate_poll_pct": 18.983407157205956,
+        "cstate_c1_pct": 81.01659284279404,
+        "cstate_c1e_pct": 0.0,
+        "cstate_c6_pct": 0.0,
+        "cpu_load_cores_pct": 74.44381886508404,
+        "cpu_load_socket0_pct": 39.10329889373498
+      }
+    },
+    {
+      "iteration": 3,
+      "timestamp": 1772791959.9406524,
+      "parameters": {
+        "min_granularity_ns": 250000,
+        "latency_ns": 500000,
+        "cstate_max": {
+          "value": "POLL",
+          "cores": "0-9"
+        },
+        "napi_busy_poll": {
+          "value": 300,
+          "cores": "0-9"
+        },
+        "wakeup_granularity_ns": 250000,
+        "migration_cost_ns": 250000,
+        "max_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        },
+        "min_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        }
+      },
+      "metrics": {
+        "throughput": 56420.63976561538,
+        "goodput": 56427.239700080674,
+        "latency_avg": 0.562,
+        "latency_p95": 1.609,
+        "measured_requests": 282106,
+        "duration_seconds": 5.000049648,
+        "p_99_latency": 3997.0,
+        "latency_p99": 3.997,
+        "elapsed_time_ns": 5000049648,
+        "latency_median": 263.0,
+        "latency_min": 81.0,
+        "latency_max": 95992.0,
+        "p_25_latency": 169.0,
+        "p_75_latency": 616.0,
+        "p_90_latency": 1157.0,
+        "all_quick_tuner_timings": [
+          {
+            "tuner_call_time": 1772791951.8794816,
+            "tuner_response_time": 1772791953.2838633,
+            "tuner_duration": 1.4043817520141602,
+            "tuner_response_time_ms": 1404.3817520141602,
+            "tuner_type": "speculator_quick",
+            "parameters_applied": true,
+            "parameters_applied_timestamp": 1772791955.0360181,
+            "proposed_parameters": {
+              "min_granularity_ns": 250000,
+              "latency_ns": 1500000,
+              "cstate_max": "POLL",
+              "napi_busy_poll": 150,
+              "wakeup_granularity_ns": 750000,
+              "migration_cost_ns": 250000,
+              "max_perf_pct": 100,
+              "min_perf_pct": 100
+            },
+            "justification": "The previous iteration showed a significant improvement in latency_p99. To continue exploration, we will slightly decrease min_granularity_ns and wakeup_granularity_ns, and increase latency_ns and napi_busy_poll from the best performing configuration to probe a nearby region.",
+            "token_metrics": {
+              "input_tokens": 1628,
+              "output_tokens": 192,
+              "total_tokens": 1820
+            },
+            "response_number": 1
+          }
+        ],
+        "quick_response_count": 1
+      },
+      "reward": 3.997,
+      "tuner_timing": {
+        "quick": {
+          "tuner_call_time": 1772791951.8794816,
+          "tuner_response_time": 1772791953.2838633,
+          "tuner_duration": 1.4043817520141602,
+          "tuner_response_time_ms": 1404.3817520141602,
+          "tuner_type": "speculator_quick",
+          "parameters_applied": true,
+          "parameters_applied_timestamp": 1772791955.0360181,
+          "proposed_parameters": {
+            "min_granularity_ns": 250000,
+            "latency_ns": 1500000,
+            "cstate_max": "POLL",
+            "napi_busy_poll": 150,
+            "wakeup_granularity_ns": 750000,
+            "migration_cost_ns": 250000,
+            "max_perf_pct": 100,
+            "min_perf_pct": 100
+          },
+          "justification": "The previous iteration showed a significant improvement in latency_p99. To continue exploration, we will slightly decrease min_granularity_ns and wakeup_granularity_ns, and increase latency_ns and napi_busy_poll from the best performing configuration to probe a nearby region.",
+          "token_metrics": {
+            "input_tokens": 1628,
+            "output_tokens": 192,
+            "total_tokens": 1820
+          },
+          "response_number": 1
+        },
+        "reasoning": {
+          "tuner_call_time": 1772791951.879703,
+          "tuner_start_iteration": 3,
+          "tuner_response_time": 1772791957.039903,
+          "tuner_duration": 5.160199880599976,
+          "tuner_response_time_ms": 5160.199880599976,
+          "tuner_type": "actor_reasoning",
+          "parameters_applied": true,
+          "parameters_applied_timestamp": 1772791958.5372322,
+          "proposed_parameters": {
+            "min_granularity_ns": 250000,
+            "latency_ns": 500000,
+            "cstate_max": "POLL",
+            "napi_busy_poll": 300,
+            "wakeup_granularity_ns": 250000,
+            "migration_cost_ns": 250000,
+            "max_perf_pct": 100,
+            "min_perf_pct": 100
+          },
+          "justification": "Reduced scheduling granularity and latency further, alongside increasing busy polling, to continue exploring the trend observed in Iter 2 which significantly lowered p99 latency. This aims to improve CPU responsiveness and reduce network processing overhead.",
+          "token_metrics": {
+            "input_tokens": 1649,
+            "output_tokens": 175,
+            "total_tokens": 2713
+          }
+        }
+      },
+      "post_tuning_phase": false,
+      "system_metrics": {
+        "window_start_time": 1772791951.8877964,
+        "window_end_time": 1772791959.8991337,
+        "perf_start_time": null,
+        "perf_end_time": null,
+        "system_metrics_start_time": 1772791952.889022,
+        "system_metrics_end_time": 1772791955.8877964,
+        "power_socket0_watts": 59.074616999999996,
+        "power_ram_watts": 10.068236666666666,
+        "cstate_poll_pct": 100.0,
+        "cstate_c1_pct": 0.0,
+        "cstate_c1e_pct": 0.0,
+        "cstate_c6_pct": 0.0,
+        "cpu_load_cores_pct": 80.62021821529423,
+        "cpu_load_socket0_pct": 42.414774080507065
+      }
+    },
+    {
+      "iteration": 4,
+      "timestamp": 1772791967.9714038,
+      "parameters": {
+        "min_granularity_ns": 250000,
+        "latency_ns": 500000,
+        "cstate_max": {
+          "value": "POLL",
+          "cores": "0-9"
+        },
+        "napi_busy_poll": {
+          "value": 300,
+          "cores": "0-9"
+        },
+        "wakeup_granularity_ns": 250000,
+        "migration_cost_ns": 250000,
+        "max_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        },
+        "min_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        }
+      },
+      "metrics": {
+        "throughput": 56308.61813442515,
+        "goodput": 56315.01811375449,
+        "latency_avg": 0.564,
+        "latency_p95": 1.4,
+        "measured_requests": 281544,
+        "duration_seconds": 5.000016149,
+        "p_99_latency": 4283.0,
+        "latency_p99": 4.283,
+        "elapsed_time_ns": 5000016149,
+        "latency_median": 301.0,
+        "latency_min": 80.0,
+        "latency_max": 74453.0,
+        "p_25_latency": 180.0,
+        "p_75_latency": 587.0,
+        "p_90_latency": 1029.0,
+        "all_quick_tuner_timings": [],
+        "quick_response_count": 0
+      },
+      "reward": 4.283,
+      "tuner_timing": {},
+      "post_tuning_phase": false,
+      "system_metrics": {
+        "window_start_time": 1772791959.9570937,
+        "window_end_time": 1772791967.966847,
+        "perf_start_time": null,
+        "perf_end_time": null,
+        "system_metrics_start_time": 1772791960.9578617,
+        "system_metrics_end_time": 1772791963.9570937,
+        "power_socket0_watts": 57.918552999999996,
+        "power_ram_watts": 9.987187333333333,
+        "cstate_poll_pct": 100.0,
+        "cstate_c1_pct": 0.0,
+        "cstate_c1e_pct": 0.0,
+        "cstate_c6_pct": 0.0,
+        "cpu_load_cores_pct": 74.9778187834277,
+        "cpu_load_socket0_pct": 37.48890939171385
+      }
+    },
+    {
+      "iteration": 5,
+      "timestamp": 1772791976.0115025,
+      "parameters": {
+        "min_granularity_ns": 100000,
+        "latency_ns": 100000,
+        "cstate_max": {
+          "value": "POLL",
+          "cores": "0-9"
+        },
+        "napi_busy_poll": {
+          "value": 400,
+          "cores": "0-9"
+        },
+        "wakeup_granularity_ns": 100000,
+        "migration_cost_ns": 250000,
+        "max_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        },
+        "min_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        }
+      },
+      "metrics": {
+        "throughput": 58836.46857724852,
+        "goodput": 58843.06851763654,
+        "latency_avg": 0.539,
+        "latency_p95": 1.378,
+        "measured_requests": 294185,
+        "duration_seconds": 5.000045161,
+        "p_99_latency": 3952.0,
+        "latency_p99": 3.952,
+        "elapsed_time_ns": 5000045161,
+        "latency_median": 300.0,
+        "latency_min": 80.0,
+        "latency_max": 58472.0,
+        "p_25_latency": 181.0,
+        "p_75_latency": 593.0,
+        "p_90_latency": 1025.0,
+        "all_quick_tuner_timings": [],
+        "quick_response_count": 0
+      },
+      "reward": 3.952,
+      "tuner_timing": {
+        "reasoning": {
+          "tuner_call_time": 1772791967.9715426,
+          "tuner_start_iteration": 5,
+          "tuner_response_time": 1772791974.1868143,
+          "tuner_duration": 6.215271711349487,
+          "tuner_response_time_ms": 6215.271711349487,
+          "tuner_type": "actor_reasoning",
+          "parameters_applied": true,
+          "parameters_applied_timestamp": 1772791975.409594,
+          "proposed_parameters": {
+            "min_granularity_ns": 100000,
+            "latency_ns": 100000,
+            "cstate_max": "POLL",
+            "napi_busy_poll": 400,
+            "wakeup_granularity_ns": 100000,
+            "migration_cost_ns": 250000,
+            "max_perf_pct": 100,
+            "min_perf_pct": 100
+          },
+          "justification": "Building on the success of reduced scheduler granularity, we are pushing min_granularity_ns, latency_ns, and wakeup_granularity_ns to their lower bounds while slightly increasing napi_busy_poll to explore further latency reductions.",
+          "token_metrics": {
+            "input_tokens": 2089,
+            "output_tokens": 144,
+            "total_tokens": 3487
+          }
+        }
+      },
+      "post_tuning_phase": false,
+      "system_metrics": {
+        "window_start_time": 1772791967.9760773,
+        "window_end_time": 1772791975.9862924,
+        "perf_start_time": null,
+        "perf_end_time": null,
+        "system_metrics_start_time": 1772791968.9765785,
+        "system_metrics_end_time": 1772791971.9760773,
+        "power_socket0_watts": 58.106846,
+        "power_ram_watts": 9.884458,
+        "cstate_poll_pct": 100.0,
+        "cstate_c1_pct": 0.0,
+        "cstate_c1e_pct": 0.0,
+        "cstate_c6_pct": 0.0,
+        "cpu_load_cores_pct": 77.31952284326103,
+        "cpu_load_socket0_pct": 38.67626307179553
+      }
+    },
+    {
+      "iteration": 6,
+      "timestamp": 1772791984.0873837,
+      "parameters": {
+        "min_granularity_ns": 100000,
+        "latency_ns": 100000,
+        "cstate_max": {
+          "value": "POLL",
+          "cores": "0-9"
+        },
+        "napi_busy_poll": {
+          "value": 600,
+          "cores": "0-9"
+        },
+        "wakeup_granularity_ns": 100000,
+        "migration_cost_ns": 100000,
+        "max_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        },
+        "min_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        }
+      },
+      "metrics": {
+        "throughput": 58625.443421765245,
+        "goodput": 58631.8433610055,
+        "latency_avg": 0.541,
+        "latency_p95": 1.299,
+        "measured_requests": 293130,
+        "duration_seconds": 5.000047469,
+        "p_99_latency": 4150.0,
+        "latency_p99": 4.15,
+        "elapsed_time_ns": 5000047469,
+        "latency_median": 312.0,
+        "latency_min": 80.0,
+        "latency_max": 88781.0,
+        "p_25_latency": 213.0,
+        "p_75_latency": 540.0,
+        "p_90_latency": 969.0,
+        "all_quick_tuner_timings": [],
+        "quick_response_count": 0
+      },
+      "reward": 4.15,
+      "tuner_timing": {
+        "reasoning": {
+          "tuner_call_time": 1772791976.0116248,
+          "tuner_start_iteration": 6,
+          "tuner_response_time": 1772791980.6242023,
+          "tuner_duration": 4.612577438354492,
+          "tuner_response_time_ms": 4612.577438354492,
+          "tuner_type": "actor_reasoning",
+          "parameters_applied": true,
+          "parameters_applied_timestamp": 1772791982.2832108,
+          "proposed_parameters": {
+            "min_granularity_ns": 100000,
+            "latency_ns": 100000,
+            "cstate_max": "POLL",
+            "napi_busy_poll": 600,
+            "wakeup_granularity_ns": 100000,
+            "migration_cost_ns": 100000,
+            "max_perf_pct": 100,
+            "min_perf_pct": 100
+          },
+          "justification": "Continuing exploration, this configuration increases busy polling to further reduce network latency and lowers migration cost to potentially improve task responsiveness, while maintaining optimal scheduling granularities.",
+          "token_metrics": {
+            "input_tokens": 2255,
+            "output_tokens": 163,
+            "total_tokens": 3188
+          }
+        }
+      },
+      "post_tuning_phase": false,
+      "system_metrics": {
+        "window_start_time": 1772791976.0163856,
+        "window_end_time": 1772791984.0278268,
+        "perf_start_time": null,
+        "perf_end_time": null,
+        "system_metrics_start_time": 1772791977.0167985,
+        "system_metrics_end_time": 1772791980.0163856,
+        "power_socket0_watts": 58.222385333333335,
+        "power_ram_watts": 10.017991333333333,
+        "cstate_poll_pct": 100.0,
+        "cstate_c1_pct": 0.0,
+        "cstate_c1e_pct": 0.0,
+        "cstate_c6_pct": 0.0,
+        "cpu_load_cores_pct": 77.91203029970076,
+        "cpu_load_socket0_pct": 39.22104782958895
+      }
+    },
+    {
+      "iteration": 7,
+      "timestamp": 1772791992.1100593,
+      "parameters": {
+        "min_granularity_ns": 100000,
+        "latency_ns": 100000,
+        "cstate_max": {
+          "value": "POLL",
+          "cores": "0-9"
+        },
+        "napi_busy_poll": {
+          "value": 600,
+          "cores": "0-9"
+        },
+        "wakeup_granularity_ns": 100000,
+        "migration_cost_ns": 100000,
+        "max_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        },
+        "min_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        }
+      },
+      "metrics": {
+        "throughput": 61154.170209893506,
+        "goodput": 61160.57014398443,
+        "latency_avg": 0.519,
+        "latency_p95": 1.277,
+        "measured_requests": 305774,
+        "duration_seconds": 5.000051492,
+        "p_99_latency": 3987.0,
+        "latency_p99": 3.987,
+        "elapsed_time_ns": 5000051492,
+        "latency_median": 303.0,
+        "latency_min": 80.0,
+        "latency_max": 31493.0,
+        "p_25_latency": 204.0,
+        "p_75_latency": 528.0,
+        "p_90_latency": 954.0,
+        "all_quick_tuner_timings": [],
+        "quick_response_count": 0
+      },
+      "reward": 3.987,
+      "tuner_timing": {},
+      "post_tuning_phase": false,
+      "system_metrics": {
+        "window_start_time": 1772791984.095225,
+        "window_end_time": 1772791992.1063106,
+        "perf_start_time": null,
+        "perf_end_time": null,
+        "system_metrics_start_time": 1772791985.0955203,
+        "system_metrics_end_time": 1772791988.095225,
+        "power_socket0_watts": 58.420118333333335,
+        "power_ram_watts": 9.752434333333333,
+        "cstate_poll_pct": 100.0,
+        "cstate_c1_pct": 0.0,
+        "cstate_c1e_pct": 0.0,
+        "cstate_c6_pct": 0.0,
+        "cpu_load_cores_pct": 81.43777562049641,
+        "cpu_load_socket0_pct": 40.751891110578235
+      }
+    },
+    {
+      "iteration": 8,
+      "timestamp": 1772792000.150646,
+      "parameters": {
+        "min_granularity_ns": 100000,
+        "latency_ns": 100000,
+        "cstate_max": {
+          "value": "POLL",
+          "cores": "0-9"
+        },
+        "napi_busy_poll": {
+          "value": 500,
+          "cores": "0-9"
+        },
+        "wakeup_granularity_ns": 100000,
+        "migration_cost_ns": 250000,
+        "max_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        },
+        "min_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        }
+      },
+      "metrics": {
+        "throughput": 58739.73900465502,
+        "goodput": 58746.338997801584,
+        "latency_avg": 0.541,
+        "latency_p95": 1.347,
+        "measured_requests": 293699,
+        "duration_seconds": 5.000005192,
+        "p_99_latency": 3871.0,
+        "latency_p99": 3.871,
+        "elapsed_time_ns": 5000005192,
+        "latency_median": 316.0,
+        "latency_min": 81.0,
+        "latency_max": 104168.0,
+        "p_25_latency": 212.0,
+        "p_75_latency": 561.0,
+        "p_90_latency": 1011.0,
+        "all_quick_tuner_timings": [],
+        "quick_response_count": 0
+      },
+      "reward": 3.871,
+      "tuner_timing": {
+        "reasoning": {
+          "tuner_call_time": 1772791984.0875401,
+          "tuner_start_iteration": 7,
+          "tuner_response_time": 1772791995.6180732,
+          "tuner_duration": 11.530533075332642,
+          "tuner_response_time_ms": 11530.533075332642,
+          "tuner_type": "actor_reasoning",
+          "parameters_applied": true,
+          "parameters_applied_timestamp": 1772791997.3441327,
+          "proposed_parameters": {
+            "min_granularity_ns": 100000,
+            "latency_ns": 100000,
+            "cstate_max": "POLL",
+            "napi_busy_poll": 500,
+            "wakeup_granularity_ns": 100000,
+            "migration_cost_ns": 250000,
+            "max_perf_pct": 100,
+            "min_perf_pct": 100
+          },
+          "justification": "Continuing to explore the napi_busy_poll parameter around the current best-performing value of 400, while maintaining other low-latency settings from the best configuration.",
+          "token_metrics": {
+            "input_tokens": 2422,
+            "output_tokens": 168,
+            "total_tokens": 4888
+          }
+        }
+      },
+      "post_tuning_phase": false,
+      "system_metrics": {
+        "window_start_time": 1772791992.1110568,
+        "window_end_time": 1772792000.1220918,
+        "perf_start_time": null,
+        "perf_end_time": null,
+        "system_metrics_start_time": 1772791993.1113458,
+        "system_metrics_end_time": 1772791996.1110568,
+        "power_socket0_watts": 58.650911666666666,
+        "power_ram_watts": 9.687796666666666,
+        "cstate_poll_pct": 100.0,
+        "cstate_c1_pct": 0.0,
+        "cstate_c1e_pct": 0.0,
+        "cstate_c6_pct": 0.0,
+        "cpu_load_cores_pct": 83.40571278175831,
+        "cpu_load_socket0_pct": 41.883407093008195
+      }
+    },
+    {
+      "iteration": 9,
+      "timestamp": 1772792008.1733541,
+      "parameters": {
+        "min_granularity_ns": 100000,
+        "latency_ns": 100000,
+        "cstate_max": {
+          "value": "POLL",
+          "cores": "0-9"
+        },
+        "napi_busy_poll": {
+          "value": 500,
+          "cores": "0-9"
+        },
+        "wakeup_granularity_ns": 100000,
+        "migration_cost_ns": 250000,
+        "max_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        },
+        "min_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        }
+      },
+      "metrics": {
+        "throughput": 58924.72670711753,
+        "goodput": 58931.12667743447,
+        "latency_avg": 0.539,
+        "latency_p95": 1.391,
+        "measured_requests": 294625,
+        "duration_seconds": 5.00002319,
+        "p_99_latency": 4078.0,
+        "latency_p99": 4.078,
+        "elapsed_time_ns": 5000023190,
+        "latency_median": 312.0,
+        "latency_min": 80.0,
+        "latency_max": 88699.0,
+        "p_25_latency": 208.0,
+        "p_75_latency": 553.0,
+        "p_90_latency": 1012.0,
+        "all_quick_tuner_timings": [],
+        "quick_response_count": 0
+      },
+      "reward": 4.078,
+      "tuner_timing": {},
+      "post_tuning_phase": false,
+      "system_metrics": {
+        "window_start_time": 1772792000.1586416,
+        "window_end_time": 1772792008.1680784,
+        "perf_start_time": null,
+        "perf_end_time": null,
+        "system_metrics_start_time": 1772792001.158918,
+        "system_metrics_end_time": 1772792004.1586416,
+        "power_socket0_watts": 59.11390299999999,
+        "power_ram_watts": 9.943118333333333,
+        "cstate_poll_pct": 100.0,
+        "cstate_c1_pct": 0.0,
+        "cstate_c1e_pct": 0.0,
+        "cstate_c6_pct": 0.0,
+        "cpu_load_cores_pct": 84.97877613731687,
+        "cpu_load_socket0_pct": 42.909256722190456
+      }
+    },
+    {
+      "iteration": 10,
+      "timestamp": 1772792016.2790236,
+      "parameters": {
+        "min_granularity_ns": 100000,
+        "latency_ns": 100000,
+        "cstate_max": {
+          "value": "POLL",
+          "cores": "0-9"
+        },
+        "napi_busy_poll": {
+          "value": 500,
+          "cores": "0-9"
+        },
+        "wakeup_granularity_ns": 100000,
+        "migration_cost_ns": 500000,
+        "max_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        },
+        "min_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        }
+      },
+      "metrics": {
+        "throughput": 57452.10823065522,
+        "goodput": 57458.70815118689,
+        "latency_avg": 0.553,
+        "latency_p95": 1.374,
+        "measured_requests": 287264,
+        "duration_seconds": 5.000060204,
+        "p_99_latency": 4242.0,
+        "latency_p99": 4.242,
+        "elapsed_time_ns": 5000060204,
+        "latency_median": 324.0,
+        "latency_min": 78.0,
+        "latency_max": 82025.0,
+        "p_25_latency": 213.0,
+        "p_75_latency": 578.0,
+        "p_90_latency": 1025.0,
+        "all_quick_tuner_timings": [],
+        "quick_response_count": 0
+      },
+      "reward": 4.242,
+      "tuner_timing": {
+        "reasoning": {
+          "tuner_call_time": 1772792000.151005,
+          "tuner_start_iteration": 9,
+          "tuner_response_time": 1772792009.1756105,
+          "tuner_duration": 9.024605512619019,
+          "tuner_response_time_ms": 9024.605512619019,
+          "tuner_type": "actor_reasoning",
+          "parameters_applied": true,
+          "parameters_applied_timestamp": 1772792010.9682999,
+          "proposed_parameters": {
+            "min_granularity_ns": 100000,
+            "latency_ns": 100000,
+            "cstate_max": "POLL",
+            "napi_busy_poll": 500,
+            "wakeup_granularity_ns": 100000,
+            "migration_cost_ns": 500000,
+            "max_perf_pct": 100,
+            "min_perf_pct": 100
+          },
+          "justification": "This configuration explores a higher migration cost to further reduce task migrations, maintaining optimal scheduler and C-state settings, and keeping napi_busy_poll at its best observed value to potentially improve p99 latency.",
+          "token_metrics": {
+            "input_tokens": 2755,
+            "output_tokens": 138,
+            "total_tokens": 4828
+          }
+        }
+      },
+      "post_tuning_phase": false,
+      "system_metrics": {
+        "window_start_time": 1772792008.1743588,
+        "window_end_time": 1772792016.184206,
+        "perf_start_time": null,
+        "perf_end_time": null,
+        "system_metrics_start_time": 1772792009.1747303,
+        "system_metrics_end_time": 1772792012.1743588,
+        "power_socket0_watts": 59.446035333333334,
+        "power_ram_watts": 9.806851333333334,
+        "cstate_poll_pct": 100.0,
+        "cstate_c1_pct": 0.0,
+        "cstate_c1e_pct": 0.0,
+        "cstate_c6_pct": 0.0,
+        "cpu_load_cores_pct": 85.59953342582848,
+        "cpu_load_socket0_pct": 44.828773909663006
+      }
+    },
+    {
+      "iteration": 11,
+      "timestamp": 1772792025.4280562,
+      "parameters": {
+        "min_granularity_ns": 100000,
+        "latency_ns": 100000,
+        "cstate_max": {
+          "value": "POLL",
+          "cores": "0-9"
+        },
+        "napi_busy_poll": {
+          "value": 450,
+          "cores": "0-9"
+        },
+        "wakeup_granularity_ns": 100000,
+        "migration_cost_ns": 250000,
+        "max_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        },
+        "min_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        }
+      },
+      "metrics": {
+        "throughput": 57924.93111765041,
+        "goodput": 57931.33104374791,
+        "latency_avg": 0.548,
+        "latency_p95": 1.369,
+        "measured_requests": 289628,
+        "duration_seconds": 5.000057737,
+        "p_99_latency": 4476.0,
+        "latency_p99": 4.476,
+        "elapsed_time_ns": 5000057737,
+        "latency_median": 317.0,
+        "latency_min": 80.0,
+        "latency_max": 43439.0,
+        "p_25_latency": 212.0,
+        "p_75_latency": 566.0,
+        "p_90_latency": 1012.0,
+        "all_quick_tuner_timings": [],
+        "quick_response_count": 0
+      },
+      "reward": 4.476,
+      "tuner_timing": {
+        "reasoning": {
+          "tuner_call_time": 1772792016.2791784,
+          "tuner_start_iteration": 11,
+          "tuner_response_time": 1772792024.202367,
+          "tuner_duration": 7.92318868637085,
+          "tuner_response_time_ms": 7923.18868637085,
+          "tuner_type": "actor_reasoning",
+          "parameters_applied": true,
+          "parameters_applied_timestamp": 1772792025.327469,
+          "proposed_parameters": {
+            "min_granularity_ns": 100000,
+            "latency_ns": 100000,
+            "cstate_max": "POLL",
+            "napi_busy_poll": 450,
+            "wakeup_granularity_ns": 100000,
+            "migration_cost_ns": 250000,
+            "max_perf_pct": 100,
+            "min_perf_pct": 100
+          },
+          "justification": "Based on previous runs, minimal scheduler granularities and POLL c-state are consistently optimal. We are refining the napi_busy_poll parameter around the best observed value of 500, while holding migration_cost_ns at a robustly performing 250000 to minimize p99 latency.",
+          "token_metrics": {
+            "input_tokens": 3091,
+            "output_tokens": 198,
+            "total_tokens": 4903
+          }
+        }
+      },
+      "post_tuning_phase": false,
+      "system_metrics": {
+        "window_start_time": 1772792016.2885122,
+        "window_end_time": 1772792024.2978895,
+        "perf_start_time": null,
+        "perf_end_time": null,
+        "system_metrics_start_time": 1772792017.2897472,
+        "system_metrics_end_time": 1772792020.2885122,
+        "power_socket0_watts": 59.05502466666667,
+        "power_ram_watts": 9.752689,
+        "cstate_poll_pct": 100.0,
+        "cstate_c1_pct": 0.0,
+        "cstate_c1e_pct": 0.0,
+        "cstate_c6_pct": 0.0,
+        "cpu_load_cores_pct": 84.49197077619043,
+        "cpu_load_socket0_pct": 42.262487038260225
+      }
+    },
+    {
+      "iteration": 12,
+      "timestamp": 1772792034.4738662,
+      "parameters": {
+        "min_granularity_ns": 100000,
+        "latency_ns": 100000,
+        "cstate_max": {
+          "value": "POLL",
+          "cores": "0-9"
+        },
+        "napi_busy_poll": {
+          "value": 550,
+          "cores": "0-9"
+        },
+        "wakeup_granularity_ns": 100000,
+        "migration_cost_ns": 250000,
+        "max_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        },
+        "min_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        }
+      },
+      "metrics": {
+        "throughput": 57290.4964520336,
+        "goodput": 57296.896418124015,
+        "latency_avg": 0.555,
+        "latency_p95": 1.38,
+        "measured_requests": 286454,
+        "duration_seconds": 5.000026492,
+        "p_99_latency": 4301.0,
+        "latency_p99": 4.301,
+        "elapsed_time_ns": 5000026492,
+        "latency_median": 325.0,
+        "latency_min": 80.0,
+        "latency_max": 108760.0,
+        "p_25_latency": 213.0,
+        "p_75_latency": 585.0,
+        "p_90_latency": 1029.0,
+        "all_quick_tuner_timings": [],
+        "quick_response_count": 0
+      },
+      "reward": 4.301,
+      "tuner_timing": {
+        "reasoning": {
+          "tuner_call_time": 1772792025.4281948,
+          "tuner_start_iteration": 12,
+          "tuner_response_time": 1772792033.2501345,
+          "tuner_duration": 7.821939706802368,
+          "tuner_response_time_ms": 7821.939706802368,
+          "tuner_type": "actor_reasoning",
+          "parameters_applied": true,
+          "parameters_applied_timestamp": 1772792034.3730774,
+          "proposed_parameters": {
+            "min_granularity_ns": 100000,
+            "latency_ns": 100000,
+            "cstate_max": "POLL",
+            "napi_busy_poll": 550,
+            "wakeup_granularity_ns": 100000,
+            "migration_cost_ns": 250000,
+            "max_perf_pct": 100,
+            "min_perf_pct": 100
+          },
+          "justification": "The best p99 latency was observed with napi_busy_poll=500 and migration_cost_ns=250000. This configuration explores a slightly higher napi_busy_poll value (550) to further investigate the optimal range while keeping other low-latency parameters at their minimum or previously optimal settings.",
+          "token_metrics": {
+            "input_tokens": 3258,
+            "output_tokens": 203,
+            "total_tokens": 4967
+          }
+        }
+      },
+      "post_tuning_phase": false,
+      "system_metrics": {
+        "window_start_time": 1772792025.4358916,
+        "window_end_time": 1772792033.4470348,
+        "perf_start_time": null,
+        "perf_end_time": null,
+        "system_metrics_start_time": 1772792026.437095,
+        "system_metrics_end_time": 1772792029.4358916,
+        "power_socket0_watts": 59.328583,
+        "power_ram_watts": 9.963477333333332,
+        "cstate_poll_pct": 100.0,
+        "cstate_c1_pct": 0.0,
+        "cstate_c1e_pct": 0.0,
+        "cstate_c6_pct": 0.0,
+        "cpu_load_cores_pct": 84.94786609566061,
+        "cpu_load_socket0_pct": 42.507101364661985
+      }
+    },
+    {
+      "iteration": 13,
+      "timestamp": 1772792042.4967222,
+      "parameters": {
+        "min_granularity_ns": 100000,
+        "latency_ns": 100000,
+        "cstate_max": {
+          "value": "POLL",
+          "cores": "0-9"
+        },
+        "napi_busy_poll": {
+          "value": 550,
+          "cores": "0-9"
+        },
+        "wakeup_granularity_ns": 100000,
+        "migration_cost_ns": 250000,
+        "max_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        },
+        "min_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        }
+      },
+      "metrics": {
+        "throughput": 57539.74971693462,
+        "goodput": 57545.94966841627,
+        "latency_avg": 0.552,
+        "latency_p95": 1.392,
+        "measured_requests": 287701,
+        "duration_seconds": 5.000039128,
+        "p_99_latency": 4445.0,
+        "latency_p99": 4.445,
+        "elapsed_time_ns": 5000039128,
+        "latency_median": 322.0,
+        "latency_min": 81.0,
+        "latency_max": 62726.0,
+        "p_25_latency": 213.0,
+        "p_75_latency": 580.0,
+        "p_90_latency": 1034.0,
+        "all_quick_tuner_timings": [],
+        "quick_response_count": 0
+      },
+      "reward": 4.445,
+      "tuner_timing": {},
+      "post_tuning_phase": false,
+      "system_metrics": {
+        "window_start_time": 1772792034.4818947,
+        "window_end_time": 1772792042.4919329,
+        "perf_start_time": null,
+        "perf_end_time": null,
+        "system_metrics_start_time": 1772792035.4830377,
+        "system_metrics_end_time": 1772792038.4818947,
+        "power_socket0_watts": 59.61491933333334,
+        "power_ram_watts": 10.006669333333333,
+        "cstate_poll_pct": 100.0,
+        "cstate_c1_pct": 0.0,
+        "cstate_c1e_pct": 0.0,
+        "cstate_c6_pct": 0.0,
+        "cpu_load_cores_pct": 86.7310197965126,
+        "cpu_load_socket0_pct": 43.41501484875135
+      }
+    },
+    {
+      "iteration": 14,
+      "timestamp": 1772792050.5794055,
+      "parameters": {
+        "min_granularity_ns": 100000,
+        "latency_ns": 100000,
+        "cstate_max": {
+          "value": "POLL",
+          "cores": "0-9"
+        },
+        "napi_busy_poll": {
+          "value": 600,
+          "cores": "0-9"
+        },
+        "wakeup_granularity_ns": 100000,
+        "migration_cost_ns": 250000,
+        "max_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        },
+        "min_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        }
+      },
+      "metrics": {
+        "throughput": 55032.06589178769,
+        "goodput": 55038.46582967373,
+        "latency_avg": 0.578,
+        "latency_p95": 1.604,
+        "measured_requests": 275163,
+        "duration_seconds": 5.000048527,
+        "p_99_latency": 4815.0,
+        "latency_p99": 4.815,
+        "elapsed_time_ns": 5000048527,
+        "latency_median": 319.0,
+        "latency_min": 79.0,
+        "latency_max": 60885.0,
+        "p_25_latency": 211.0,
+        "p_75_latency": 564.0,
+        "p_90_latency": 1104.0,
+        "all_quick_tuner_timings": [],
+        "quick_response_count": 0
+      },
+      "reward": 4.815,
+      "tuner_timing": {
+        "reasoning": {
+          "tuner_call_time": 1772792034.474314,
+          "tuner_start_iteration": 13,
+          "tuner_response_time": 1772792044.401127,
+          "tuner_duration": 9.926813125610352,
+          "tuner_response_time_ms": 9926.813125610352,
+          "tuner_type": "actor_reasoning",
+          "parameters_applied": true,
+          "parameters_applied_timestamp": 1772792046.2701993,
+          "proposed_parameters": {
+            "min_granularity_ns": 100000,
+            "latency_ns": 100000,
+            "cstate_max": "POLL",
+            "napi_busy_poll": 600,
+            "wakeup_granularity_ns": 100000,
+            "migration_cost_ns": 250000,
+            "max_perf_pct": 100,
+            "min_perf_pct": 100
+          },
+          "justification": "Continuing exploration by combining a strong napi_busy_poll value (600) with the migration_cost_ns (250000) that yielded the overall best P99 latency, to test a new promising region.",
+          "token_metrics": {
+            "input_tokens": 3253,
+            "output_tokens": 162,
+            "total_tokens": 5395
+          }
+        }
+      },
+      "post_tuning_phase": false,
+      "system_metrics": {
+        "window_start_time": 1772792042.497761,
+        "window_end_time": 1772792050.5092795,
+        "perf_start_time": null,
+        "perf_end_time": null,
+        "system_metrics_start_time": 1772792043.4989753,
+        "system_metrics_end_time": 1772792046.497761,
+        "power_socket0_watts": 59.79279533333332,
+        "power_ram_watts": 10.147832,
+        "cstate_poll_pct": 100.0,
+        "cstate_c1_pct": 0.0,
+        "cstate_c1e_pct": 0.0,
+        "cstate_c6_pct": 0.0,
+        "cpu_load_cores_pct": 84.70312111208077,
+        "cpu_load_socket0_pct": 44.08196013155689
+      }
+    },
+    {
+      "iteration": 15,
+      "timestamp": 1772792058.6033423,
+      "parameters": {
+        "min_granularity_ns": 100000,
+        "latency_ns": 100000,
+        "cstate_max": {
+          "value": "POLL",
+          "cores": "0-9"
+        },
+        "napi_busy_poll": {
+          "value": 600,
+          "cores": "0-9"
+        },
+        "wakeup_granularity_ns": 100000,
+        "migration_cost_ns": 250000,
+        "max_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        },
+        "min_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        }
+      },
+      "metrics": {
+        "throughput": 56649.95130140765,
+        "goodput": 56656.35122812209,
+        "latency_avg": 0.561,
+        "latency_p95": 1.719,
+        "measured_requests": 283253,
+        "duration_seconds": 5.000057255,
+        "p_99_latency": 4387.0,
+        "latency_p99": 4.387,
+        "elapsed_time_ns": 5000057255,
+        "latency_median": 306.0,
+        "latency_min": 80.0,
+        "latency_max": 73089.0,
+        "p_25_latency": 201.0,
+        "p_75_latency": 558.0,
+        "p_90_latency": 1194.0,
+        "all_quick_tuner_timings": [],
+        "quick_response_count": 0
+      },
+      "reward": 4.387,
+      "tuner_timing": {},
+      "post_tuning_phase": false,
+      "system_metrics": {
+        "window_start_time": 1772792050.5884697,
+        "window_end_time": 1772792058.598435,
+        "perf_start_time": null,
+        "perf_end_time": null,
+        "system_metrics_start_time": 1772792051.589869,
+        "system_metrics_end_time": 1772792054.5884697,
+        "power_socket0_watts": 59.757578,
+        "power_ram_watts": 10.177417,
+        "cstate_poll_pct": 100.0,
+        "cstate_c1_pct": 0.0,
+        "cstate_c1e_pct": 0.0,
+        "cstate_c6_pct": 0.0,
+        "cpu_load_cores_pct": 87.58817173694672,
+        "cpu_load_socket0_pct": 43.810920885308384
+      }
+    },
+    {
+      "iteration": 16,
+      "timestamp": 1772792066.61989,
+      "parameters": {
+        "min_granularity_ns": 100000,
+        "latency_ns": 100000,
+        "cstate_max": {
+          "value": "POLL",
+          "cores": "0-9"
+        },
+        "napi_busy_poll": {
+          "value": 600,
+          "cores": "0-9"
+        },
+        "wakeup_granularity_ns": 100000,
+        "migration_cost_ns": 250000,
+        "max_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        },
+        "min_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        }
+      },
+      "metrics": {
+        "throughput": 55359.54834358888,
+        "goodput": 55365.74829300598,
+        "latency_avg": 0.574,
+        "latency_p95": 1.732,
+        "measured_requests": 276800,
+        "duration_seconds": 5.000040793,
+        "p_99_latency": 4591.0,
+        "latency_p99": 4.591,
+        "elapsed_time_ns": 5000040793,
+        "latency_median": 312.0,
+        "latency_min": 79.0,
+        "latency_max": 106372.0,
+        "p_25_latency": 204.0,
+        "p_75_latency": 570.0,
+        "p_90_latency": 1195.0,
+        "all_quick_tuner_timings": [],
+        "quick_response_count": 0
+      },
+      "reward": 4.591,
+      "tuner_timing": {},
+      "post_tuning_phase": false,
+      "system_metrics": {
+        "window_start_time": 1772792058.6046913,
+        "window_end_time": 1772792066.6148155,
+        "perf_start_time": null,
+        "perf_end_time": null,
+        "system_metrics_start_time": 1772792059.605953,
+        "system_metrics_end_time": 1772792062.6046913,
+        "power_socket0_watts": 59.443187,
+        "power_ram_watts": 10.072663,
+        "cstate_poll_pct": 100.0,
+        "cstate_c1_pct": 0.0,
+        "cstate_c1e_pct": 0.0,
+        "cstate_c6_pct": 0.0,
+        "cpu_load_cores_pct": 86.44608338495182,
+        "cpu_load_socket0_pct": 43.25604499280595
+      }
+    },
+    {
+      "iteration": 17,
+      "timestamp": 1772792075.224174,
+      "parameters": {
+        "min_granularity_ns": 100000,
+        "latency_ns": 100000,
+        "cstate_max": {
+          "value": "POLL",
+          "cores": "0-9"
+        },
+        "napi_busy_poll": {
+          "value": 550,
+          "cores": "0-9"
+        },
+        "wakeup_granularity_ns": 100000,
+        "migration_cost_ns": 100000,
+        "max_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        },
+        "min_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        }
+      },
+      "metrics": {
+        "throughput": 55836.566096037066,
+        "goodput": 55842.96609215099,
+        "latency_avg": 0.569,
+        "latency_p95": 1.712,
+        "measured_requests": 279183,
+        "duration_seconds": 5.000003036,
+        "p_99_latency": 4567.0,
+        "latency_p99": 4.567,
+        "elapsed_time_ns": 5000003036,
+        "latency_median": 305.0,
+        "latency_min": 80.0,
+        "latency_max": 91226.0,
+        "p_25_latency": 200.0,
+        "p_75_latency": 548.0,
+        "p_90_latency": 1175.0,
+        "all_quick_tuner_timings": [],
+        "quick_response_count": 0
+      },
+      "reward": 4.567,
+      "tuner_timing": {
+        "reasoning": {
+          "tuner_call_time": 1772792050.5801265,
+          "tuner_start_iteration": 15,
+          "tuner_response_time": 1772792067.0210493,
+          "tuner_duration": 16.440922737121582,
+          "tuner_response_time_ms": 16440.922737121582,
+          "tuner_type": "actor_reasoning",
+          "parameters_applied": true,
+          "parameters_applied_timestamp": 1772792068.5111825,
+          "proposed_parameters": {
+            "min_granularity_ns": 100000,
+            "latency_ns": 100000,
+            "cstate_max": "POLL",
+            "napi_busy_poll": 550,
+            "wakeup_granularity_ns": 100000,
+            "migration_cost_ns": 100000,
+            "max_perf_pct": 100,
+            "min_perf_pct": 100
+          },
+          "justification": "I am exploring the effect of a lower migration_cost_ns (100000) with a slightly higher napi_busy_poll (550) to understand their interaction, as a higher napi_busy_poll (600) previously performed better with a lower migration_cost_ns. This continues exploration in a promising region, building on the insight from previous runs where migration_cost_ns=250000 yielded worse results with napi_busy_poll=550 and 600.",
+          "token_metrics": {
+            "input_tokens": 3247,
+            "output_tokens": 245,
+            "total_tokens": 6972
+          }
+        }
+      },
+      "post_tuning_phase": false,
+      "system_metrics": {
+        "window_start_time": 1772792066.6209152,
+        "window_end_time": 1772792075.13109,
+        "perf_start_time": null,
+        "perf_end_time": null,
+        "system_metrics_start_time": 1772792067.6220949,
+        "system_metrics_end_time": 1772792070.6209152,
+        "power_socket0_watts": 59.124747000000006,
+        "power_ram_watts": 10.034300666666667,
+        "cstate_poll_pct": 100.0,
+        "cstate_c1_pct": 0.0,
+        "cstate_c1e_pct": 0.0,
+        "cstate_c6_pct": 0.0,
+        "cpu_load_cores_pct": 83.79057611340055,
+        "cpu_load_socket0_pct": 42.73927649038087
+      }
+    },
+    {
+      "iteration": 18,
+      "timestamp": 1772792083.2471032,
+      "parameters": {
+        "min_granularity_ns": 100000,
+        "latency_ns": 100000,
+        "cstate_max": {
+          "value": "POLL",
+          "cores": "0-9"
+        },
+        "napi_busy_poll": {
+          "value": 550,
+          "cores": "0-9"
+        },
+        "wakeup_granularity_ns": 100000,
+        "migration_cost_ns": 100000,
+        "max_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        },
+        "min_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        }
+      },
+      "metrics": {
+        "throughput": 56384.3630888473,
+        "goodput": 56390.76303925536,
+        "latency_avg": 0.564,
+        "latency_p95": 1.432,
+        "measured_requests": 281924,
+        "duration_seconds": 5.000038744,
+        "p_99_latency": 4721.0,
+        "latency_p99": 4.721,
+        "elapsed_time_ns": 5000038744,
+        "latency_median": 321.0,
+        "latency_min": 80.0,
+        "latency_max": 68771.0,
+        "p_25_latency": 212.0,
+        "p_75_latency": 584.0,
+        "p_90_latency": 1060.0,
+        "all_quick_tuner_timings": [],
+        "quick_response_count": 0
+      },
+      "reward": 4.721,
+      "tuner_timing": {},
+      "post_tuning_phase": false,
+      "system_metrics": {
+        "window_start_time": 1772792075.2322245,
+        "window_end_time": 1772792083.2438974,
+        "perf_start_time": null,
+        "perf_end_time": null,
+        "system_metrics_start_time": 1772792076.2335143,
+        "system_metrics_end_time": 1772792079.2322245,
+        "power_socket0_watts": 59.113251999999996,
+        "power_ram_watts": 10.126203,
+        "cstate_poll_pct": 100.0,
+        "cstate_c1_pct": 0.0,
+        "cstate_c1e_pct": 0.0,
+        "cstate_c6_pct": 0.0,
+        "cpu_load_cores_pct": 85.31233206625777,
+        "cpu_load_socket0_pct": 42.65616603312888
+      }
+    },
+    {
+      "iteration": 19,
+      "timestamp": 1772792091.2939243,
+      "parameters": {
+        "min_granularity_ns": 100000,
+        "latency_ns": 100000,
+        "cstate_max": {
+          "value": "POLL",
+          "cores": "0-9"
+        },
+        "napi_busy_poll": {
+          "value": 500,
+          "cores": "0-9"
+        },
+        "wakeup_granularity_ns": 100000,
+        "migration_cost_ns": 100000,
+        "max_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        },
+        "min_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        }
+      },
+      "metrics": {
+        "throughput": 54911.2273175002,
+        "goodput": 54917.8272727063,
+        "latency_avg": 0.579,
+        "latency_p95": 1.475,
+        "measured_requests": 274558,
+        "duration_seconds": 5.000033935,
+        "p_99_latency": 5070.0,
+        "latency_p99": 5.07,
+        "elapsed_time_ns": 5000033935,
+        "latency_median": 326.0,
+        "latency_min": 79.0,
+        "latency_max": 87092.0,
+        "p_25_latency": 214.0,
+        "p_75_latency": 592.0,
+        "p_90_latency": 1076.0,
+        "all_quick_tuner_timings": [],
+        "quick_response_count": 0
+      },
+      "reward": 5.07,
+      "tuner_timing": {
+        "reasoning": {
+          "tuner_call_time": 1772792075.2246096,
+          "tuner_start_iteration": 18,
+          "tuner_response_time": 1772792087.0545971,
+          "tuner_duration": 11.829987525939941,
+          "tuner_response_time_ms": 11829.987525939941,
+          "tuner_type": "actor_reasoning",
+          "parameters_applied": true,
+          "parameters_applied_timestamp": 1772792088.6880715,
+          "proposed_parameters": {
+            "min_granularity_ns": 100000,
+            "latency_ns": 100000,
+            "cstate_max": "POLL",
+            "napi_busy_poll": 500,
+            "wakeup_granularity_ns": 100000,
+            "migration_cost_ns": 100000,
+            "max_perf_pct": 100,
+            "min_perf_pct": 100
+          },
+          "justification": "Exploring a combination of the best observed napi_busy_poll (500) with the lowest effective migration_cost_ns (100000) from previous high-performing iterations to further minimize p99 latency. This explores a new region within the parameter space that combines favorable values.",
+          "token_metrics": {
+            "input_tokens": 3248,
+            "output_tokens": 195,
+            "total_tokens": 5524
+          }
+        }
+      },
+      "post_tuning_phase": false,
+      "system_metrics": {
+        "window_start_time": 1772792083.248098,
+        "window_end_time": 1772792091.2589376,
+        "perf_start_time": null,
+        "perf_end_time": null,
+        "system_metrics_start_time": 1772792084.249341,
+        "system_metrics_end_time": 1772792087.248098,
+        "power_socket0_watts": 59.05624566666666,
+        "power_ram_watts": 10.253851000000001,
+        "cstate_poll_pct": 100.0,
+        "cstate_c1_pct": 0.0,
+        "cstate_c1e_pct": 0.0,
+        "cstate_c6_pct": 0.0,
+        "cpu_load_cores_pct": 85.65589981268003,
+        "cpu_load_socket0_pct": 42.89331566621697
+      }
+    },
+    {
+      "iteration": 20,
+      "timestamp": 1772792099.3147967,
+      "parameters": {
+        "min_granularity_ns": 100000,
+        "latency_ns": 100000,
+        "cstate_max": {
+          "value": "POLL",
+          "cores": "0-9"
+        },
+        "napi_busy_poll": {
+          "value": 500,
+          "cores": "0-9"
+        },
+        "wakeup_granularity_ns": 100000,
+        "migration_cost_ns": 100000,
+        "max_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        },
+        "min_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        }
+      },
+      "metrics": {
+        "throughput": 55414.54539232975,
+        "goodput": 55421.14536200552,
+        "latency_avg": 0.574,
+        "latency_p95": 1.454,
+        "measured_requests": 277074,
+        "duration_seconds": 5.000022973,
+        "p_99_latency": 4919.0,
+        "latency_p99": 4.919,
+        "elapsed_time_ns": 5000022973,
+        "latency_median": 323.0,
+        "latency_min": 81.0,
+        "latency_max": 86969.0,
+        "p_25_latency": 211.0,
+        "p_75_latency": 594.0,
+        "p_90_latency": 1072.0,
+        "all_quick_tuner_timings": [],
+        "quick_response_count": 0
+      },
+      "reward": 4.919,
+      "tuner_timing": {},
+      "post_tuning_phase": false,
+      "system_metrics": {
+        "window_start_time": 1772792091.3002338,
+        "window_end_time": 1772792099.3117335,
+        "perf_start_time": null,
+        "perf_end_time": null,
+        "system_metrics_start_time": 1772792092.3014874,
+        "system_metrics_end_time": 1772792095.3002338,
+        "power_socket0_watts": 58.76726466666667,
+        "power_ram_watts": 10.127473,
+        "cstate_poll_pct": 100.0,
+        "cstate_c1_pct": 0.0,
+        "cstate_c1e_pct": 0.0,
+        "cstate_c6_pct": 0.0,
+        "cpu_load_cores_pct": 84.47594315417844,
+        "cpu_load_socket0_pct": 42.320479827914305
+      }
+    },
+    {
+      "iteration": 21,
+      "timestamp": 1772792107.4015234,
+      "parameters": {
+        "min_granularity_ns": 100000,
+        "latency_ns": 100000,
+        "cstate_max": {
+          "value": "POLL",
+          "cores": "0-9"
+        },
+        "napi_busy_poll": {
+          "value": 350,
+          "cores": "0-9"
+        },
+        "wakeup_granularity_ns": 100000,
+        "migration_cost_ns": 250000,
+        "max_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        },
+        "min_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        }
+      },
+      "metrics": {
+        "throughput": 52241.11679067461,
+        "goodput": 52247.716704360944,
+        "latency_avg": 0.608,
+        "latency_p95": 1.645,
+        "measured_requests": 261209,
+        "duration_seconds": 5.00006539,
+        "p_99_latency": 6077.0,
+        "latency_p99": 6.077,
+        "elapsed_time_ns": 5000065390,
+        "latency_median": 309.0,
+        "latency_min": 78.0,
+        "latency_max": 92714.0,
+        "p_25_latency": 197.0,
+        "p_75_latency": 564.0,
+        "p_90_latency": 1086.0,
+        "all_quick_tuner_timings": [],
+        "quick_response_count": 0
+      },
+      "reward": 6.077,
+      "tuner_timing": {
+        "reasoning": {
+          "tuner_call_time": 1772792091.2940893,
+          "tuner_start_iteration": 20,
+          "tuner_response_time": 1772792101.61995,
+          "tuner_duration": 10.325860738754272,
+          "tuner_response_time_ms": 10325.860738754272,
+          "tuner_type": "actor_reasoning",
+          "parameters_applied": true,
+          "parameters_applied_timestamp": 1772792103.3934524,
+          "proposed_parameters": {
+            "min_granularity_ns": 100000,
+            "latency_ns": 100000,
+            "cstate_max": "POLL",
+            "napi_busy_poll": 350,
+            "wakeup_granularity_ns": 100000,
+            "migration_cost_ns": 250000,
+            "max_perf_pct": 100,
+            "min_perf_pct": 100
+          },
+          "justification": "Exploring a slightly lower napi_busy_poll value (350) with migration_cost_ns=250000, as this region previously yielded the best latency_p99 results (e.g., napi_busy_poll=400 and 500).",
+          "token_metrics": {
+            "input_tokens": 3250,
+            "output_tokens": 195,
+            "total_tokens": 5755
+          }
+        }
+      },
+      "post_tuning_phase": false,
+      "system_metrics": {
+        "window_start_time": 1772792099.3160756,
+        "window_end_time": 1772792107.3282142,
+        "perf_start_time": null,
+        "perf_end_time": null,
+        "system_metrics_start_time": 1772792100.317399,
+        "system_metrics_end_time": 1772792103.3160756,
+        "power_socket0_watts": 58.334425333333336,
+        "power_ram_watts": 10.011544666666666,
+        "cstate_poll_pct": 100.0,
+        "cstate_c1_pct": 0.0,
+        "cstate_c1e_pct": 0.0,
+        "cstate_c6_pct": 0.0,
+        "cpu_load_cores_pct": 79.59804438477148,
+        "cpu_load_socket0_pct": 42.39831689124612
+      }
+    },
+    {
+      "iteration": 22,
+      "timestamp": 1772792115.4205225,
+      "parameters": {
+        "min_granularity_ns": 100000,
+        "latency_ns": 100000,
+        "cstate_max": {
+          "value": "POLL",
+          "cores": "0-9"
+        },
+        "napi_busy_poll": {
+          "value": 350,
+          "cores": "0-9"
+        },
+        "wakeup_granularity_ns": 100000,
+        "migration_cost_ns": 250000,
+        "max_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        },
+        "min_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        }
+      },
+      "metrics": {
+        "throughput": 54659.21958084801,
+        "goodput": 54665.41956038311,
+        "latency_avg": 0.582,
+        "latency_p95": 1.481,
+        "measured_requests": 273297,
+        "duration_seconds": 5.000016504,
+        "p_99_latency": 5133.0,
+        "latency_p99": 5.133,
+        "elapsed_time_ns": 5000016504,
+        "latency_median": 323.0,
+        "latency_min": 81.0,
+        "latency_max": 81196.0,
+        "p_25_latency": 210.0,
+        "p_75_latency": 602.0,
+        "p_90_latency": 1090.0,
+        "all_quick_tuner_timings": [],
+        "quick_response_count": 0
+      },
+      "reward": 5.133,
+      "tuner_timing": {},
+      "post_tuning_phase": false,
+      "system_metrics": {
+        "window_start_time": 1772792107.4056106,
+        "window_end_time": 1772792115.4173145,
+        "perf_start_time": null,
+        "perf_end_time": null,
+        "system_metrics_start_time": 1772792108.4068592,
+        "system_metrics_end_time": 1772792111.4056106,
+        "power_socket0_watts": 58.556165,
+        "power_ram_watts": 10.004455666666667,
+        "cstate_poll_pct": 100.0,
+        "cstate_c1_pct": 0.0,
+        "cstate_c1e_pct": 0.0,
+        "cstate_c6_pct": 0.0,
+        "cpu_load_cores_pct": 84.35784974451921,
+        "cpu_load_socket0_pct": 42.2279539984732
+      }
+    },
+    {
+      "iteration": 23,
+      "timestamp": 1772792123.437014,
+      "parameters": {
+        "min_granularity_ns": 100000,
+        "latency_ns": 100000,
+        "cstate_max": {
+          "value": "POLL",
+          "cores": "0-9"
+        },
+        "napi_busy_poll": {
+          "value": 650,
+          "cores": "0-9"
+        },
+        "wakeup_granularity_ns": 100000,
+        "migration_cost_ns": 250000,
+        "max_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        },
+        "min_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        }
+      },
+      "metrics": {
+        "throughput": 49370.403664273465,
+        "goodput": 49377.00361129041,
+        "latency_avg": 0.644,
+        "latency_p95": 1.603,
+        "measured_requests": 246854,
+        "duration_seconds": 5.000040139,
+        "p_99_latency": 6798.0,
+        "latency_p99": 6.798,
+        "elapsed_time_ns": 5000040139,
+        "latency_median": 315.0,
+        "latency_min": 77.0,
+        "latency_max": 82638.0,
+        "p_25_latency": 201.0,
+        "p_75_latency": 581.0,
+        "p_90_latency": 1097.0,
+        "all_quick_tuner_timings": [
+          {
+            "tuner_call_time": 1772791959.940751,
+            "tuner_response_time": 1772792121.3328156,
+            "tuner_duration": 161.39206457138062,
+            "tuner_response_time_ms": 161392.06457138062,
+            "tuner_type": "speculator_quick",
+            "parameters_applied": false,
+            "parameters_applied_timestamp": null,
+            "proposed_parameters": null,
+            "justification": null,
+            "token_metrics": {
+              "input_tokens": 1906,
+              "output_tokens": 65525,
+              "total_tokens": 67431
+            },
+            "response_number": 1
+          }
+        ],
+        "quick_response_count": 1
+      },
+      "reward": 6.798,
+      "tuner_timing": {
+        "quick": {
+          "tuner_call_time": 1772791959.940751,
+          "tuner_response_time": 1772792121.3328156,
+          "tuner_duration": 161.39206457138062,
+          "tuner_response_time_ms": 161392.06457138062,
+          "tuner_type": "speculator_quick",
+          "parameters_applied": false,
+          "parameters_applied_timestamp": null,
+          "proposed_parameters": null,
+          "justification": null,
+          "token_metrics": {
+            "input_tokens": 1906,
+            "output_tokens": 65525,
+            "total_tokens": 67431
+          },
+          "response_number": 1
+        },
+        "reasoning": {
+          "tuner_call_time": 1772792107.401667,
+          "tuner_start_iteration": 22,
+          "tuner_response_time": 1772792118.2277565,
+          "tuner_duration": 10.82608938217163,
+          "tuner_response_time_ms": 10826.08938217163,
+          "tuner_type": "actor_reasoning",
+          "parameters_applied": true,
+          "parameters_applied_timestamp": 1772792119.9299898,
+          "proposed_parameters": {
+            "min_granularity_ns": 100000,
+            "latency_ns": 100000,
+            "cstate_max": "POLL",
+            "napi_busy_poll": 650,
+            "wakeup_granularity_ns": 100000,
+            "migration_cost_ns": 250000,
+            "max_perf_pct": 100,
+            "min_perf_pct": 100
+          },
+          "justification": "Exploring the upper end of the napi_busy_poll range (650) while maintaining the previously effective migration_cost_ns (250000) and other low-latency settings. This continues exploration around the best performing region and probes for further improvements.",
+          "token_metrics": {
+            "input_tokens": 3251,
+            "output_tokens": 189,
+            "total_tokens": 5547
+          }
+        }
+      },
+      "post_tuning_phase": false,
+      "system_metrics": {
+        "window_start_time": 1772792115.421553,
+        "window_end_time": 1772792123.4336712,
+        "perf_start_time": null,
+        "perf_end_time": null,
+        "system_metrics_start_time": 1772792116.422813,
+        "system_metrics_end_time": 1772792119.421553,
+        "power_socket0_watts": 58.877738,
+        "power_ram_watts": 10.360695666666667,
+        "cstate_poll_pct": 100.0,
+        "cstate_c1_pct": 0.0,
+        "cstate_c1e_pct": 0.0,
+        "cstate_c6_pct": 0.0,
+        "cpu_load_cores_pct": 85.7815673615762,
+        "cpu_load_socket0_pct": 43.240672018961654
+      }
+    },
+    {
+      "iteration": 24,
+      "timestamp": 1772792131.5573053,
+      "parameters": {
+        "min_granularity_ns": 100000,
+        "latency_ns": 100000,
+        "cstate_max": {
+          "value": "POLL",
+          "cores": "0-9"
+        },
+        "napi_busy_poll": {
+          "value": 500,
+          "cores": "0-9"
+        },
+        "wakeup_granularity_ns": 100000,
+        "migration_cost_ns": 100000,
+        "max_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        },
+        "min_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        }
+      },
+      "metrics": {
+        "throughput": 53042.302518856435,
+        "goodput": 53048.70250709453,
+        "latency_avg": 0.599,
+        "latency_p95": 1.518,
+        "measured_requests": 265212,
+        "duration_seconds": 5.000009189,
+        "p_99_latency": 5245.0,
+        "latency_p99": 5.245,
+        "elapsed_time_ns": 5000009189,
+        "latency_median": 327.0,
+        "latency_min": 81.0,
+        "latency_max": 98744.0,
+        "p_25_latency": 210.0,
+        "p_75_latency": 615.0,
+        "p_90_latency": 1116.0,
+        "all_quick_tuner_timings": [
+          {
+            "tuner_call_time": 1772792123.4372892,
+            "tuner_response_time": 1772792124.5445764,
+            "tuner_duration": 1.1072871685028076,
+            "tuner_response_time_ms": 1107.2871685028076,
+            "tuner_type": "speculator_quick",
+            "parameters_applied": true,
+            "parameters_applied_timestamp": 1772792126.4468966,
+            "proposed_parameters": {
+              "min_granularity_ns": 100000,
+              "latency_ns": 100000,
+              "cstate_max": "POLL",
+              "napi_busy_poll": 500,
+              "wakeup_granularity_ns": 100000,
+              "migration_cost_ns": 100000,
+              "max_perf_pct": 100,
+              "min_perf_pct": 100
+            },
+            "justification": "The last run showed a significant increase in latency_p99. To explore a potentially better region, we will revert napi_busy_poll to 500 and migration_cost_ns to 100000, which were part of a better performing configuration in iteration 8.",
+            "token_metrics": {
+              "input_tokens": 3232,
+              "output_tokens": 195,
+              "total_tokens": 3429
+            },
+            "response_number": 1
+          }
+        ],
+        "quick_response_count": 1
+      },
+      "reward": 5.245,
+      "tuner_timing": {
+        "quick": {
+          "tuner_call_time": 1772792123.4372892,
+          "tuner_response_time": 1772792124.5445764,
+          "tuner_duration": 1.1072871685028076,
+          "tuner_response_time_ms": 1107.2871685028076,
+          "tuner_type": "speculator_quick",
+          "parameters_applied": true,
+          "parameters_applied_timestamp": 1772792126.4468966,
+          "proposed_parameters": {
+            "min_granularity_ns": 100000,
+            "latency_ns": 100000,
+            "cstate_max": "POLL",
+            "napi_busy_poll": 500,
+            "wakeup_granularity_ns": 100000,
+            "migration_cost_ns": 100000,
+            "max_perf_pct": 100,
+            "min_perf_pct": 100
+          },
+          "justification": "The last run showed a significant increase in latency_p99. To explore a potentially better region, we will revert napi_busy_poll to 500 and migration_cost_ns to 100000, which were part of a better performing configuration in iteration 8.",
+          "token_metrics": {
+            "input_tokens": 3232,
+            "output_tokens": 195,
+            "total_tokens": 3429
+          },
+          "response_number": 1
+        }
+      },
+      "post_tuning_phase": false,
+      "system_metrics": {
+        "window_start_time": 1772792123.4456165,
+        "window_end_time": 1772792131.4543536,
+        "perf_start_time": null,
+        "perf_end_time": null,
+        "system_metrics_start_time": 1772792124.44686,
+        "system_metrics_end_time": 1772792127.4456165,
+        "power_socket0_watts": 59.06887966666667,
+        "power_ram_watts": 10.175494666666667,
+        "cstate_poll_pct": 100.0,
+        "cstate_c1_pct": 0.0,
+        "cstate_c1e_pct": 0.0,
+        "cstate_c6_pct": 0.0,
+        "cpu_load_cores_pct": 85.90890072113143,
+        "cpu_load_socket0_pct": 44.38293614676598
+      }
+    },
+    {
+      "iteration": 25,
+      "timestamp": 1772792139.646619,
+      "parameters": {
+        "min_granularity_ns": 100000,
+        "latency_ns": 100000,
+        "cstate_max": {
+          "value": "POLL",
+          "cores": "0-9"
+        },
+        "napi_busy_poll": {
+          "value": 525,
+          "cores": "0-9"
+        },
+        "wakeup_granularity_ns": 100000,
+        "migration_cost_ns": 250000,
+        "max_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        },
+        "min_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        }
+      },
+      "metrics": {
+        "throughput": 52084.51766024667,
+        "goodput": 52090.91762555373,
+        "latency_avg": 0.61,
+        "latency_p95": 1.746,
+        "measured_requests": 260424,
+        "duration_seconds": 5.000027104,
+        "p_99_latency": 5764.0,
+        "latency_p99": 5.764,
+        "elapsed_time_ns": 5000027104,
+        "latency_median": 307.0,
+        "latency_min": 78.0,
+        "latency_max": 96731.0,
+        "p_25_latency": 196.0,
+        "p_75_latency": 582.0,
+        "p_90_latency": 1129.0,
+        "all_quick_tuner_timings": [
+          {
+            "tuner_call_time": 1772792131.5577085,
+            "tuner_response_time": 1772792132.9625125,
+            "tuner_duration": 1.404803991317749,
+            "tuner_response_time_ms": 1404.803991317749,
+            "tuner_type": "speculator_quick",
+            "parameters_applied": true,
+            "parameters_applied_timestamp": 1772792134.7854164,
+            "proposed_parameters": {
+              "min_granularity_ns": 100000,
+              "latency_ns": 100000,
+              "cstate_max": "POLL",
+              "napi_busy_poll": 500,
+              "wakeup_granularity_ns": 100000,
+              "migration_cost_ns": 100000,
+              "max_perf_pct": 100,
+              "min_perf_pct": 100
+            },
+            "justification": "The previous iteration showed a slight increase in latency_p99. To continue exploration and potentially improve upon the best result (iter 8), we will slightly increase napi_busy_poll to 500, as this value was present in the best performing configuration, and keep migration_cost_ns at 100000, which yielded a better result than 250000 in recent iterations.",
+            "token_metrics": {
+              "input_tokens": 3399,
+              "output_tokens": 221,
+              "total_tokens": 3622
+            },
+            "response_number": 1
+          }
+        ],
+        "quick_response_count": 1
+      },
+      "reward": 5.764,
+      "tuner_timing": {
+        "quick": {
+          "tuner_call_time": 1772792131.5577085,
+          "tuner_response_time": 1772792132.9625125,
+          "tuner_duration": 1.404803991317749,
+          "tuner_response_time_ms": 1404.803991317749,
+          "tuner_type": "speculator_quick",
+          "parameters_applied": true,
+          "parameters_applied_timestamp": 1772792134.7854164,
+          "proposed_parameters": {
+            "min_granularity_ns": 100000,
+            "latency_ns": 100000,
+            "cstate_max": "POLL",
+            "napi_busy_poll": 500,
+            "wakeup_granularity_ns": 100000,
+            "migration_cost_ns": 100000,
+            "max_perf_pct": 100,
+            "min_perf_pct": 100
+          },
+          "justification": "The previous iteration showed a slight increase in latency_p99. To continue exploration and potentially improve upon the best result (iter 8), we will slightly increase napi_busy_poll to 500, as this value was present in the best performing configuration, and keep migration_cost_ns at 100000, which yielded a better result than 250000 in recent iterations.",
+          "token_metrics": {
+            "input_tokens": 3399,
+            "output_tokens": 221,
+            "total_tokens": 3622
+          },
+          "response_number": 1
+        },
+        "reasoning": {
+          "tuner_call_time": 1772792123.4377923,
+          "tuner_start_iteration": 24,
+          "tuner_response_time": 1772792134.7857654,
+          "tuner_duration": 11.347973108291626,
+          "tuner_response_time_ms": 11347.973108291626,
+          "tuner_type": "actor_reasoning",
+          "parameters_applied": true,
+          "parameters_applied_timestamp": 1772792136.4399295,
+          "proposed_parameters": {
+            "min_granularity_ns": 100000,
+            "latency_ns": 100000,
+            "cstate_max": "POLL",
+            "napi_busy_poll": 525,
+            "wakeup_granularity_ns": 100000,
+            "migration_cost_ns": 250000,
+            "max_perf_pct": 100,
+            "min_perf_pct": 100
+          },
+          "justification": "Exploring a slight increase in napi_busy_poll near the observed optimum (500), while maintaining other parameters that have consistently shown low latency_p99.",
+          "token_metrics": {
+            "input_tokens": 3252,
+            "output_tokens": 167,
+            "total_tokens": 5612
+          }
+        }
+      },
+      "post_tuning_phase": false,
+      "system_metrics": {
+        "window_start_time": 1772792131.5631936,
+        "window_end_time": 1772792139.5741227,
+        "perf_start_time": null,
+        "perf_end_time": null,
+        "system_metrics_start_time": 1772792132.5644486,
+        "system_metrics_end_time": 1772792135.5631936,
+        "power_socket0_watts": 58.28814033333333,
+        "power_ram_watts": 9.950757666666666,
+        "cstate_poll_pct": 100.0,
+        "cstate_c1_pct": 0.0,
+        "cstate_c1e_pct": 0.0,
+        "cstate_c6_pct": 0.0,
+        "cpu_load_cores_pct": 79.49891769466642,
+        "cpu_load_socket0_pct": 43.29475879362827
+      }
+    },
+    {
+      "iteration": 26,
+      "timestamp": 1772792147.6768413,
+      "parameters": {
+        "min_granularity_ns": 100000,
+        "latency_ns": 100000,
+        "cstate_max": {
+          "value": "POLL",
+          "cores": "0-9"
+        },
+        "napi_busy_poll": {
+          "value": 500,
+          "cores": "0-9"
+        },
+        "wakeup_granularity_ns": 100000,
+        "migration_cost_ns": 100000,
+        "max_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        },
+        "min_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        }
+      },
+      "metrics": {
+        "throughput": 53588.191082925005,
+        "goodput": 53594.59108186004,
+        "latency_avg": 0.593,
+        "latency_p95": 1.547,
+        "measured_requests": 267941,
+        "duration_seconds": 5.000000832,
+        "p_99_latency": 5209.0,
+        "latency_p99": 5.209,
+        "elapsed_time_ns": 5000000832,
+        "latency_median": 326.0,
+        "latency_min": 81.0,
+        "latency_max": 91241.0,
+        "p_25_latency": 211.0,
+        "p_75_latency": 609.0,
+        "p_90_latency": 1133.0,
+        "all_quick_tuner_timings": [
+          {
+            "tuner_call_time": 1772792139.64691,
+            "tuner_response_time": 1772792140.8585002,
+            "tuner_duration": 1.21159029006958,
+            "tuner_response_time_ms": 1211.59029006958,
+            "tuner_type": "speculator_quick",
+            "parameters_applied": true,
+            "parameters_applied_timestamp": 1772792142.7669468,
+            "proposed_parameters": {
+              "min_granularity_ns": 100000,
+              "latency_ns": 100000,
+              "cstate_max": "POLL",
+              "napi_busy_poll": 500,
+              "wakeup_granularity_ns": 100000,
+              "migration_cost_ns": 100000,
+              "max_perf_pct": 100,
+              "min_perf_pct": 100
+            },
+            "justification": "The previous iteration with napi_busy_poll=525 and migration_cost_ns=250000 resulted in higher latency. To explore a potentially better region near the best observed latency_p99 of 3.87 (iter 8), we will revert migration_cost_ns to 100000 and slightly decrease napi_busy_poll to 500, keeping other parameters consistent with the best performing configurations.",
+            "token_metrics": {
+              "input_tokens": 3236,
+              "output_tokens": 230,
+              "total_tokens": 3468
+            },
+            "response_number": 1
+          }
+        ],
+        "quick_response_count": 1
+      },
+      "reward": 5.209,
+      "tuner_timing": {
+        "quick": {
+          "tuner_call_time": 1772792139.64691,
+          "tuner_response_time": 1772792140.8585002,
+          "tuner_duration": 1.21159029006958,
+          "tuner_response_time_ms": 1211.59029006958,
+          "tuner_type": "speculator_quick",
+          "parameters_applied": true,
+          "parameters_applied_timestamp": 1772792142.7669468,
+          "proposed_parameters": {
+            "min_granularity_ns": 100000,
+            "latency_ns": 100000,
+            "cstate_max": "POLL",
+            "napi_busy_poll": 500,
+            "wakeup_granularity_ns": 100000,
+            "migration_cost_ns": 100000,
+            "max_perf_pct": 100,
+            "min_perf_pct": 100
+          },
+          "justification": "The previous iteration with napi_busy_poll=525 and migration_cost_ns=250000 resulted in higher latency. To explore a potentially better region near the best observed latency_p99 of 3.87 (iter 8), we will revert migration_cost_ns to 100000 and slightly decrease napi_busy_poll to 500, keeping other parameters consistent with the best performing configurations.",
+          "token_metrics": {
+            "input_tokens": 3236,
+            "output_tokens": 230,
+            "total_tokens": 3468
+          },
+          "response_number": 1
+        }
+      },
+      "post_tuning_phase": false,
+      "system_metrics": {
+        "window_start_time": 1772792139.6568868,
+        "window_end_time": 1772792147.668392,
+        "perf_start_time": null,
+        "perf_end_time": null,
+        "system_metrics_start_time": 1772792140.6579049,
+        "system_metrics_end_time": 1772792143.6568868,
+        "power_socket0_watts": 58.73076566666666,
+        "power_ram_watts": 10.258190999999998,
+        "cstate_poll_pct": 100.0,
+        "cstate_c1_pct": 0.0,
+        "cstate_c1e_pct": 0.0,
+        "cstate_c6_pct": 0.0,
+        "cpu_load_cores_pct": 84.22768555933894,
+        "cpu_load_socket0_pct": 43.816952709927676
+      }
+    },
+    {
+      "iteration": 27,
+      "timestamp": 1772792156.2252426,
+      "parameters": {
+        "min_granularity_ns": 100000,
+        "latency_ns": 100000,
+        "cstate_max": {
+          "value": "POLL",
+          "cores": "0-9"
+        },
+        "napi_busy_poll": {
+          "value": 500,
+          "cores": "0-9"
+        },
+        "wakeup_granularity_ns": 100000,
+        "migration_cost_ns": 100000,
+        "max_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        },
+        "min_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        }
+      },
+      "metrics": {
+        "throughput": 53055.33053460223,
+        "goodput": 53061.93047620199,
+        "latency_avg": 0.599,
+        "latency_p95": 1.533,
+        "measured_requests": 265279,
+        "duration_seconds": 5.000044243,
+        "p_99_latency": 5519.0,
+        "latency_p99": 5.519,
+        "elapsed_time_ns": 5000044243,
+        "latency_median": 328.0,
+        "latency_min": 79.0,
+        "latency_max": 100283.0,
+        "p_25_latency": 213.0,
+        "p_75_latency": 609.0,
+        "p_90_latency": 1117.0,
+        "all_quick_tuner_timings": [
+          {
+            "tuner_call_time": 1772792147.6770551,
+            "tuner_response_time": 1772792149.4545925,
+            "tuner_duration": 1.7775373458862305,
+            "tuner_response_time_ms": 1777.5373458862305,
+            "tuner_type": "speculator_quick",
+            "parameters_applied": true,
+            "parameters_applied_timestamp": 1772792151.314525,
+            "proposed_parameters": {
+              "min_granularity_ns": 100000,
+              "latency_ns": 100000,
+              "cstate_max": "POLL",
+              "napi_busy_poll": 500,
+              "wakeup_granularity_ns": 100000,
+              "migration_cost_ns": 100000,
+              "max_perf_pct": 100,
+              "min_perf_pct": 100
+            },
+            "justification": "Continuing exploration by probing a slightly higher napi_busy_poll value, as it has shown promise in previous iterations for reducing latency while maintaining throughput. Migration cost remains low to favor responsiveness.",
+            "token_metrics": {
+              "input_tokens": 3405,
+              "output_tokens": 170,
+              "total_tokens": 3577
+            },
+            "response_number": 1
+          }
+        ],
+        "quick_response_count": 1
+      },
+      "reward": 5.519,
+      "tuner_timing": {
+        "quick": {
+          "tuner_call_time": 1772792147.6770551,
+          "tuner_response_time": 1772792149.4545925,
+          "tuner_duration": 1.7775373458862305,
+          "tuner_response_time_ms": 1777.5373458862305,
+          "tuner_type": "speculator_quick",
+          "parameters_applied": true,
+          "parameters_applied_timestamp": 1772792151.314525,
+          "proposed_parameters": {
+            "min_granularity_ns": 100000,
+            "latency_ns": 100000,
+            "cstate_max": "POLL",
+            "napi_busy_poll": 500,
+            "wakeup_granularity_ns": 100000,
+            "migration_cost_ns": 100000,
+            "max_perf_pct": 100,
+            "min_perf_pct": 100
+          },
+          "justification": "Continuing exploration by probing a slightly higher napi_busy_poll value, as it has shown promise in previous iterations for reducing latency while maintaining throughput. Migration cost remains low to favor responsiveness.",
+          "token_metrics": {
+            "input_tokens": 3405,
+            "output_tokens": 170,
+            "total_tokens": 3577
+          },
+          "response_number": 1
+        },
+        "reasoning": {
+          "tuner_call_time": 1772792139.6472516,
+          "tuner_start_iteration": 26,
+          "tuner_response_time": 1772792147.9810698,
+          "tuner_duration": 8.333818197250366,
+          "tuner_response_time_ms": 8333.818197250366,
+          "tuner_type": "actor_reasoning",
+          "parameters_applied": true,
+          "parameters_applied_timestamp": 1772792149.3540447,
+          "proposed_parameters": {
+            "min_granularity_ns": 100000,
+            "latency_ns": 100000,
+            "cstate_max": "POLL",
+            "napi_busy_poll": 450,
+            "wakeup_granularity_ns": 100000,
+            "migration_cost_ns": 250000,
+            "max_perf_pct": 100,
+            "min_perf_pct": 100
+          },
+          "justification": "Exploring a `napi_busy_poll` value between the two best performing configurations, maintaining `migration_cost_ns` at 250000 to probe a potentially optimal region for minimizing latency.",
+          "token_metrics": {
+            "input_tokens": 3258,
+            "output_tokens": 177,
+            "total_tokens": 5086
+          }
+        }
+      },
+      "post_tuning_phase": false,
+      "system_metrics": {
+        "window_start_time": 1772792147.6811543,
+        "window_end_time": 1772792156.1915429,
+        "perf_start_time": null,
+        "perf_end_time": null,
+        "system_metrics_start_time": 1772792148.6819034,
+        "system_metrics_end_time": 1772792151.6811543,
+        "power_socket0_watts": 58.80457766666666,
+        "power_ram_watts": 10.342326,
+        "cstate_poll_pct": 100.0,
+        "cstate_c1_pct": 0.0,
+        "cstate_c1e_pct": 0.0,
+        "cstate_c6_pct": 0.0,
+        "cpu_load_cores_pct": 83.65472410060492,
+        "cpu_load_socket0_pct": 43.20388697770517
+      }
+    },
+    {
+      "iteration": 28,
+      "timestamp": 1772792164.8452725,
+      "parameters": {
+        "min_granularity_ns": 100000,
+        "latency_ns": 100000,
+        "cstate_max": {
+          "value": "POLL",
+          "cores": "0-9"
+        },
+        "napi_busy_poll": {
+          "value": 500,
+          "cores": "0-9"
+        },
+        "wakeup_granularity_ns": 100000,
+        "migration_cost_ns": 250000,
+        "max_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        },
+        "min_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        }
+      },
+      "metrics": {
+        "throughput": 53200.778253144716,
+        "goodput": 53207.17817835006,
+        "latency_avg": 0.597,
+        "latency_p95": 1.6,
+        "measured_requests": 266007,
+        "duration_seconds": 5.000058434,
+        "p_99_latency": 5201.0,
+        "latency_p99": 5.201,
+        "elapsed_time_ns": 5000058434,
+        "latency_median": 324.0,
+        "latency_min": 80.0,
+        "latency_max": 64455.0,
+        "p_25_latency": 211.0,
+        "p_75_latency": 620.0,
+        "p_90_latency": 1153.0,
+        "all_quick_tuner_timings": [
+          {
+            "tuner_call_time": 1772792156.2254243,
+            "tuner_response_time": 1772792157.3374565,
+            "tuner_duration": 1.112032175064087,
+            "tuner_response_time_ms": 1112.032175064087,
+            "tuner_type": "speculator_quick",
+            "parameters_applied": true,
+            "parameters_applied_timestamp": 1772792159.1336653,
+            "proposed_parameters": {
+              "min_granularity_ns": 100000,
+              "latency_ns": 100000,
+              "cstate_max": "POLL",
+              "napi_busy_poll": 500,
+              "wakeup_granularity_ns": 100000,
+              "migration_cost_ns": 250000,
+              "max_perf_pct": 100,
+              "min_perf_pct": 100
+            },
+            "justification": "Continuing exploration, this configuration slightly increases migration_cost_ns from the last iteration, aiming to find a better balance between latency and throughput, given that the best performance was achieved with a higher migration_cost_ns.",
+            "token_metrics": {
+              "input_tokens": 3244,
+              "output_tokens": 177,
+              "total_tokens": 3423
+            },
+            "response_number": 1
+          }
+        ],
+        "quick_response_count": 1
+      },
+      "reward": 5.201,
+      "tuner_timing": {
+        "quick": {
+          "tuner_call_time": 1772792156.2254243,
+          "tuner_response_time": 1772792157.3374565,
+          "tuner_duration": 1.112032175064087,
+          "tuner_response_time_ms": 1112.032175064087,
+          "tuner_type": "speculator_quick",
+          "parameters_applied": true,
+          "parameters_applied_timestamp": 1772792159.1336653,
+          "proposed_parameters": {
+            "min_granularity_ns": 100000,
+            "latency_ns": 100000,
+            "cstate_max": "POLL",
+            "napi_busy_poll": 500,
+            "wakeup_granularity_ns": 100000,
+            "migration_cost_ns": 250000,
+            "max_perf_pct": 100,
+            "min_perf_pct": 100
+          },
+          "justification": "Continuing exploration, this configuration slightly increases migration_cost_ns from the last iteration, aiming to find a better balance between latency and throughput, given that the best performance was achieved with a higher migration_cost_ns.",
+          "token_metrics": {
+            "input_tokens": 3244,
+            "output_tokens": 177,
+            "total_tokens": 3423
+          },
+          "response_number": 1
+        }
+      },
+      "post_tuning_phase": false,
+      "system_metrics": {
+        "window_start_time": 1772792156.2357106,
+        "window_end_time": 1772792164.7468748,
+        "perf_start_time": null,
+        "perf_end_time": null,
+        "system_metrics_start_time": 1772792157.237003,
+        "system_metrics_end_time": 1772792160.2357106,
+        "power_socket0_watts": 58.742729,
+        "power_ram_watts": 10.155288666666667,
+        "cstate_poll_pct": 100.0,
+        "cstate_c1_pct": 0.0,
+        "cstate_c1e_pct": 0.0,
+        "cstate_c6_pct": 0.0,
+        "cpu_load_cores_pct": 83.41617866496317,
+        "cpu_load_socket0_pct": 43.58665162848708
+      }
+    },
+    {
+      "iteration": 29,
+      "timestamp": 1772792172.925337,
+      "parameters": {
+        "min_granularity_ns": 100000,
+        "latency_ns": 100000,
+        "cstate_max": {
+          "value": "POLL",
+          "cores": "0-9"
+        },
+        "napi_busy_poll": {
+          "value": 450,
+          "cores": "0-9"
+        },
+        "wakeup_granularity_ns": 100000,
+        "migration_cost_ns": 250000,
+        "max_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        },
+        "min_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        }
+      },
+      "metrics": {
+        "throughput": 53347.439094355876,
+        "goodput": 53353.839027065704,
+        "latency_avg": 0.596,
+        "latency_p95": 1.528,
+        "measured_requests": 266740,
+        "duration_seconds": 5.000052571,
+        "p_99_latency": 5580.0,
+        "latency_p99": 5.58,
+        "elapsed_time_ns": 5000052571,
+        "latency_median": 330.0,
+        "latency_min": 78.0,
+        "latency_max": 42096.0,
+        "p_25_latency": 214.0,
+        "p_75_latency": 607.0,
+        "p_90_latency": 1109.0,
+        "all_quick_tuner_timings": [
+          {
+            "tuner_call_time": 1772792164.8453722,
+            "tuner_response_time": 1772792166.968352,
+            "tuner_duration": 2.1229798793792725,
+            "tuner_response_time_ms": 2122.9798793792725,
+            "tuner_type": "speculator_quick",
+            "parameters_applied": true,
+            "parameters_applied_timestamp": 1772792168.8178647,
+            "proposed_parameters": {
+              "min_granularity_ns": 100000,
+              "latency_ns": 100000,
+              "cstate_max": "POLL",
+              "napi_busy_poll": 450,
+              "wakeup_granularity_ns": 100000,
+              "migration_cost_ns": 250000,
+              "max_perf_pct": 100,
+              "min_perf_pct": 100
+            },
+            "justification": "The previous configuration with napi_busy_poll=500 and migration_cost_ns=250000 showed a slight increase in latency compared to the best observed. Exploring a slightly lower napi_busy_poll value (450) while maintaining the migration_cost_ns at 250000 might help reduce latency further without significantly impacting throughput, as we are still in the exploration phase.",
+            "token_metrics": {
+              "input_tokens": 3413,
+              "output_tokens": 221,
+              "total_tokens": 3634
+            },
+            "response_number": 1
+          }
+        ],
+        "quick_response_count": 1
+      },
+      "reward": 5.58,
+      "tuner_timing": {
+        "quick": {
+          "tuner_call_time": 1772792164.8453722,
+          "tuner_response_time": 1772792166.968352,
+          "tuner_duration": 2.1229798793792725,
+          "tuner_response_time_ms": 2122.9798793792725,
+          "tuner_type": "speculator_quick",
+          "parameters_applied": true,
+          "parameters_applied_timestamp": 1772792168.8178647,
+          "proposed_parameters": {
+            "min_granularity_ns": 100000,
+            "latency_ns": 100000,
+            "cstate_max": "POLL",
+            "napi_busy_poll": 450,
+            "wakeup_granularity_ns": 100000,
+            "migration_cost_ns": 250000,
+            "max_perf_pct": 100,
+            "min_perf_pct": 100
+          },
+          "justification": "The previous configuration with napi_busy_poll=500 and migration_cost_ns=250000 showed a slight increase in latency compared to the best observed. Exploring a slightly lower napi_busy_poll value (450) while maintaining the migration_cost_ns at 250000 might help reduce latency further without significantly impacting throughput, as we are still in the exploration phase.",
+          "token_metrics": {
+            "input_tokens": 3413,
+            "output_tokens": 221,
+            "total_tokens": 3634
+          },
+          "response_number": 1
+        },
+        "reasoning": {
+          "tuner_call_time": 1772792156.2258015,
+          "tuner_start_iteration": 28,
+          "tuner_response_time": 1772792165.349518,
+          "tuner_duration": 9.123716592788696,
+          "tuner_response_time_ms": 9123.716592788696,
+          "tuner_type": "actor_reasoning",
+          "parameters_applied": true,
+          "parameters_applied_timestamp": 1772792166.8676608,
+          "proposed_parameters": {
+            "min_granularity_ns": 100000,
+            "latency_ns": 100000,
+            "cstate_max": "POLL",
+            "napi_busy_poll": 450,
+            "wakeup_granularity_ns": 100000,
+            "migration_cost_ns": 250000,
+            "max_perf_pct": 100,
+            "min_perf_pct": 100
+          },
+          "justification": "Probing a value for napi_busy_poll between the two best performing configurations (400 and 500) while maintaining a higher migration_cost_ns to further optimize for latency_p99, as this region has shown the lowest p99 latencies.",
+          "token_metrics": {
+            "input_tokens": 3266,
+            "output_tokens": 154,
+            "total_tokens": 5306
+          }
+        }
+      },
+      "post_tuning_phase": false,
+      "system_metrics": {
+        "window_start_time": 1772792164.8496501,
+        "window_end_time": 1772792172.8587606,
+        "perf_start_time": null,
+        "perf_end_time": null,
+        "system_metrics_start_time": 1772792165.849902,
+        "system_metrics_end_time": 1772792168.8496501,
+        "power_socket0_watts": 58.94139799999999,
+        "power_ram_watts": 10.338118,
+        "cstate_poll_pct": 100.0,
+        "cstate_c1_pct": 0.0,
+        "cstate_c1e_pct": 0.0,
+        "cstate_c6_pct": 0.0,
+        "cpu_load_cores_pct": 84.7284816087108,
+        "cpu_load_socket0_pct": 44.83088103967152
+      }
+    },
+    {
+      "iteration": 30,
+      "timestamp": 1772792180.968056,
+      "parameters": {
+        "min_granularity_ns": 100000,
+        "latency_ns": 100000,
+        "cstate_max": {
+          "value": "POLL",
+          "cores": "0-9"
+        },
+        "napi_busy_poll": {
+          "value": 500,
+          "cores": "0-9"
+        },
+        "wakeup_granularity_ns": 100000,
+        "migration_cost_ns": 250000,
+        "max_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        },
+        "min_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        }
+      },
+      "metrics": {
+        "throughput": 53234.50483392984,
+        "goodput": 53240.90477440015,
+        "latency_avg": 0.597,
+        "latency_p95": 1.538,
+        "measured_requests": 266175,
+        "duration_seconds": 5.000046508,
+        "p_99_latency": 5367.0,
+        "latency_p99": 5.367,
+        "elapsed_time_ns": 5000046508,
+        "latency_median": 324.0,
+        "latency_min": 80.0,
+        "latency_max": 60339.0,
+        "p_25_latency": 209.0,
+        "p_75_latency": 619.0,
+        "p_90_latency": 1120.0,
+        "all_quick_tuner_timings": [
+          {
+            "tuner_call_time": 1772792172.925437,
+            "tuner_response_time": 1772792173.8356173,
+            "tuner_duration": 0.9101803302764893,
+            "tuner_response_time_ms": 910.1803302764893,
+            "tuner_type": "speculator_quick",
+            "parameters_applied": true,
+            "parameters_applied_timestamp": 1772792175.5575216,
+            "proposed_parameters": {
+              "min_granularity_ns": 100000,
+              "latency_ns": 100000,
+              "cstate_max": "POLL",
+              "napi_busy_poll": 500,
+              "wakeup_granularity_ns": 100000,
+              "migration_cost_ns": 250000,
+              "max_perf_pct": 100,
+              "min_perf_pct": 100
+            },
+            "justification": "The previous best configuration (Iter 8) achieved the lowest latency_p99 of 3.87. While Iter 29 showed a slight increase in latency, it maintained high throughput. Given this is the final tuning call, we will revert to the best performing configuration from history to ensure robustness.",
+            "token_metrics": {
+              "input_tokens": 3252,
+              "output_tokens": 196,
+              "total_tokens": 3450
+            },
+            "response_number": 1
+          }
+        ],
+        "quick_response_count": 1
+      },
+      "reward": 5.367,
+      "tuner_timing": {
+        "quick": {
+          "tuner_call_time": 1772792172.925437,
+          "tuner_response_time": 1772792173.8356173,
+          "tuner_duration": 0.9101803302764893,
+          "tuner_response_time_ms": 910.1803302764893,
+          "tuner_type": "speculator_quick",
+          "parameters_applied": true,
+          "parameters_applied_timestamp": 1772792175.5575216,
+          "proposed_parameters": {
+            "min_granularity_ns": 100000,
+            "latency_ns": 100000,
+            "cstate_max": "POLL",
+            "napi_busy_poll": 500,
+            "wakeup_granularity_ns": 100000,
+            "migration_cost_ns": 250000,
+            "max_perf_pct": 100,
+            "min_perf_pct": 100
+          },
+          "justification": "The previous best configuration (Iter 8) achieved the lowest latency_p99 of 3.87. While Iter 29 showed a slight increase in latency, it maintained high throughput. Given this is the final tuning call, we will revert to the best performing configuration from history to ensure robustness.",
+          "token_metrics": {
+            "input_tokens": 3252,
+            "output_tokens": 196,
+            "total_tokens": 3450
+          },
+          "response_number": 1
+        },
+        "reasoning_final_before_stable": {
+          "tuner_call_time": 1772792180.9682693,
+          "tuner_start_iteration": 31,
+          "tuner_response_time": 1772792186.5523424,
+          "tuner_duration": 5.584073066711426,
+          "tuner_response_time_ms": 5584.073066711426,
+          "tuner_type": "actor_reasoning",
+          "parameters_applied": true,
+          "parameters_applied_timestamp": 1772792187.6871934,
+          "proposed_parameters": {
+            "min_granularity_ns": 100000,
+            "latency_ns": 100000,
+            "cstate_max": "POLL",
+            "napi_busy_poll": 500,
+            "wakeup_granularity_ns": 100000,
+            "migration_cost_ns": 250000,
+            "max_perf_pct": 100,
+            "min_perf_pct": 100
+          },
+          "justification": "This configuration achieved the lowest latency_p99 of 3.87 in the observed history, indicating optimal settings for critical scheduling and network parameters to minimize tail latency.",
+          "token_metrics": {
+            "input_tokens": 3439,
+            "output_tokens": 168,
+            "total_tokens": 4564
+          }
+        }
+      },
+      "post_tuning_phase": false,
+      "system_metrics": {
+        "window_start_time": 1772792172.9363215,
+        "window_end_time": 1772792180.9460135,
+        "perf_start_time": null,
+        "perf_end_time": null,
+        "system_metrics_start_time": 1772792173.937656,
+        "system_metrics_end_time": 1772792176.9363215,
+        "power_socket0_watts": 58.69156066666667,
+        "power_ram_watts": 10.234868666666666,
+        "cstate_poll_pct": 100.0,
+        "cstate_c1_pct": 0.0,
+        "cstate_c1e_pct": 0.0,
+        "cstate_c6_pct": 0.0,
+        "cpu_load_cores_pct": 83.52932930076122,
+        "cpu_load_socket0_pct": 43.13913646528317
+      }
+    },
+    {
+      "iteration": 31,
+      "timestamp": 1772792196.2004735,
+      "parameters": {
+        "min_granularity_ns": 100000,
+        "latency_ns": 100000,
+        "cstate_max": {
+          "value": "POLL",
+          "cores": "0-9"
+        },
+        "napi_busy_poll": {
+          "value": 500,
+          "cores": "0-9"
+        },
+        "wakeup_granularity_ns": 100000,
+        "migration_cost_ns": 250000,
+        "max_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        },
+        "min_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        }
+      },
+      "metrics": {
+        "throughput": 51773.046193356924,
+        "goodput": 51779.64614825415,
+        "latency_avg": 0.614,
+        "latency_p95": 1.75,
+        "measured_requests": 258867,
+        "duration_seconds": 5.000034169,
+        "p_99_latency": 5338.0,
+        "latency_p99": 5.338,
+        "elapsed_time_ns": 5000034169,
+        "latency_median": 321.0,
+        "latency_min": 82.0,
+        "latency_max": 51066.0,
+        "p_25_latency": 209.0,
+        "p_75_latency": 628.0,
+        "p_90_latency": 1203.0
+      },
+      "reward": 5.338,
+      "tuner_timing": {},
+      "post_tuning_phase": true,
+      "system_metrics": {
+        "window_start_time": 1772792187.6880403,
+        "window_end_time": 1772792196.1990056,
+        "perf_start_time": null,
+        "perf_end_time": null,
+        "system_metrics_start_time": 1772792188.6893184,
+        "system_metrics_end_time": 1772792191.6880403,
+        "power_socket0_watts": 57.904880999999996,
+        "power_ram_watts": 9.916863333333334,
+        "cstate_poll_pct": 100.0,
+        "cstate_c1_pct": 0.0,
+        "cstate_c1e_pct": 0.0,
+        "cstate_c6_pct": 0.0,
+        "cpu_load_cores_pct": 78.69008566557612,
+        "cpu_load_socket0_pct": 39.36154448295307
+      }
+    },
+    {
+      "iteration": 32,
+      "timestamp": 1772792204.2143095,
+      "parameters": {
+        "min_granularity_ns": 100000,
+        "latency_ns": 100000,
+        "cstate_max": {
+          "value": "POLL",
+          "cores": "0-9"
+        },
+        "napi_busy_poll": {
+          "value": 500,
+          "cores": "0-9"
+        },
+        "wakeup_granularity_ns": 100000,
+        "migration_cost_ns": 250000,
+        "max_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        },
+        "min_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        }
+      },
+      "metrics": {
+        "throughput": 52960.96505277841,
+        "goodput": 52967.56499857569,
+        "latency_avg": 0.601,
+        "latency_p95": 1.615,
+        "measured_requests": 264807,
+        "duration_seconds": 5.000041063,
+        "p_99_latency": 6329.0,
+        "latency_p99": 6.329,
+        "elapsed_time_ns": 5000041063,
+        "latency_median": 295.0,
+        "latency_min": 79.0,
+        "latency_max": 33619.0,
+        "p_25_latency": 191.0,
+        "p_75_latency": 569.0,
+        "p_90_latency": 1116.0
+      },
+      "reward": 6.329,
+      "tuner_timing": {},
+      "post_tuning_phase": true,
+      "system_metrics": {
+        "window_start_time": 1772792196.2010968,
+        "window_end_time": 1772792204.212466,
+        "perf_start_time": null,
+        "perf_end_time": null,
+        "system_metrics_start_time": 1772792197.2023857,
+        "system_metrics_end_time": 1772792200.2010968,
+        "power_socket0_watts": 57.851211,
+        "power_ram_watts": 9.852654,
+        "cstate_poll_pct": 100.0,
+        "cstate_c1_pct": 0.0,
+        "cstate_c1e_pct": 0.0,
+        "cstate_c6_pct": 0.0,
+        "cpu_load_cores_pct": 79.50968779091484,
+        "cpu_load_socket0_pct": 41.48751716278415
+      }
+    },
+    {
+      "iteration": 33,
+      "timestamp": 1772792212.7283297,
+      "parameters": {
+        "min_granularity_ns": 100000,
+        "latency_ns": 100000,
+        "cstate_max": {
+          "value": "POLL",
+          "cores": "0-9"
+        },
+        "napi_busy_poll": {
+          "value": 500,
+          "cores": "0-9"
+        },
+        "wakeup_granularity_ns": 100000,
+        "migration_cost_ns": 250000,
+        "max_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        },
+        "min_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        }
+      },
+      "metrics": {
+        "throughput": 53683.34237905586,
+        "goodput": 53689.94229820685,
+        "latency_avg": 0.592,
+        "latency_p95": 1.492,
+        "measured_requests": 268420,
+        "duration_seconds": 5.00006125,
+        "p_99_latency": 5456.0,
+        "latency_p99": 5.456,
+        "elapsed_time_ns": 5000061250,
+        "latency_median": 323.0,
+        "latency_min": 80.0,
+        "latency_max": 74357.0,
+        "p_25_latency": 212.0,
+        "p_75_latency": 591.0,
+        "p_90_latency": 1082.0
+      },
+      "reward": 5.456,
+      "tuner_timing": {},
+      "post_tuning_phase": true,
+      "system_metrics": {
+        "window_start_time": 1772792204.2149594,
+        "window_end_time": 1772792212.7271469,
+        "perf_start_time": null,
+        "perf_end_time": null,
+        "system_metrics_start_time": 1772792205.2162719,
+        "system_metrics_end_time": 1772792208.2149594,
+        "power_socket0_watts": 58.35682466666666,
+        "power_ram_watts": 10.158190333333334,
+        "cstate_poll_pct": 100.0,
+        "cstate_c1_pct": 0.0,
+        "cstate_c1e_pct": 0.0,
+        "cstate_c6_pct": 0.0,
+        "cpu_load_cores_pct": 81.12100526269283,
+        "cpu_load_socket0_pct": 40.57700428151143
+      }
+    },
+    {
+      "iteration": 34,
+      "timestamp": 1772792221.2447863,
+      "parameters": {
+        "min_granularity_ns": 100000,
+        "latency_ns": 100000,
+        "cstate_max": {
+          "value": "POLL",
+          "cores": "0-9"
+        },
+        "napi_busy_poll": {
+          "value": 500,
+          "cores": "0-9"
+        },
+        "wakeup_granularity_ns": 100000,
+        "migration_cost_ns": 250000,
+        "max_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        },
+        "min_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        }
+      },
+      "metrics": {
+        "throughput": 50830.60482064361,
+        "goodput": 50837.204795301026,
+        "latency_avg": 0.625,
+        "latency_p95": 1.765,
+        "measured_requests": 254154,
+        "duration_seconds": 5.000019199,
+        "p_99_latency": 6682.0,
+        "latency_p99": 6.682,
+        "elapsed_time_ns": 5000019199,
+        "latency_median": 301.0,
+        "latency_min": 74.0,
+        "latency_max": 53338.0,
+        "p_25_latency": 187.0,
+        "p_75_latency": 570.0,
+        "p_90_latency": 1118.0
+      },
+      "reward": 6.682,
+      "tuner_timing": {},
+      "post_tuning_phase": true,
+      "system_metrics": {
+        "window_start_time": 1772792212.728921,
+        "window_end_time": 1772792221.2426224,
+        "perf_start_time": null,
+        "perf_end_time": null,
+        "system_metrics_start_time": 1772792213.7302105,
+        "system_metrics_end_time": 1772792216.728921,
+        "power_socket0_watts": 57.47016933333333,
+        "power_ram_watts": 9.817316,
+        "cstate_poll_pct": 100.0,
+        "cstate_c1_pct": 0.0,
+        "cstate_c1e_pct": 0.0,
+        "cstate_c6_pct": 0.0,
+        "cpu_load_cores_pct": 75.8013726510233,
+        "cpu_load_socket0_pct": 37.95052130901
+      }
+    },
+    {
+      "iteration": 35,
+      "timestamp": 1772792229.7589445,
+      "parameters": {
+        "min_granularity_ns": 100000,
+        "latency_ns": 100000,
+        "cstate_max": {
+          "value": "POLL",
+          "cores": "0-9"
+        },
+        "napi_busy_poll": {
+          "value": 500,
+          "cores": "0-9"
+        },
+        "wakeup_granularity_ns": 100000,
+        "migration_cost_ns": 250000,
+        "max_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        },
+        "min_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        }
+      },
+      "metrics": {
+        "throughput": 53253.51622485167,
+        "goodput": 53259.91614267673,
+        "latency_avg": 0.597,
+        "latency_p95": 1.495,
+        "measured_requests": 266271,
+        "duration_seconds": 5.0000642,
+        "p_99_latency": 5765.0,
+        "latency_p99": 5.765,
+        "elapsed_time_ns": 5000064200,
+        "latency_median": 323.0,
+        "latency_min": 76.0,
+        "latency_max": 78559.0,
+        "p_25_latency": 208.0,
+        "p_75_latency": 605.0,
+        "p_90_latency": 1095.0
+      },
+      "reward": 5.765,
+      "tuner_timing": {},
+      "post_tuning_phase": true,
+      "system_metrics": {
+        "window_start_time": 1772792221.245382,
+        "window_end_time": 1772792229.7576034,
+        "perf_start_time": null,
+        "perf_end_time": null,
+        "system_metrics_start_time": 1772792222.2459373,
+        "system_metrics_end_time": 1772792225.245382,
+        "power_socket0_watts": 58.282952,
+        "power_ram_watts": 9.957861999999999,
+        "cstate_poll_pct": 100.0,
+        "cstate_c1_pct": 0.0,
+        "cstate_c1e_pct": 0.0,
+        "cstate_c6_pct": 0.0,
+        "cpu_load_cores_pct": 81.35223563046212,
+        "cpu_load_socket0_pct": 40.70895933467712
+      }
+    },
+    {
+      "iteration": 36,
+      "timestamp": 1772792238.273884,
+      "parameters": {
+        "min_granularity_ns": 100000,
+        "latency_ns": 100000,
+        "cstate_max": {
+          "value": "POLL",
+          "cores": "0-9"
+        },
+        "napi_busy_poll": {
+          "value": 500,
+          "cores": "0-9"
+        },
+        "wakeup_granularity_ns": 100000,
+        "migration_cost_ns": 250000,
+        "max_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        },
+        "min_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        }
+      },
+      "metrics": {
+        "throughput": 53365.14425978037,
+        "goodput": 53371.544181139405,
+        "latency_avg": 0.596,
+        "latency_p95": 1.533,
+        "measured_requests": 266829,
+        "duration_seconds": 5.000061439,
+        "p_99_latency": 5480.0,
+        "latency_p99": 5.48,
+        "elapsed_time_ns": 5000061439,
+        "latency_median": 325.0,
+        "latency_min": 80.0,
+        "latency_max": 57693.0,
+        "p_25_latency": 209.0,
+        "p_75_latency": 612.0,
+        "p_90_latency": 1118.0
+      },
+      "reward": 5.48,
+      "tuner_timing": {},
+      "post_tuning_phase": true,
+      "system_metrics": {
+        "window_start_time": 1772792229.7595284,
+        "window_end_time": 1772792238.27169,
+        "perf_start_time": null,
+        "perf_end_time": null,
+        "system_metrics_start_time": 1772792230.7608187,
+        "system_metrics_end_time": 1772792233.7595284,
+        "power_socket0_watts": 58.427951,
+        "power_ram_watts": 10.082052333333333,
+        "cstate_poll_pct": 100.0,
+        "cstate_c1_pct": 0.0,
+        "cstate_c1e_pct": 0.0,
+        "cstate_c6_pct": 0.0,
+        "cpu_load_cores_pct": 82.5169108104778,
+        "cpu_load_socket0_pct": 41.27479527451995
+      }
+    },
+    {
+      "iteration": 37,
+      "timestamp": 1772792246.7881677,
+      "parameters": {
+        "min_granularity_ns": 100000,
+        "latency_ns": 100000,
+        "cstate_max": {
+          "value": "POLL",
+          "cores": "0-9"
+        },
+        "napi_busy_poll": {
+          "value": 500,
+          "cores": "0-9"
+        },
+        "wakeup_granularity_ns": 100000,
+        "migration_cost_ns": 250000,
+        "max_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        },
+        "min_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        }
+      },
+      "metrics": {
+        "throughput": 52758.63085044212,
+        "goodput": 52765.2307792434,
+        "latency_avg": 0.602,
+        "latency_p95": 1.554,
+        "measured_requests": 263796,
+        "duration_seconds": 5.000053939,
+        "p_99_latency": 5780.0,
+        "latency_p99": 5.78,
+        "elapsed_time_ns": 5000053939,
+        "latency_median": 323.0,
+        "latency_min": 78.0,
+        "latency_max": 88908.0,
+        "p_25_latency": 209.0,
+        "p_75_latency": 601.0,
+        "p_90_latency": 1124.0
+      },
+      "reward": 5.78,
+      "tuner_timing": {},
+      "post_tuning_phase": true,
+      "system_metrics": {
+        "window_start_time": 1772792238.274524,
+        "window_end_time": 1772792246.786979,
+        "perf_start_time": null,
+        "perf_end_time": null,
+        "system_metrics_start_time": 1772792239.2759087,
+        "system_metrics_end_time": 1772792242.274524,
+        "power_socket0_watts": 58.33867733333333,
+        "power_ram_watts": 10.144165,
+        "cstate_poll_pct": 100.0,
+        "cstate_c1_pct": 0.0,
+        "cstate_c1e_pct": 0.0,
+        "cstate_c6_pct": 0.0,
+        "cpu_load_cores_pct": 81.23835040742367,
+        "cpu_load_socket0_pct": 40.61917520371183
+      }
+    },
+    {
+      "iteration": 38,
+      "timestamp": 1772792255.3036568,
+      "parameters": {
+        "min_granularity_ns": 100000,
+        "latency_ns": 100000,
+        "cstate_max": {
+          "value": "POLL",
+          "cores": "0-9"
+        },
+        "napi_busy_poll": {
+          "value": 500,
+          "cores": "0-9"
+        },
+        "wakeup_granularity_ns": 100000,
+        "migration_cost_ns": 250000,
+        "max_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        },
+        "min_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        }
+      },
+      "metrics": {
+        "throughput": 51934.71536601009,
+        "goodput": 51940.91530815471,
+        "latency_avg": 0.612,
+        "latency_p95": 1.549,
+        "measured_requests": 259676,
+        "duration_seconds": 5.000046658,
+        "p_99_latency": 5827.0,
+        "latency_p99": 5.827,
+        "elapsed_time_ns": 5000046658,
+        "latency_median": 328.0,
+        "latency_min": 81.0,
+        "latency_max": 99590.0,
+        "p_25_latency": 210.0,
+        "p_75_latency": 627.0,
+        "p_90_latency": 1133.0
+      },
+      "reward": 5.827,
+      "tuner_timing": {},
+      "post_tuning_phase": true,
+      "system_metrics": {
+        "window_start_time": 1772792246.788805,
+        "window_end_time": 1772792255.3008907,
+        "perf_start_time": null,
+        "perf_end_time": null,
+        "system_metrics_start_time": 1772792247.79012,
+        "system_metrics_end_time": 1772792250.788805,
+        "power_socket0_watts": 58.29758,
+        "power_ram_watts": 10.021974333333334,
+        "cstate_poll_pct": 100.0,
+        "cstate_c1_pct": 0.0,
+        "cstate_c1e_pct": 0.0,
+        "cstate_c6_pct": 0.0,
+        "cpu_load_cores_pct": 80.9626662161272,
+        "cpu_load_socket0_pct": 40.53083805855865
+      }
+    },
+    {
+      "iteration": 39,
+      "timestamp": 1772792263.8174736,
+      "parameters": {
+        "min_granularity_ns": 100000,
+        "latency_ns": 100000,
+        "cstate_max": {
+          "value": "POLL",
+          "cores": "0-9"
+        },
+        "napi_busy_poll": {
+          "value": 500,
+          "cores": "0-9"
+        },
+        "wakeup_granularity_ns": 100000,
+        "migration_cost_ns": 250000,
+        "max_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        },
+        "min_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        }
+      },
+      "metrics": {
+        "throughput": 53401.607925394615,
+        "goodput": 53408.00787840616,
+        "latency_avg": 0.595,
+        "latency_p95": 1.503,
+        "measured_requests": 267010,
+        "duration_seconds": 5.00003671,
+        "p_99_latency": 5492.0,
+        "latency_p99": 5.492,
+        "elapsed_time_ns": 5000036710,
+        "latency_median": 326.0,
+        "latency_min": 81.0,
+        "latency_max": 90298.0,
+        "p_25_latency": 212.0,
+        "p_75_latency": 610.0,
+        "p_90_latency": 1104.0
+      },
+      "reward": 5.492,
+      "tuner_timing": {},
+      "post_tuning_phase": true,
+      "system_metrics": {
+        "window_start_time": 1772792255.3042622,
+        "window_end_time": 1772792263.8163602,
+        "perf_start_time": null,
+        "perf_end_time": null,
+        "system_metrics_start_time": 1772792256.305542,
+        "system_metrics_end_time": 1772792259.3042622,
+        "power_socket0_watts": 58.27363466666666,
+        "power_ram_watts": 10.105293333333334,
+        "cstate_poll_pct": 100.0,
+        "cstate_c1_pct": 0.0,
+        "cstate_c1e_pct": 0.0,
+        "cstate_c6_pct": 0.0,
+        "cpu_load_cores_pct": 81.10654777821668,
+        "cpu_load_socket0_pct": 40.56977553927336
+      }
+    },
+    {
+      "iteration": 40,
+      "timestamp": 1772792271.831366,
+      "parameters": {
+        "min_granularity_ns": 100000,
+        "latency_ns": 100000,
+        "cstate_max": {
+          "value": "POLL",
+          "cores": "0-9"
+        },
+        "napi_busy_poll": {
+          "value": 500,
+          "cores": "0-9"
+        },
+        "wakeup_granularity_ns": 100000,
+        "migration_cost_ns": 250000,
+        "max_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        },
+        "min_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        }
+      },
+      "metrics": {
+        "throughput": 49363.55914252979,
+        "goodput": 49370.159056847064,
+        "latency_avg": 0.644,
+        "latency_p95": 1.971,
+        "measured_requests": 246821,
+        "duration_seconds": 5.000064912,
+        "p_99_latency": 7650.0,
+        "latency_p99": 7.65,
+        "elapsed_time_ns": 5000064912,
+        "latency_median": 272.0,
+        "latency_min": 78.0,
+        "latency_max": 51897.0,
+        "p_25_latency": 175.0,
+        "p_75_latency": 543.0,
+        "p_90_latency": 1159.0
+      },
+      "reward": 7.65,
+      "tuner_timing": {},
+      "post_tuning_phase": true,
+      "system_metrics": {
+        "window_start_time": 1772792263.8180919,
+        "window_end_time": 1772792271.8296967,
+        "perf_start_time": null,
+        "perf_end_time": null,
+        "system_metrics_start_time": 1772792264.8193772,
+        "system_metrics_end_time": 1772792267.8180919,
+        "power_socket0_watts": 56.79300666666666,
+        "power_ram_watts": 9.480629666666665,
+        "cstate_poll_pct": 100.0,
+        "cstate_c1_pct": 0.0,
+        "cstate_c1e_pct": 0.0,
+        "cstate_c6_pct": 0.0,
+        "cpu_load_cores_pct": 69.1372749584316,
+        "cpu_load_socket0_pct": 37.305398850430954
+      }
+    },
+    {
+      "iteration": 41,
+      "timestamp": 1772792280.345377,
+      "parameters": {
+        "min_granularity_ns": 100000,
+        "latency_ns": 100000,
+        "cstate_max": {
+          "value": "POLL",
+          "cores": "0-9"
+        },
+        "napi_busy_poll": {
+          "value": 500,
+          "cores": "0-9"
+        },
+        "wakeup_granularity_ns": 100000,
+        "migration_cost_ns": 250000,
+        "max_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        },
+        "min_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        }
+      },
+      "metrics": {
+        "throughput": 50824.67434107516,
+        "goodput": 50831.07432525184,
+        "latency_avg": 0.625,
+        "latency_p95": 1.872,
+        "measured_requests": 254124,
+        "duration_seconds": 5.000012362,
+        "p_99_latency": 5892.0,
+        "latency_p99": 5.892,
+        "elapsed_time_ns": 5000012362,
+        "latency_median": 306.0,
+        "latency_min": 78.0,
+        "latency_max": 51077.0,
+        "p_25_latency": 194.0,
+        "p_75_latency": 579.0,
+        "p_90_latency": 1179.0
+      },
+      "reward": 5.892,
+      "tuner_timing": {},
+      "post_tuning_phase": true,
+      "system_metrics": {
+        "window_start_time": 1772792271.83197,
+        "window_end_time": 1772792280.3440917,
+        "perf_start_time": null,
+        "perf_end_time": null,
+        "system_metrics_start_time": 1772792272.8332875,
+        "system_metrics_end_time": 1772792275.83197,
+        "power_socket0_watts": 57.90538966666667,
+        "power_ram_watts": 9.960427000000001,
+        "cstate_poll_pct": 100.0,
+        "cstate_c1_pct": 0.0,
+        "cstate_c1e_pct": 0.0,
+        "cstate_c6_pct": 0.0,
+        "cpu_load_cores_pct": 76.83745262275978,
+        "cpu_load_socket0_pct": 38.45172961170992
+      }
+    },
+    {
+      "iteration": 42,
+      "timestamp": 1772792288.8594406,
+      "parameters": {
+        "min_granularity_ns": 100000,
+        "latency_ns": 100000,
+        "cstate_max": {
+          "value": "POLL",
+          "cores": "0-9"
+        },
+        "napi_busy_poll": {
+          "value": 500,
+          "cores": "0-9"
+        },
+        "wakeup_granularity_ns": 100000,
+        "migration_cost_ns": 250000,
+        "max_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        },
+        "min_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        }
+      },
+      "metrics": {
+        "throughput": 53222.659438846786,
+        "goodput": 53229.25939661497,
+        "latency_avg": 0.597,
+        "latency_p95": 1.508,
+        "measured_requests": 266115,
+        "duration_seconds": 5.000031994,
+        "p_99_latency": 5697.0,
+        "latency_p99": 5.697,
+        "elapsed_time_ns": 5000031994,
+        "latency_median": 321.0,
+        "latency_min": 81.0,
+        "latency_max": 108430.0,
+        "p_25_latency": 207.0,
+        "p_75_latency": 606.0,
+        "p_90_latency": 1099.0
+      },
+      "reward": 5.697,
+      "tuner_timing": {},
+      "post_tuning_phase": true,
+      "system_metrics": {
+        "window_start_time": 1772792280.3459883,
+        "window_end_time": 1772792288.8581808,
+        "perf_start_time": null,
+        "perf_end_time": null,
+        "system_metrics_start_time": 1772792281.3472853,
+        "system_metrics_end_time": 1772792284.3459883,
+        "power_socket0_watts": 58.220818333333334,
+        "power_ram_watts": 9.966027333333335,
+        "cstate_poll_pct": 100.0,
+        "cstate_c1_pct": 0.0,
+        "cstate_c1e_pct": 0.0,
+        "cstate_c6_pct": 0.0,
+        "cpu_load_cores_pct": 79.96551584842668,
+        "cpu_load_socket0_pct": 40.03259290771168
+      }
+    },
+    {
+      "iteration": 43,
+      "timestamp": 1772792297.3733065,
+      "parameters": {
+        "min_granularity_ns": 100000,
+        "latency_ns": 100000,
+        "cstate_max": {
+          "value": "POLL",
+          "cores": "0-9"
+        },
+        "napi_busy_poll": {
+          "value": 500,
+          "cores": "0-9"
+        },
+        "wakeup_granularity_ns": 100000,
+        "migration_cost_ns": 250000,
+        "max_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        },
+        "min_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        }
+      },
+      "metrics": {
+        "throughput": 51081.726912265134,
+        "goodput": 51088.326902821864,
+        "latency_avg": 0.622,
+        "latency_p95": 1.654,
+        "measured_requests": 255409,
+        "duration_seconds": 5.000007154,
+        "p_99_latency": 6044.0,
+        "latency_p99": 6.044,
+        "elapsed_time_ns": 5000007154,
+        "latency_median": 323.0,
+        "latency_min": 78.0,
+        "latency_max": 76614.0,
+        "p_25_latency": 208.0,
+        "p_75_latency": 612.0,
+        "p_90_latency": 1166.0
+      },
+      "reward": 6.044,
+      "tuner_timing": {},
+      "post_tuning_phase": true,
+      "system_metrics": {
+        "window_start_time": 1772792288.8600295,
+        "window_end_time": 1772792297.3721962,
+        "perf_start_time": null,
+        "perf_end_time": null,
+        "system_metrics_start_time": 1772792289.8613195,
+        "system_metrics_end_time": 1772792292.8600295,
+        "power_socket0_watts": 58.259942,
+        "power_ram_watts": 9.931286000000002,
+        "cstate_poll_pct": 100.0,
+        "cstate_c1_pct": 0.0,
+        "cstate_c1e_pct": 0.0,
+        "cstate_c6_pct": 0.0,
+        "cpu_load_cores_pct": 80.0958269334205,
+        "cpu_load_socket0_pct": 40.06441511687527
+      }
+    },
+    {
+      "iteration": 44,
+      "timestamp": 1772792305.8876328,
+      "parameters": {
+        "min_granularity_ns": 100000,
+        "latency_ns": 100000,
+        "cstate_max": {
+          "value": "POLL",
+          "cores": "0-9"
+        },
+        "napi_busy_poll": {
+          "value": 500,
+          "cores": "0-9"
+        },
+        "wakeup_granularity_ns": 100000,
+        "migration_cost_ns": 250000,
+        "max_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        },
+        "min_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        }
+      },
+      "metrics": {
+        "throughput": 52395.959737708705,
+        "goodput": 52402.35968393252,
+        "latency_avg": 0.607,
+        "latency_p95": 1.74,
+        "measured_requests": 261982,
+        "duration_seconds": 5.000042013,
+        "p_99_latency": 5742.0,
+        "latency_p99": 5.742,
+        "elapsed_time_ns": 5000042013,
+        "latency_median": 316.0,
+        "latency_min": 78.0,
+        "latency_max": 69466.0,
+        "p_25_latency": 206.0,
+        "p_75_latency": 574.0,
+        "p_90_latency": 1206.0
+      },
+      "reward": 5.742,
+      "tuner_timing": {},
+      "post_tuning_phase": true,
+      "system_metrics": {
+        "window_start_time": 1772792297.3739643,
+        "window_end_time": 1772792305.8860888,
+        "perf_start_time": null,
+        "perf_end_time": null,
+        "system_metrics_start_time": 1772792298.3752553,
+        "system_metrics_end_time": 1772792301.3739643,
+        "power_socket0_watts": 58.00064533333333,
+        "power_ram_watts": 10.013212333333334,
+        "cstate_poll_pct": 100.0,
+        "cstate_c1_pct": 0.0,
+        "cstate_c1e_pct": 0.0,
+        "cstate_c6_pct": 0.0,
+        "cpu_load_cores_pct": 78.25624802662907,
+        "cpu_load_socket0_pct": 39.4682600677363
+      }
+    },
+    {
+      "iteration": 45,
+      "timestamp": 1772792314.4016736,
+      "parameters": {
+        "min_granularity_ns": 100000,
+        "latency_ns": 100000,
+        "cstate_max": {
+          "value": "POLL",
+          "cores": "0-9"
+        },
+        "napi_busy_poll": {
+          "value": 500,
+          "cores": "0-9"
+        },
+        "wakeup_granularity_ns": 100000,
+        "migration_cost_ns": 250000,
+        "max_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        },
+        "min_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        }
+      },
+      "metrics": {
+        "throughput": 52712.831745131225,
+        "goodput": 52719.23167613868,
+        "latency_avg": 0.603,
+        "latency_p95": 1.704,
+        "measured_requests": 263567,
+        "duration_seconds": 5.000053901,
+        "p_99_latency": 5686.0,
+        "latency_p99": 5.686,
+        "elapsed_time_ns": 5000053901,
+        "latency_median": 314.0,
+        "latency_min": 81.0,
+        "latency_max": 63596.0,
+        "p_25_latency": 204.0,
+        "p_75_latency": 587.0,
+        "p_90_latency": 1190.0
+      },
+      "reward": 5.686,
+      "tuner_timing": {},
+      "post_tuning_phase": true,
+      "system_metrics": {
+        "window_start_time": 1772792305.8882174,
+        "window_end_time": 1772792314.4004307,
+        "perf_start_time": null,
+        "perf_end_time": null,
+        "system_metrics_start_time": 1772792306.8895133,
+        "system_metrics_end_time": 1772792309.8882174,
+        "power_socket0_watts": 58.230502666666666,
+        "power_ram_watts": 9.990986666666666,
+        "cstate_poll_pct": 100.0,
+        "cstate_c1_pct": 0.0,
+        "cstate_c1e_pct": 0.0,
+        "cstate_c6_pct": 0.0,
+        "cpu_load_cores_pct": 78.95801901154822,
+        "cpu_load_socket0_pct": 39.49567617244077
+      }
+    },
+    {
+      "iteration": 46,
+      "timestamp": 1772792322.9158187,
+      "parameters": {
+        "min_granularity_ns": 100000,
+        "latency_ns": 100000,
+        "cstate_max": {
+          "value": "POLL",
+          "cores": "0-9"
+        },
+        "napi_busy_poll": {
+          "value": 500,
+          "cores": "0-9"
+        },
+        "wakeup_granularity_ns": 100000,
+        "migration_cost_ns": 250000,
+        "max_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        },
+        "min_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        }
+      },
+      "metrics": {
+        "throughput": 52672.55668208938,
+        "goodput": 52679.15667666155,
+        "latency_avg": 0.604,
+        "latency_p95": 1.725,
+        "measured_requests": 263363,
+        "duration_seconds": 5.000004112,
+        "p_99_latency": 5499.0,
+        "latency_p99": 5.499,
+        "elapsed_time_ns": 5000004112,
+        "latency_median": 315.0,
+        "latency_min": 77.0,
+        "latency_max": 105492.0,
+        "p_25_latency": 204.0,
+        "p_75_latency": 584.0,
+        "p_90_latency": 1198.0
+      },
+      "reward": 5.499,
+      "tuner_timing": {},
+      "post_tuning_phase": true,
+      "system_metrics": {
+        "window_start_time": 1772792314.4022934,
+        "window_end_time": 1772792322.914538,
+        "perf_start_time": null,
+        "perf_end_time": null,
+        "system_metrics_start_time": 1772792315.4036062,
+        "system_metrics_end_time": 1772792318.4022934,
+        "power_socket0_watts": 58.22940433333334,
+        "power_ram_watts": 9.994735333333333,
+        "cstate_poll_pct": 100.0,
+        "cstate_c1_pct": 0.0,
+        "cstate_c1e_pct": 0.0,
+        "cstate_c6_pct": 0.0,
+        "cpu_load_cores_pct": 78.69640860044215,
+        "cpu_load_socket0_pct": 39.56338581837289
+      }
+    },
+    {
+      "iteration": 47,
+      "timestamp": 1772792331.4311278,
+      "parameters": {
+        "min_granularity_ns": 100000,
+        "latency_ns": 100000,
+        "cstate_max": {
+          "value": "POLL",
+          "cores": "0-9"
+        },
+        "napi_busy_poll": {
+          "value": 500,
+          "cores": "0-9"
+        },
+        "wakeup_granularity_ns": 100000,
+        "migration_cost_ns": 250000,
+        "max_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        },
+        "min_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        }
+      },
+      "metrics": {
+        "throughput": 53133.67134698925,
+        "goodput": 53140.271306165865,
+        "latency_avg": 0.598,
+        "latency_p95": 1.539,
+        "measured_requests": 265670,
+        "duration_seconds": 5.000030927,
+        "p_99_latency": 5646.0,
+        "latency_p99": 5.646,
+        "elapsed_time_ns": 5000030927,
+        "latency_median": 321.0,
+        "latency_min": 82.0,
+        "latency_max": 65908.0,
+        "p_25_latency": 207.0,
+        "p_75_latency": 610.0,
+        "p_90_latency": 1125.0
+      },
+      "reward": 5.646,
+      "tuner_timing": {},
+      "post_tuning_phase": true,
+      "system_metrics": {
+        "window_start_time": 1772792322.9164019,
+        "window_end_time": 1772792331.4285486,
+        "perf_start_time": null,
+        "perf_end_time": null,
+        "system_metrics_start_time": 1772792323.9176877,
+        "system_metrics_end_time": 1772792326.9164019,
+        "power_socket0_watts": 58.35629599999999,
+        "power_ram_watts": 10.014196666666667,
+        "cstate_poll_pct": 100.0,
+        "cstate_c1_pct": 0.0,
+        "cstate_c1e_pct": 0.0,
+        "cstate_c6_pct": 0.0,
+        "cpu_load_cores_pct": 79.41977670780834,
+        "cpu_load_socket0_pct": 39.7428916542342
+      }
+    },
+    {
+      "iteration": 48,
+      "timestamp": 1772792339.9453144,
+      "parameters": {
+        "min_granularity_ns": 100000,
+        "latency_ns": 100000,
+        "cstate_max": {
+          "value": "POLL",
+          "cores": "0-9"
+        },
+        "napi_busy_poll": {
+          "value": 500,
+          "cores": "0-9"
+        },
+        "wakeup_granularity_ns": 100000,
+        "migration_cost_ns": 250000,
+        "max_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        },
+        "min_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        }
+      },
+      "metrics": {
+        "throughput": 52380.96893605424,
+        "goodput": 52387.36888338651,
+        "latency_avg": 0.607,
+        "latency_p95": 1.518,
+        "measured_requests": 261907,
+        "duration_seconds": 5.000041147,
+        "p_99_latency": 5871.0,
+        "latency_p99": 5.871,
+        "elapsed_time_ns": 5000041147,
+        "latency_median": 327.0,
+        "latency_min": 80.0,
+        "latency_max": 72546.0,
+        "p_25_latency": 213.0,
+        "p_75_latency": 606.0,
+        "p_90_latency": 1114.0
+      },
+      "reward": 5.871,
+      "tuner_timing": {},
+      "post_tuning_phase": true,
+      "system_metrics": {
+        "window_start_time": 1772792331.4317207,
+        "window_end_time": 1772792339.9438257,
+        "perf_start_time": null,
+        "perf_end_time": null,
+        "system_metrics_start_time": 1772792332.4330049,
+        "system_metrics_end_time": 1772792335.4317207,
+        "power_socket0_watts": 58.124444000000004,
+        "power_ram_watts": 9.947616333333334,
+        "cstate_poll_pct": 100.0,
+        "cstate_c1_pct": 0.0,
+        "cstate_c1e_pct": 0.0,
+        "cstate_c6_pct": 0.0,
+        "cpu_load_cores_pct": 77.52513017106513,
+        "cpu_load_socket0_pct": 38.77906673569758
+      }
+    },
+    {
+      "iteration": 49,
+      "timestamp": 1772792348.4594424,
+      "parameters": {
+        "min_granularity_ns": 100000,
+        "latency_ns": 100000,
+        "cstate_max": {
+          "value": "POLL",
+          "cores": "0-9"
+        },
+        "napi_busy_poll": {
+          "value": 500,
+          "cores": "0-9"
+        },
+        "wakeup_granularity_ns": 100000,
+        "migration_cost_ns": 250000,
+        "max_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        },
+        "min_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        }
+      },
+      "metrics": {
+        "throughput": 52925.69399422246,
+        "goodput": 52932.09395721916,
+        "latency_avg": 0.601,
+        "latency_p95": 1.528,
+        "measured_requests": 264630,
+        "duration_seconds": 5.000028909,
+        "p_99_latency": 5753.0,
+        "latency_p99": 5.753,
+        "elapsed_time_ns": 5000028909,
+        "latency_median": 325.0,
+        "latency_min": 79.0,
+        "latency_max": 72123.0,
+        "p_25_latency": 211.0,
+        "p_75_latency": 608.0,
+        "p_90_latency": 1117.0
+      },
+      "reward": 5.753,
+      "tuner_timing": {},
+      "post_tuning_phase": true,
+      "system_metrics": {
+        "window_start_time": 1772792339.945965,
+        "window_end_time": 1772792348.4580853,
+        "perf_start_time": null,
+        "perf_end_time": null,
+        "system_metrics_start_time": 1772792340.9472227,
+        "system_metrics_end_time": 1772792343.945965,
+        "power_socket0_watts": 58.45669866666666,
+        "power_ram_watts": 10.043557333333334,
+        "cstate_poll_pct": 100.0,
+        "cstate_c1_pct": 0.0,
+        "cstate_c1e_pct": 0.0,
+        "cstate_c6_pct": 0.0,
+        "cpu_load_cores_pct": 79.33145772226801,
+        "cpu_load_socket0_pct": 39.682230511299025
+      }
+    },
+    {
+      "iteration": 50,
+      "timestamp": 1772792356.9736795,
+      "parameters": {
+        "min_granularity_ns": 100000,
+        "latency_ns": 100000,
+        "cstate_max": {
+          "value": "POLL",
+          "cores": "0-9"
+        },
+        "napi_busy_poll": {
+          "value": 500,
+          "cores": "0-9"
+        },
+        "wakeup_granularity_ns": 100000,
+        "migration_cost_ns": 250000,
+        "max_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        },
+        "min_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        }
+      },
+      "metrics": {
+        "throughput": 51796.31370512915,
+        "goodput": 51802.913643164975,
+        "latency_avg": 0.614,
+        "latency_p95": 1.565,
+        "measured_requests": 258984,
+        "duration_seconds": 5.000046943,
+        "p_99_latency": 5918.0,
+        "latency_p99": 5.918,
+        "elapsed_time_ns": 5000046943,
+        "latency_median": 321.0,
+        "latency_min": 79.0,
+        "latency_max": 117712.0,
+        "p_25_latency": 207.0,
+        "p_75_latency": 613.0,
+        "p_90_latency": 1140.0
+      },
+      "reward": 5.918,
+      "tuner_timing": {},
+      "post_tuning_phase": true,
+      "system_metrics": {
+        "window_start_time": 1772792348.460066,
+        "window_end_time": 1772792356.972529,
+        "perf_start_time": null,
+        "perf_end_time": null,
+        "system_metrics_start_time": 1772792349.4613574,
+        "system_metrics_end_time": 1772792352.460066,
+        "power_socket0_watts": 58.412794,
+        "power_ram_watts": 9.88585,
+        "cstate_poll_pct": 100.0,
+        "cstate_c1_pct": 0.0,
+        "cstate_c1e_pct": 0.0,
+        "cstate_c6_pct": 0.0,
+        "cpu_load_cores_pct": 77.12075070588456,
+        "cpu_load_socket0_pct": 38.79173829315787
+      }
+    }
+  ],
+  "reason": "completed",
+  "mode": "actor-speculator",
+  "optimizer_gist": "This optimization history reveals that `napi_busy_poll` and `migration_cost_ns` were the most influential parameters, showing significant impact on the reward. Conversely, `min_granularity_ns`, `latency_ns`, and `wakeup_granularity_ns` quickly converged to 100,000 ns and remained constant, while `cstate_max`, `max_perf_pct`, and `min_perf_pct` were fixed throughout. The optimal configuration achieved a reward of 7.65 at Iteration 40, with `{min_granularity_ns=100000, latency_ns=100000, cstate_max=POLL, napi_busy_poll=500, wakeup_granularity_ns=100000, migration_cost_ns=250000, max_perf_pct=100, min_perf_pct=100}`.\n\nFor future runs, fix `cstate_max=POLL`, `max_perf_pct=100`, and `min_perf_pct=100` as they appear irrelevant to the current tuning. Narrow the search ranges for `min_granularity_ns`, `latency_ns`, and `wakeup_granularity_ns` to values around 100,000 ns, and focus exploration primarily on `napi_busy_poll` (suggested range 100-650) and `migration_cost_ns` (suggested range 100,000-250,000). A good starting configuration would be the optimal one from Iteration 40.",
+  "optimizer_gist_raw": {
+    "text": "This optimization history reveals that `napi_busy_poll` and `migration_cost_ns` were the most influential parameters, showing significant impact on the reward. Conversely, `min_granularity_ns`, `latency_ns`, and `wakeup_granularity_ns` quickly converged to 100,000 ns and remained constant, while `cstate_max`, `max_perf_pct`, and `min_perf_pct` were fixed throughout. The optimal configuration achieved a reward of 7.65 at Iteration 40, with `{min_granularity_ns=100000, latency_ns=100000, cstate_max=POLL, napi_busy_poll=500, wakeup_granularity_ns=100000, migration_cost_ns=250000, max_perf_pct=100, min_perf_pct=100}`.\n\nFor future runs, fix `cstate_max=POLL`, `max_perf_pct=100`, and `min_perf_pct=100` as they appear irrelevant to the current tuning. Narrow the search ranges for `min_granularity_ns`, `latency_ns`, and `wakeup_granularity_ns` to values around 100,000 ns, and focus exploration primarily on `napi_busy_poll` (suggested range 100-650) and `migration_cost_ns` (suggested range 100,000-250,000). A good starting configuration would be the optimal one from Iteration 40.",
+    "usage_metadata": {
+      "prompt_token_count": 5453,
+      "candidates_token_count": 370,
+      "total_token_count": 8755
+    }
+  }
+}

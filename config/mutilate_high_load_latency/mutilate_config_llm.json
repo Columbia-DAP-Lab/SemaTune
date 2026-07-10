@@ -1,0 +1,41 @@
+{
+    "benchmark": "mutilate",
+    "pin_to_cores": "0-7",
+    "mutilate_client_host": "128.105.144.218",
+    "mutilate_target": "128.105.145.4:11211",
+    "mutilate_threads": 8,
+    "mutilate_clients": 8,
+    "mutilate_qps": 500000,
+    "mutilate_iadist": "exponential:10",
+    "mutilate_depth": 4,
+    "mutilate_bin_path": "/users/gliargko/os-param-tuning/deps/mutilate/mutilate",
+    "mutilate_memcached_bin": "memcached",
+    "tuner_type": "llm",
+    "parameter_ranges": {
+        "min_granularity_ns": [
+            100000,
+            50000000
+        ],
+        "wakeup_granularity_ns": [
+            100000,
+            50000000
+        ]
+    },
+    "parameters_to_tune": [
+        "min_granularity_ns",
+        "wakeup_granularity_ns"
+    ],
+    "fixed_parameters": {
+        "latency_ns": 24000000,
+        "migration_cost_ns": 500000
+    },
+    "optimization_metric": "latency_p99",
+    "optimization_goal": "minimize",
+    "max_iterations": 60,
+    "window_duration": 60,
+    "tuning_mode": "outside-of-window",
+    "continuous_apply": false,
+    "results_dir": "results/mutilate_hi_p99/llm/",
+    "llm_api_key": null,
+    "llm_model_name": "gemini-2.0-flash-exp"
+}

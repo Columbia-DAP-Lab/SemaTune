@@ -1,0 +1,132 @@
+openai SDK not available, OpenRouter LLM tuner will not work
+INFO - 2026-02-12 10:13:38,010 - main.py:116 - Signal handlers registered
+INFO - 2026-02-12 10:13:38,019 - config.py:242 - Temporary override: window_duration set to 5s
+INFO - 2026-02-12 10:13:38,020 - benchbase.py:41 - Initializing BenchBase benchmark with type: tpcc
+WARNING - 2026-02-12 10:13:38,021 - qlearning.py:66 - Q-learning grid_points reduced from 10 to 2 to cap action space at 1000
+INFO - 2026-02-12 10:13:38,022 - qlearning.py:94 - Q-Learning tuner initialized with 640 discrete actions
+INFO - 2026-02-12 10:13:38,023 - qlearning.py:95 - Grid points per parameter: 2
+INFO - 2026-02-12 10:13:38,058 - optimizer.py:86 - ============================================================
+INFO - 2026-02-12 10:13:38,059 - optimizer.py:87 - Starting single-loop OS parameter optimization
+INFO - 2026-02-12 10:13:38,059 - optimizer.py:88 - Benchmark: tpcc
+INFO - 2026-02-12 10:13:38,059 - optimizer.py:89 - Tuner: qlearning
+INFO - 2026-02-12 10:13:38,059 - optimizer.py:90 - Optimizing for: minimize power_socket0_watts
+INFO - 2026-02-12 10:13:38,059 - optimizer.py:91 - Max iterations: 60
+INFO - 2026-02-12 10:13:38,060 - optimizer.py:92 - Tuning mode: outside-of-window
+INFO - 2026-02-12 10:13:38,060 - optimizer.py:93 - ============================================================
+INFO - 2026-02-12 10:13:38,060 - benchbase.py:74 - Running BenchBase pre-execution setup (create + load)...
+INFO - 2026-02-12 10:13:38,062 - benchbase.py:92 - Running BenchBase setup from /mydata/os-param-tuning/deps/benchbase/target/benchbase-postgres: java -jar benchbase.jar -b tpcc --config /mydata/os-param-tuning/results_config_full_param_tpcc_lo_pwr_wrt_p99_20260212_085340/tpcc_lo_pwr_wrt_p99/qlearning/temp_configs/config_window_0.xml --create=true --load=true -d /mydata/os-param-tuning/results_config_full_param_tpcc_lo_pwr_wrt_p99_20260212_085340/tpcc_lo_pwr_wrt_p99/qlearning/database_setup
+[INFO ] 2026-02-12 16:13:39,391 [main]  com.oltpbenchmark.DBWorkload main - ======================================================================
+
+Benchmark:                       TPCC {com.oltpbenchmark.benchmarks.tpcc.TPCCBenchmark}
+Configuration:                   /mydata/os-param-tuning/results_config_full_param_tpcc_lo_pwr_wrt_p99_20260212_085340/tpcc_lo_pwr_wrt_p99/qlearning/temp_configs/config_window_0.xml
+Type:                            POSTGRES
+Driver:                          org.postgresql.Driver
+URL:                             jdbc:postgresql://localhost:5432/benchbase?sslmode=disable&ApplicationName=tpcc&reWriteBatchedInserts=true
+Isolation:                       TRANSACTION_READ_COMMITTED
+Batch Size:                      128
+Scale Factor:                    4.0
+Terminals:                       24
+New Connection Per Txn:          false
+Reconnect on Connection Failure: true
+
+[INFO ] 2026-02-12 16:13:39,397 [main]  com.oltpbenchmark.DBWorkload main - ======================================================================
+[INFO ] 2026-02-12 16:13:39,498 [main]  com.oltpbenchmark.DBWorkload main - Creating new TPCC database...
+[ERROR] 2026-02-12 16:13:41,223 [main]  com.oltpbenchmark.DBWorkload main - Unexpected error when creating benchmark database tables.
+org.postgresql.util.PSQLException: ERROR: deadlock detected
+  Detail: Process 2929296 waits for AccessExclusiveLock on relation 29086 of database 16384; blocked by process 2929230.
+Process 2929230 waits for RowShareLock on relation 29076 of database 16384; blocked by process 2929296.
+  Hint: See server log for query details.
+	at org.postgresql.core.v3.QueryExecutorImpl.receiveErrorResponse(QueryExecutorImpl.java:2733)
+	at org.postgresql.core.v3.QueryExecutorImpl.processResults(QueryExecutorImpl.java:2420)
+	at org.postgresql.core.v3.QueryExecutorImpl.execute(QueryExecutorImpl.java:372)
+	at org.postgresql.jdbc.PgStatement.executeInternal(PgStatement.java:517)
+	at org.postgresql.jdbc.PgStatement.execute(PgStatement.java:434)
+	at org.postgresql.jdbc.PgStatement.executeWithFlags(PgStatement.java:356)
+	at org.postgresql.jdbc.PgStatement.executeCachedSql(PgStatement.java:341)
+	at org.postgresql.jdbc.PgStatement.executeWithFlags(PgStatement.java:317)
+	at org.postgresql.jdbc.PgStatement.execute(PgStatement.java:312)
+	at com.oltpbenchmark.util.ScriptRunner.runScript(ScriptRunner.java:116)
+	at com.oltpbenchmark.util.ScriptRunner.runScript(ScriptRunner.java:75)
+	at com.oltpbenchmark.util.ScriptRunner.runScript(ScriptRunner.java:64)
+	at com.oltpbenchmark.api.BenchmarkModule.createDatabase(BenchmarkModule.java:232)
+	at com.oltpbenchmark.api.BenchmarkModule.createDatabase(BenchmarkModule.java:211)
+	at com.oltpbenchmark.DBWorkload.runCreator(DBWorkload.java:767)
+	at com.oltpbenchmark.DBWorkload.main(DBWorkload.java:487)
+ERROR - 2026-02-12 10:13:41,262 - optimizer.py:119 - Error during optimization: Command '['java', '-jar', 'benchbase.jar', '-b', 'tpcc', '--config', '/mydata/os-param-tuning/results_config_full_param_tpcc_lo_pwr_wrt_p99_20260212_085340/tpcc_lo_pwr_wrt_p99/qlearning/temp_configs/config_window_0.xml', '--create=true', '--load=true', '-d', '/mydata/os-param-tuning/results_config_full_param_tpcc_lo_pwr_wrt_p99_20260212_085340/tpcc_lo_pwr_wrt_p99/qlearning/database_setup']' returned non-zero exit status 1.
+Traceback (most recent call last):
+  File "/mydata/os-param-tuning/src/barebones_optimizer/optimizer.py", line 97, in run
+    if not self.benchmark.pre_execute():
+  File "/mydata/os-param-tuning/src/barebones_optimizer/benchmarks/benchbase.py", line 93, in pre_execute
+    subprocess.run(cmd, cwd=self.benchbase_dir, check=True)
+  File "/usr/lib/python3.10/subprocess.py", line 526, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['java', '-jar', 'benchbase.jar', '-b', 'tpcc', '--config', '/mydata/os-param-tuning/results_config_full_param_tpcc_lo_pwr_wrt_p99_20260212_085340/tpcc_lo_pwr_wrt_p99/qlearning/temp_configs/config_window_0.xml', '--create=true', '--load=true', '-d', '/mydata/os-param-tuning/results_config_full_param_tpcc_lo_pwr_wrt_p99_20260212_085340/tpcc_lo_pwr_wrt_p99/qlearning/database_setup']' returned non-zero exit status 1.
+INFO - 2026-02-12 10:13:41,268 - optimizer.py:1130 - Saved optimization history to results_config_full_param_tpcc_lo_pwr_wrt_p99_20260212_085340/tpcc_lo_pwr_wrt_p99/qlearning/optimization_history_tpcc_20260212_101341.json
+INFO - 2026-02-12 10:13:41,268 - optimizer.py:954 - History saved to results_config_full_param_tpcc_lo_pwr_wrt_p99_20260212_085340/tpcc_lo_pwr_wrt_p99/qlearning/optimization_history_tpcc_20260212_101341.json
+INFO - 2026-02-12 10:13:41,268 - optimizer.py:996 - Shutting down executor threads...
+INFO - 2026-02-12 10:13:41,269 - optimizer.py:1003 - Resetting all parameters to defaults...
+INFO - 2026-02-12 10:13:41,269 - parameter_manager.py:1309 - Setting scaling governor to powersave...
+INFO - 2026-02-12 10:13:42,417 - parameter_manager.py:526 - Set scaling_governor=powersave (all cores)
+INFO - 2026-02-12 10:13:42,418 - parameter_manager.py:1324 - Resetting parameters to defaults: ['latency_ns', 'min_granularity_ns', 'wakeup_granularity_ns', 'migration_cost_ns', 'scaling_governor', 'scaling_min_freq', 'scaling_max_freq', 'min_perf_pct', 'max_perf_pct', 'turbo', 'pmqos', 'cstate_max', 'busy_poll', 'busy_read', 'netdev_budget', 'netdev_budget_usecs']
+INFO - 2026-02-12 10:13:42,446 - parameter_manager.py:252 - Set latency_ns = 24000000
+INFO - 2026-02-12 10:13:42,475 - parameter_manager.py:252 - Set min_granularity_ns = 3000000
+INFO - 2026-02-12 10:13:42,503 - parameter_manager.py:252 - Set wakeup_granularity_ns = 4000000
+INFO - 2026-02-12 10:13:42,532 - parameter_manager.py:252 - Set migration_cost_ns = 500000
+INFO - 2026-02-12 10:13:43,667 - parameter_manager.py:526 - Set scaling_governor=powersave (all cores)
+INFO - 2026-02-12 10:13:44,818 - parameter_manager.py:591 - Set scaling_min_freq=0kHz (all cores)
+INFO - 2026-02-12 10:13:45,994 - parameter_manager.py:656 - Set scaling_max_freq=0kHz (all cores)
+INFO - 2026-02-12 10:13:46,025 - parameter_manager.py:749 - Set min_perf_pct=0 (global)
+INFO - 2026-02-12 10:13:46,055 - parameter_manager.py:791 - Set max_perf_pct=100 (global)
+INFO - 2026-02-12 10:13:46,084 - parameter_manager.py:828 - Set turbo=ON
+INFO - 2026-02-12 10:13:47,081 - parameter_manager.py:870 - Set pm_qos_resume_latency_us=0µs (all cores, 40 CPUs)
+INFO - 2026-02-12 10:13:51,215 - parameter_manager.py:919 - Set cstate_max=unlimited (cores: all) - enabled 160 C-states
+INFO - 2026-02-12 10:13:51,218 - parameter_manager.py:1040 - Set net.core.busy_poll=0
+INFO - 2026-02-12 10:13:51,221 - parameter_manager.py:1084 - Set net.core.busy_read=0
+INFO - 2026-02-12 10:13:51,223 - parameter_manager.py:1114 - Set net.core.netdev_budget=300
+INFO - 2026-02-12 10:13:51,226 - parameter_manager.py:1144 - Set net.core.netdev_budget_usecs=8000
+INFO - 2026-02-12 10:13:51,226 - parameter_manager.py:1330 - Setting EPP to default...
+INFO - 2026-02-12 10:13:53,415 - parameter_manager.py:725 - Set EPP=default (all cores)
+INFO - 2026-02-12 10:13:53,415 - optimizer.py:1005 - Parameters reset complete
+INFO - 2026-02-12 10:13:53,416 - optimizer.py:1022 - Optimization complete: 0 iterations in 3.21s
+INFO - 2026-02-12 10:13:53,416 - optimizer.py:1023 - Best parameters: {}
+INFO - 2026-02-12 10:13:53,416 - optimizer.py:1024 - Best reward: inf
+INFO - 2026-02-12 10:13:53,417 - main.py:77 - Performing cleanup on exit...
+INFO - 2026-02-12 10:13:53,417 - main.py:95 - Saving optimizer history and resetting parameters...
+INFO - 2026-02-12 10:13:53,417 - optimizer.py:996 - Shutting down executor threads...
+INFO - 2026-02-12 10:13:53,417 - optimizer.py:1003 - Resetting all parameters to defaults...
+INFO - 2026-02-12 10:13:53,418 - parameter_manager.py:1309 - Setting scaling governor to powersave...
+INFO - 2026-02-12 10:13:54,575 - parameter_manager.py:526 - Set scaling_governor=powersave (all cores)
+INFO - 2026-02-12 10:13:54,575 - parameter_manager.py:1324 - Resetting parameters to defaults: ['latency_ns', 'min_granularity_ns', 'wakeup_granularity_ns', 'migration_cost_ns', 'scaling_governor', 'scaling_min_freq', 'scaling_max_freq', 'min_perf_pct', 'max_perf_pct', 'turbo', 'pmqos', 'cstate_max', 'busy_poll', 'busy_read', 'netdev_budget', 'netdev_budget_usecs']
+INFO - 2026-02-12 10:13:54,603 - parameter_manager.py:252 - Set latency_ns = 24000000
+INFO - 2026-02-12 10:13:54,633 - parameter_manager.py:252 - Set min_granularity_ns = 3000000
+INFO - 2026-02-12 10:13:54,662 - parameter_manager.py:252 - Set wakeup_granularity_ns = 4000000
+INFO - 2026-02-12 10:13:54,692 - parameter_manager.py:252 - Set migration_cost_ns = 500000
+INFO - 2026-02-12 10:13:55,882 - parameter_manager.py:526 - Set scaling_governor=powersave (all cores)
+INFO - 2026-02-12 10:13:57,091 - parameter_manager.py:591 - Set scaling_min_freq=0kHz (all cores)
+INFO - 2026-02-12 10:13:58,307 - parameter_manager.py:656 - Set scaling_max_freq=0kHz (all cores)
+INFO - 2026-02-12 10:13:58,338 - parameter_manager.py:749 - Set min_perf_pct=0 (global)
+INFO - 2026-02-12 10:13:58,370 - parameter_manager.py:791 - Set max_perf_pct=100 (global)
+INFO - 2026-02-12 10:13:58,397 - parameter_manager.py:828 - Set turbo=ON
+INFO - 2026-02-12 10:13:59,494 - parameter_manager.py:870 - Set pm_qos_resume_latency_us=0µs (all cores, 40 CPUs)
+INFO - 2026-02-12 10:14:11,404 - parameter_manager.py:919 - Set cstate_max=unlimited (cores: all) - enabled 160 C-states
+INFO - 2026-02-12 10:14:11,405 - parameter_manager.py:1040 - Set net.core.busy_poll=0
+INFO - 2026-02-12 10:14:11,406 - parameter_manager.py:1084 - Set net.core.busy_read=0
+INFO - 2026-02-12 10:14:11,407 - parameter_manager.py:1114 - Set net.core.netdev_budget=300
+INFO - 2026-02-12 10:14:11,407 - parameter_manager.py:1144 - Set net.core.netdev_budget_usecs=8000
+INFO - 2026-02-12 10:14:11,408 - parameter_manager.py:1330 - Setting EPP to default...
+INFO - 2026-02-12 10:14:12,636 - parameter_manager.py:725 - Set EPP=default (all cores)
+INFO - 2026-02-12 10:14:12,637 - optimizer.py:1005 - Parameters reset complete
+INFO - 2026-02-12 10:14:12,637 - optimizer.py:1022 - Optimization complete: 0 iterations in 15.36s
+INFO - 2026-02-12 10:14:12,638 - optimizer.py:1023 - Best parameters: {}
+INFO - 2026-02-12 10:14:12,638 - optimizer.py:1024 - Best reward: inf
+
+================================================================================
+OPTIMIZATION COMPLETE
+================================================================================
+Iterations: 0
+Total time: 3.2s
+Best reward: inf
+Best parameters: {}
+Termination reason: error
+History saved to: results_config_full_param_tpcc_lo_pwr_wrt_p99_20260212_085340/tpcc_lo_pwr_wrt_p99/qlearning/optimization_history_tpcc_20260212_101341.json
+================================================================================

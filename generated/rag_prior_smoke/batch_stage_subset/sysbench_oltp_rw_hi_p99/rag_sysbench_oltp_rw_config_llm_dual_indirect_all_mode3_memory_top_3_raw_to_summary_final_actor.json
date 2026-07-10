@@ -1,0 +1,132 @@
+{
+  "benchmark": "sysbench_oltp",
+  "pin_to_cores": "0-9",
+  "sysbench_threads": 40,
+  "tuner_type": "llm",
+  "llm_api_key": null,
+  "parameter_ranges": {
+    "min_granularity_ns": [
+      100000,
+      100000000
+    ],
+    "latency_ns": [
+      100000,
+      100000000
+    ],
+    "cstate_max": [
+      "POLL",
+      "C6",
+      "C3",
+      "C1E",
+      "C1"
+    ],
+    "napi_busy_poll": [
+      0,
+      1000
+    ],
+    "wakeup_granularity_ns": [
+      100000,
+      100000000
+    ],
+    "migration_cost_ns": [
+      100000,
+      100000000
+    ],
+    "max_perf_pct": [
+      0,
+      100
+    ],
+    "min_perf_pct": [
+      0,
+      100
+    ]
+  },
+  "parameters_to_tune": [
+    "min_granularity_ns",
+    "latency_ns",
+    "cstate_max",
+    "napi_busy_poll",
+    "wakeup_granularity_ns",
+    "migration_cost_ns",
+    "max_perf_pct",
+    "min_perf_pct"
+  ],
+  "fixed_parameters": {},
+  "optimization_metric": "latency_p99",
+  "optimization_goal": "minimize",
+  "max_iterations": 30,
+  "window_duration": 10,
+  "tuning_mode": "in-window",
+  "results_dir": "results/sysbench_oltp_rw_hi_p99/rag_llm_dual_indirect_all_mode3_memory_top_3_raw_to_summary_final_actor/",
+  "continuous_apply": false,
+  "llm_actor_model": "gemini-2.5-flash",
+  "llm_speculator_model": "gemini-2.5-flash-lite",
+  "use_indirect_optimization": true,
+  "llm_indirect_history_show_all_metrics": true,
+  "llm_additional_metrics": [
+    "instructions_per_cycle",
+    "cycles",
+    "instructions",
+    "branch_misses",
+    "branch_miss_rate_pct",
+    "page_faults",
+    "context_switches_per_sec",
+    "cpu_migrations_per_sec",
+    "branches_per_sec",
+    "power_socket0_watts",
+    "power_ram_watts",
+    "cstate_poll_pct",
+    "cstate_c1_pct",
+    "cstate_c1e_pct",
+    "cstate_c6_pct",
+    "cpu_load_cores_pct",
+    "cpu_load_socket0_pct"
+  ],
+  "llm_indirect_prompt_style": "signature_compare",
+  "llm_measure_default_before_tuning": true,
+  "post_tuning_windows": 20,
+  "llm_explore_until_last_iteration": true,
+  "dual_loop_actor_only_final": false,
+  "dual_loop_force_final_actor_before_stable": true,
+  "llm_force_final_freeze_before_stable": false,
+  "llm_actor_additional_metrics": [
+    "instructions_per_cycle",
+    "cycles",
+    "instructions",
+    "branch_misses",
+    "branch_miss_rate_pct",
+    "page_faults",
+    "context_switches_per_sec",
+    "cpu_migrations_per_sec",
+    "branches_per_sec",
+    "power_socket0_watts",
+    "power_ram_watts",
+    "cstate_poll_pct",
+    "cstate_c1_pct",
+    "cstate_c1e_pct",
+    "cstate_c6_pct",
+    "cpu_load_cores_pct",
+    "cpu_load_socket0_pct"
+  ],
+  "llm_speculator_additional_metrics": [
+    "instructions_per_cycle",
+    "cycles",
+    "instructions",
+    "branch_misses",
+    "branch_miss_rate_pct",
+    "page_faults",
+    "context_switches_per_sec",
+    "cpu_migrations_per_sec",
+    "branches_per_sec",
+    "power_socket0_watts",
+    "power_ram_watts",
+    "cstate_poll_pct",
+    "cstate_c1_pct",
+    "cstate_c1e_pct",
+    "cstate_c6_pct",
+    "cpu_load_cores_pct",
+    "cpu_load_socket0_pct"
+  ],
+  "omit_explicit_pairwise_comparison_instruction": false,
+  "previous_run_gist": "Hidden primary-metric values from the prior run have been redacted. Use the qualitative parameter patterns and configuration hints below.\n\nThis prior focuses on minimizing hidden primary metric.\n\n**Consensus & Promising Regions:**\n\n*   **C-States:** There's a strong divergence. One summary points to C6 for throughput (though not our objective), while another strongly favors C1 for hidden primary metric. A third suggests POLL for minimal latency. This indicates C-state is a critical parameter to re-evaluate early.\n    *   **C1:** Appears promising for hidden primary metric, with high C1 utilization (around 99.9%) and low C1E/C6 utilization being a stable signature.\n    *   **POLL:** Also shows promise for extremely low latency, achieving 100% poll_pct.\n    *   **C6:** Associated with higher latency and potentially better throughput, but likely not optimal for minimizing hidden primary metric.\n*   **Granularity & Latency:**\n    *   **min_granularity_ns, wakeup_granularity_ns, latency_ns:** Generally, lower values in these parameters are favored for minimizing latency. However, there's a notable disagreement: one summary found a sweet spot around 75ms (75,000,000 ns) for throughput, while others suggest values in the 100,000-250,000 ns range for hidden primary metric. Extremely low values (<1,000,000 ns) were risky in one context.\n    *   **migration_cost_ns:** High values (70,000,000-80,000,000 ns) were found to be crucial for minimizing hidden primary metric in one run.\n*   **Performance Percentages:**\n    *   **max_perf_pct:** Consistently appears to be best at 100%.\n    *   **min_perf_pct:** Values around 10% were noted as promising for hidden primary metric, while higher values (95-100%) were associated with POLL c-state and minimal latency. This suggests a potential trade-off or different optimal points depending on the C-state.\n*   **napi_busy_poll:** Values around 250-270 were promising for hidden primary metric. Higher values (750) were associated with throughput. Very low values (<50) were risky.\n\n**Risky Regions & Caveats:**\n\n*   **Very Low Granularities/Latencies:** Values in the 20,000,000-30,000,000 ns range for granularity and latency were associated with increased context switches and decreased IPC in one run, indicating potential overhead.\n*   **High C-States (C6):** While potentially good for throughput, C6 appears to be a risky region for minimizing hidden primary metric.\n*   **POLL C-state:** While showing promise for extreme low latency, it might lead to higher CPU load and power consumption.\n*   **hidden-score signal Signal:** The absence of a visible primary metric (hidden primary metric) and reliance on a proxy hidden-score signal in multiple runs introduces uncertainty. Parameter regions identified as \"best\" should be validated against the actual hidden primary metric metric early on.\n\n**Early Validation Guidance:**\n\n*   **C-State Exploration:** Begin by exploring both C1 and POLL c-states. Monitor C1 utilization (aiming for ~99.9%) and POLL utilization (aiming for 100%). Observe if C6 states emerge and if they correlate with increased latency.\n*   **Granularity/Latency Trade-off:** Test a range of `min_granularity_ns` and `latency_ns` values. Start with values around 100,000-250,000 ns and also explore the 50,000,000 ns region. Be cautious of values below 1,000,000 ns.\n*   **`migration_cost_ns`:** Prioritize exploring higher values in the 70,000,000-80,000,000 ns range.\n*   **`napi_busy_poll`:** Focus on the 250-270 range.\n*   **System Signatures:** Look for low context switches and CPU migrations when exploring promising latency regions. High C1 utilization (with low C1E/C6) is a good indicator for C1-based tuning. 100% poll_pct is key for POLL-based tuning.\n*   **Initial Broad Exploration:** Be prepared for initial broad exploration, especially if the C-state choice is unclear. Monitor for high hidden-score signal variance in early cycles as an indicator of a wide search space."
+}

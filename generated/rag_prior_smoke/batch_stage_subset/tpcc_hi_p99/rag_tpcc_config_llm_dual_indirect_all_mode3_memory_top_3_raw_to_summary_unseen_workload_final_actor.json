@@ -1,0 +1,133 @@
+{
+  "benchmark": "tpcc",
+  "pin_to_cores": "0-9",
+  "benchbase_jar_path": "deps/benchbase/target/benchbase-postgres/benchbase.jar",
+  "benchbase_config_file": "config/benchbase/postgres/sample_tpcc_hi.xml",
+  "tuner_type": "llm",
+  "llm_api_key": null,
+  "parameter_ranges": {
+    "min_granularity_ns": [
+      100000,
+      100000000
+    ],
+    "latency_ns": [
+      100000,
+      100000000
+    ],
+    "cstate_max": [
+      "POLL",
+      "C6",
+      "C3",
+      "C1E",
+      "C1"
+    ],
+    "napi_busy_poll": [
+      0,
+      1000
+    ],
+    "wakeup_granularity_ns": [
+      100000,
+      100000000
+    ],
+    "migration_cost_ns": [
+      100000,
+      100000000
+    ],
+    "max_perf_pct": [
+      0,
+      100
+    ],
+    "min_perf_pct": [
+      0,
+      100
+    ]
+  },
+  "parameters_to_tune": [
+    "min_granularity_ns",
+    "latency_ns",
+    "cstate_max",
+    "napi_busy_poll",
+    "wakeup_granularity_ns",
+    "migration_cost_ns",
+    "max_perf_pct",
+    "min_perf_pct"
+  ],
+  "fixed_parameters": {},
+  "optimization_metric": "latency_p99",
+  "optimization_goal": "minimize",
+  "max_iterations": 30,
+  "window_duration": 10,
+  "tuning_mode": "in-window",
+  "results_dir": "results/tpcc_hi_p99/rag_llm_dual_indirect_all_mode3_memory_top_3_raw_to_summary_unseen_workload_final_actor/",
+  "continuous_apply": false,
+  "llm_actor_model": "gemini-2.5-flash",
+  "llm_speculator_model": "gemini-2.5-flash-lite",
+  "use_indirect_optimization": true,
+  "llm_indirect_history_show_all_metrics": true,
+  "llm_additional_metrics": [
+    "instructions_per_cycle",
+    "cycles",
+    "instructions",
+    "branch_misses",
+    "branch_miss_rate_pct",
+    "page_faults",
+    "context_switches_per_sec",
+    "cpu_migrations_per_sec",
+    "branches_per_sec",
+    "power_socket0_watts",
+    "power_ram_watts",
+    "cstate_poll_pct",
+    "cstate_c1_pct",
+    "cstate_c1e_pct",
+    "cstate_c6_pct",
+    "cpu_load_cores_pct",
+    "cpu_load_socket0_pct"
+  ],
+  "llm_indirect_prompt_style": "signature_compare",
+  "llm_measure_default_before_tuning": true,
+  "post_tuning_windows": 20,
+  "llm_explore_until_last_iteration": true,
+  "dual_loop_actor_only_final": false,
+  "dual_loop_force_final_actor_before_stable": true,
+  "llm_force_final_freeze_before_stable": false,
+  "llm_actor_additional_metrics": [
+    "instructions_per_cycle",
+    "cycles",
+    "instructions",
+    "branch_misses",
+    "branch_miss_rate_pct",
+    "page_faults",
+    "context_switches_per_sec",
+    "cpu_migrations_per_sec",
+    "branches_per_sec",
+    "power_socket0_watts",
+    "power_ram_watts",
+    "cstate_poll_pct",
+    "cstate_c1_pct",
+    "cstate_c1e_pct",
+    "cstate_c6_pct",
+    "cpu_load_cores_pct",
+    "cpu_load_socket0_pct"
+  ],
+  "llm_speculator_additional_metrics": [
+    "instructions_per_cycle",
+    "cycles",
+    "instructions",
+    "branch_misses",
+    "branch_miss_rate_pct",
+    "page_faults",
+    "context_switches_per_sec",
+    "cpu_migrations_per_sec",
+    "branches_per_sec",
+    "power_socket0_watts",
+    "power_ram_watts",
+    "cstate_poll_pct",
+    "cstate_c1_pct",
+    "cstate_c1e_pct",
+    "cstate_c6_pct",
+    "cpu_load_cores_pct",
+    "cpu_load_socket0_pct"
+  ],
+  "omit_explicit_pairwise_comparison_instruction": false,
+  "previous_run_gist": "Hidden primary-metric values from the prior run have been redacted. Use the qualitative parameter patterns and configuration hints below.\n\nThis prior synthesizes insights from previous tuning runs to guide a new run focused on minimizing hidden primary metric.\n\n**Consensus and Key Relationships:**\n\n*   **C-State Management:** There's a strong indication that aggressive C-state management is crucial. While one run favored `POLL` for minimal latency, others found better stability and performance with `C1E` or `C1`, especially when aiming for a balance. `C6` appears less optimal for low latency objectives.\n*   **Latency and Granularity:** Lower values for `latency_ns`, `min_granularity_ns`, and `wakeup_granularity_ns` generally correlate with lower latency, but there's a critical trade-off. Extremely low values (e.g., < 100-200ms) can lead to increased context switches and reduced IPC, indicating a \"sweet spot\" rather than an absolute minimum. Values around 100,000 to 1,000,000 ns appear promising.\n*   **Performance Percentages:** High `min_perf_pct` (90-100%) and `max_perf_pct` (90-100%) are consistently associated with better performance, suggesting the system should be pushed towards higher performance states.\n*   **Busy Polling:** `napi_busy_poll` values in the higher range (e.g., 200-1000) are generally beneficial for reducing latency, with values near the maximum often being explored.\n\n**Promising Regions:**\n\n*   **Aggressive Low Latency:** Configurations with very low `latency_ns`, `migration_cost_ns`, `min_granularity_ns`, and `wakeup_granularity_ns` (e.g., 100,000-250,000 ns), combined with `cstate_max: POLL`, high `napi_busy_poll` (950-1000), and high `min_perf_pct` (95-100%) show promise for absolute minimum latency.\n*   **Balanced Low Latency:** Configurations using `C1E` or `C1` for `cstate_max`, with moderate latency and granularity settings (e.g., `latency_ns`: 500,000-1,000,000 ns, `min_granularity_ns`: 250,000-500,000 ns), and `min_perf_pct` around 90-95%, also appear to be in a stable, good-performing region.\n\n**Risky Regions:**\n\n*   **Extremely Low Granularity/Latency:** Values below 100,000 ns for `latency_ns`, `min_granularity_ns`, and `wakeup_granularity_ns` can lead to performance degradation due to overhead.\n*   **High C1/C1E Usage with High Latency:** While `C1E` and `C1` can be good, very high usage combined with higher latency parameters might not be optimal for minimizing `hidden primary metric`.\n*   **Low `napi_busy_poll`:** Values near 0 for `napi_busy_poll` are generally detrimental.\n\n**Early Exploration Guidance:**\n\n*   **Initial State:** The system often starts with higher latency or mixed C-state usage. Be prepared for an initial exploration phase.\n*   **C-State Shift:** Expect the system to move away from `POLL` towards `C1E` or `C1` as latency parameters are tuned, or vice-versa if the objective is absolute minimum latency. Monitor this transition.\n*   **Granularity Sensitivity:** Early exploration of very low granularities (e.g., 20-30ms) should be approached with caution, as it can quickly lead to increased context switches and reduced IPC.\n*   **Metric Signatures:** Rely on system metrics like `cstate_poll_pct`, `cstate_c1_pct`, `cstate_c1e_pct`, `cpu_load_cores_pct`, and `instructions_per_cycle` for guidance, especially if direct hidden-score signal signals are not immediately clear or stable. High `cstate_poll_pct` and moderate `cpu_load_cores_pct` (45-55%) are good indicators for the aggressive low-latency path. High `cpu_load_cores_pct` (~97%) with `C1`/`C1E` dominance suggests the balanced path.\n\n**Early Validation:**\n\n*   Monitor `hidden primary metric` closely from the start.\n*   Observe the transition in `cstate_max` and its impact on `cpu_load_cores_pct` and `cstate_*_pct`.\n*   Watch for increases in `context_switches_per_sec` and decreases in `instructions_per_cycle` when exploring very low granularity settings.\n*   If using a hidden-score signal signal, be aware of potential noise and look for stable hidden-score signal regions rather than isolated peaks."
+}
