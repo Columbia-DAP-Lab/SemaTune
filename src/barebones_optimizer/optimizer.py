@@ -859,8 +859,10 @@ class SimpleOptimizer:
                     # Check if this is a per-core parameter
                     from .parameter_manager import is_per_core_parameter
                     bind_cores = is_per_core_parameter(param_name) and self.config.pin_to_cores
+                    # Do not rebind NIC IRQs while applying network parameters.
+                    # IRQ migration can dominate short in-window measurements.
                     if param_name in {"busy_poll", "napi_busy_poll", "busy_read", "netdev_budget", "netdev_budget_usecs"}:
-                        bind_cores = bind_cores and getattr(self.config, "bind_network_irqs", True)
+                        bind_cores = False
                     if bind_cores:
                         # Merge with pin_to_cores
                         new_params[param_name] = {
@@ -1185,8 +1187,10 @@ class SimpleOptimizer:
             # Check if this is a per-core parameter
             from .parameter_manager import is_per_core_parameter
             bind_cores = is_per_core_parameter(param_name) and self.config.pin_to_cores
+            # Do not rebind NIC IRQs while applying network parameters.
+            # IRQ migration can dominate short in-window measurements.
             if param_name in {"busy_poll", "napi_busy_poll", "busy_read", "netdev_budget", "netdev_budget_usecs"}:
-                bind_cores = bind_cores and getattr(self.config, "bind_network_irqs", True)
+                bind_cores = False
             if bind_cores:
                 # Merge with pin_to_cores
                 tunable_params_to_apply[param_name] = {
