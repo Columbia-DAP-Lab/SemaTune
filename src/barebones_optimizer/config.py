@@ -32,6 +32,10 @@ class SimpleConfig:
     
     # CPU pinning (taskset)
     pin_to_cores: Optional[str] = None  # e.g., "0,1,2,3" or "0-7" or None for all cores
+    # Network sysctls are global. Some experiments also bind NIC IRQs to the
+    # benchmark cores when applying them; disable this for short in-window
+    # experiments where rebinding would dominate the measurement window.
+    bind_network_irqs: bool = False
     
     # Benchmark-specific settings
     # Sysbench settings
@@ -82,7 +86,7 @@ class SimpleConfig:
     tailbench_xapian_db_path: Optional[str] = None  # Xapian database path (default: ${DATA_ROOT}/xapian/wiki)
     tailbench_silo_scale_factor: Optional[int] = None  # Silo scale factor / number of warehouses (default: 4)
     tailbench_sphinx_audio_samples: Optional[str] = None  # Sphinx audio samples file name (default: audio_samples)
-    
+
     # DCPerf settings
     dcperf_path: Optional[str] = None  # Path to DCPerf directory (default: deps/DCPerf)
     dcperf_benchmark_name: Optional[str] = None  # Which benchpress benchmark to run (e.g., "spark_standalone_local")
@@ -277,7 +281,7 @@ class SimpleConfig:
             'bayesian_n_trials', 'bayesian_seed',
             'dqn_grid_points', 'dqn_learning_rate', 'dqn_epsilon_start', 'dqn_epsilon_end',
             'dqn_epsilon_decay', 'dqn_batch_size', 'dqn_memory_size', 'dqn_target_update_freq',
-            'dqn_hidden_size', 'dqn_gamma',
+            'dqn_hidden_size', 'dqn_gamma', 'dqn_max_actions',
             'qlearning_grid_points', 'qlearning_max_actions', 'qlearning_learning_rate',
             'qlearning_epsilon_start', 'qlearning_epsilon_end', 'qlearning_epsilon_decay',
             'qlearning_gamma',
@@ -295,10 +299,12 @@ class SimpleConfig:
             if param in data:
                 tuner_params[param] = data.pop(param)
         
-        # Detect if dual-loop fields were explicitly provided in the JSON
-        # (before they get consumed by cls(**data) or popped)
-        # Require BOTH fields: only llm_model_name → single loop
-        _has_explicit_dual_loop = ('llm_actor_model' in data and 'llm_speculator_model' in data)
+        # Detect an actual dual-loop request before cls(**data). Serialized
+        # single-loop configs retain these optional keys with null values, so
+        # key presence alone must not route them through the dual-loop engine.
+        _has_explicit_dual_loop = bool(
+            data.get('llm_actor_model') and data.get('llm_speculator_model')
+        )
         
         # Convert lists to tuples for continuous ranges, keep lists for categorical
         if 'parameter_ranges' in data:

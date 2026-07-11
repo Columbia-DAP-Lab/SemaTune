@@ -1758,6 +1758,60 @@ def get_default_parameters() -> Dict[str, Union[int, str, bool]]:
     return defaults
 
 
+def get_selected_default_parameters(
+    parameter_names: Set[str],
+) -> Dict[str, Union[int, str, bool]]:
+    """Return defaults only for parameters selected by an experiment.
+
+    Optimizers must not apply the complete global default map when a config
+    tunes only a subset of parameters. Besides being surprising, doing so can
+    change governor, C-state, networking, and VM controls unrelated to the
+    experiment.
+    """
+    defaults = get_default_parameters()
+    aliases = {"napi_busy_poll": "busy_poll"}
+    selected: Dict[str, Union[int, str, bool]] = {}
+    for name in set(parameter_names):
+        source_name = aliases.get(name, name)
+        if source_name in defaults:
+            selected[name] = defaults[source_name]
+    return selected
+
+
+def reset_selected_parameters_to_defaults(
+    param_manager: ParameterManager,
+    parameter_names: Set[str],
+) -> bool:
+    """Reset only the named parameters to the controller's known defaults.
+
+    Evaluator-facing live runners additionally restore an exact raw host-state
+    snapshot. This narrower reset is the optimizer's safe fallback and keeps
+    the governor/EPP ordering required by Intel P-state systems.
+    """
+    selected = set(parameter_names)
+    if not selected:
+        logger.info("No experiment parameters selected for reset")
+        return True
+
+    defaults = get_selected_default_parameters(selected)
+    success = True
+
+    if "scaling_governor" in defaults:
+        logger.info("Resetting selected scaling governor before dependent controls")
+        if not param_manager.set_scaling_governor(defaults["scaling_governor"]):
+            success = False
+
+    epp_value = defaults.pop("epp", None)
+    defaults.pop("scaling_governor", None)
+    if defaults and not param_manager.set_parameters(defaults):
+        success = False
+
+    if epp_value is not None and not param_manager.set_epp(epp_value):
+        success = False
+
+    return success
+
+
 def reset_all_parameters_to_defaults(
     param_manager: ParameterManager,
     include_new_parameters: bool = False

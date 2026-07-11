@@ -4,10 +4,11 @@ This artifact accompanies **“SemaTune: Semantic-Aware Online OS Tuning with
 Large Language Models,”** accepted at the ACM SIGOPS 32nd Symposium on
 Operating Systems Principles (SOSP ’26).
 
-This document covers the **Artifact Available** badge. Availability review
-checks that the identified artifact is permanently accessible, complete,
-licensed, citable, and internally consistent. It does not require evaluators to
-repeat the paper’s days-long tuning campaigns.
+This document covers the **Artifact Available** package and the evaluator entry
+point for the **Artifact Functional** workflow. Availability review checks that
+the identified artifact is permanently accessible, complete, licensed,
+citable, and internally consistent. Functional review can exercise the short
+live example below without repeating the paper’s days-long tuning campaigns.
 
 ## Artifact Available
 
@@ -44,6 +45,90 @@ and display the immutable source, software, model, and external-input records.
 These checks do not install packages, contact an LLM provider, change kernel
 settings, or run a benchmark.
 
+### Optional full paper-plot reconstruction (Results Reproduced scope)
+
+The evaluator-facing mapping from paper claims to archived result directories,
+plotting programs, reference figures, and per-plot commands is in
+[`artifact/PAPER_CLAIMS_AND_PLOTS.md`](artifact/PAPER_CLAIMS_AND_PLOTS.md).
+The isolated paper-era snapshot is under `all_results/paper_evaluation/` and is
+identified by `artifact/paper_plot_inputs.json`. To verify its checksums and
+regenerate/validate the active empirical outputs:
+
+```bash
+scripts/artifact_plots/verify_paper_inputs.sh
+SEMATUNE_VALIDATION_MODE=measured \
+  scripts/artifact_plots/generate_all.sh artifact/generated_plots
+```
+
+This is optional for Functional review; regenerating every paper presentation
+belongs to Results Reproduced. The plot-only workflow takes about one minute on the reference analysis host;
+it does not rerun the days-long tuning campaigns. The indirect System/Twitter
+series uses all five recovered March 13 measured histories; it does not use the
+paper-era synthetic IPC-plus-five-percentage-point substitution. Memory Top-1/Top-3 values are
+recomputed from archived histories, and the missing Sysbench App/No-Memory
+series is sourced from the regular App-only paper run; the latency CSV is reused
+and validated.
+
+The `measured` profile validates the retained measured histories; the optional
+`paper` profile preserves strict checks against the two disclosed Plot 3/4
+numbers in the accepted manuscript.
+
+The evaluator-facing one-rerun workflow, exact per-plot configurations, shared
+result mapping, resume behavior, and end-to-end runner are under
+[`reproduction/`](reproduction/README.md). The three Results-Reproduced commands
+are:
+
+```bash
+reproduction/reproduce_all.sh --dry-run
+reproduction/reproduce_all.sh --archived-only --output-dir results/reproduced_archived
+reproduction/reproduce_all.sh --run --output-dir results/reproduced_one_run
+```
+
+The live command performs one rerun per unique configuration and automatically
+plots all results. It requires the caller's exported `GEMINI_API_KEY`, the full
+paper dependencies, and the dedicated paper-compatible host. The nominal
+benchmark-window time is about 23.5 hours, with one to several days of wall time
+expected after workload and model overhead.
+
+## Artifact Functional: minimal live example
+
+> **Safety warning:** this experiment changes live scheduler, busy-poll,
+> P-state, and C-state controls. Use only a dedicated or disposable bare-metal
+> machine.
+
+The defensible checklist minimum is Fixed versus dual-loop SemaTune on one
+short workload. This package goes beyond that minimum and runs the requested
+TPC-C suite: Fixed, MLOS, Bayesian/SMAC, DQN, Q-learning, SemaTune Single,
+SemaTune Dual, and SemaTune-Trim. Every method uses the canonical eight TPC-C
+controls for 10 tuning plus 5 frozen stable windows at 5 seconds per window.
+The evaluator commands are:
+
+```bash
+functional_example/install_tpcc.sh
+functional_example/run.sh --dry-run
+functional_example/run.sh --quick --trace-replay \
+  --output-dir results/functional_tpcc_trace
+```
+
+The deterministic trace makes no provider request. `--quick --real-llm` uses
+only the caller's exported `GEMINI_API_KEY`; the key is never printed or
+serialized. The eight-method suite takes roughly 15–30 minutes, has a
+60-minute timeout, produces raw histories/logs/CSV/JSON plus the live and
+archived-evidence plots, and restores and byte-verifies all captured controls
+on every exit path. Results are host-dependent and validation does not promise
+improvement. Do not overlap trace and real suites: the runner holds an
+exclusive host lock because BenchBase recreates the shared TPC-C tables.
+
+```bash
+functional_example/plot.sh \
+  --results-dir results/functional_tpcc_trace \
+  --output-dir results/functional_tpcc_trace/plots
+```
+
+See [`functional_example/README.md`](functional_example/README.md) for exact
+outputs, resource expectations, harmless warnings, restoration coverage, and
+the six representative experiment-kind inputs.
+
 ### Archive contents
 
 The release contains:
@@ -54,14 +139,16 @@ The release contains:
   `src/barebones_optimizer/memory/`, including redaction, summarization,
   embedding, ChromaDB storage, retrieval, configuration generation, tests, and
   plotting utilities.
-- Experiment configurations under `config/` and exact compact memory
-  configurations under `generated/rag_prior_smoke/`.
-- Archived memory and model-backend comparison records under
-  `all_results/results_rag/`, `all_results/results_gemini_3/`, and
-  `all_results/results_kimi/`, together with the corresponding
-  paper-branch plotting scripts.
-- The 15-workload, 71-run cross-run-memory source corpus under the retained
-  `all_results/results_config_full_param_*_retry/` directories.
+- Six representative experiment-kind configurations and the runnable quick
+  inputs under `functional_example/`; the broader historical config grids are
+  not part of the Functional package.
+- A 438 MiB, 2,657-file paper-plot snapshot under
+  `all_results/paper_evaluation/`, imported from commit
+  `4383a40da65f468fb0895d68cd375912dc909068`, plus per-file checksums. Plot
+  commands always write regenerated PDFs/CSVs to the requested output directory.
+- Archived paper evidence is curated only under
+  `all_results/paper_evaluation/`; duplicate old/short/window roots are not
+  part of the release.
 - Benchmark source snapshots under `deps/`, fixed by the commits below.
 - A Python 3.10 dependency specification and fully transitive, hash-locked
   environment in `requirements.in` and `requirements.txt`.
@@ -92,6 +179,26 @@ PostgreSQL’s exact server version is preserved in the archived BenchBase
 summaries, while the Sysbench/LuaJIT versions are preserved in the archived
 `sysbench.log` files.
 
+### Functional-validation machine (not the paper platform)
+
+The minimal workflow was validated on a separate machine. These values are
+not claims about the original paper platform above.
+
+| Component | Recorded value |
+| --- | --- |
+| OS / kernel | Ubuntu 22.04.2 LTS; `5.15.0-177-generic` |
+| CPU | 2 × Intel Xeon E5-2660 v3 at 2.60 GHz; 10 cores/socket; 2 threads/core; 20 physical / 40 logical CPUs |
+| NUMA | node 0 CPUs `0-9,20-29`; node 1 CPUs `10-19,30-39` |
+| Memory | 157 GiB visible RAM; 8 GiB swap |
+| Storage | 2.1 TiB ext4 LVM over two 1.1 TB HUC101212CSS600 disks |
+| PostgreSQL / Sysbench / Python | 14.23 / 1.0.20 / 3.10.12 |
+| Functional CPU allocation | controls and perf CPUs 0–9; BenchBase CPUs 10–19; PostgreSQL not explicitly pinned |
+| Power/frequency state | SMT enabled; turbo enabled; `intel_cpufreq` with `powersave`; POLL/C1/C1E/C3/C6 exposed |
+
+The live preflight requires CPUs 0–19, debugfs scheduler controls, Intel
+P-state, cpuidle, perf, Java 21, BenchBase, PostgreSQL, Python 3.10, and administrator
+access. It reports a clear incompatibility rather than silently degrading.
+
 ### Benchmark implementations
 
 The paper’s 13 workloads are Mutilate/Memcached; BenchBase TPC-C, Wikipedia,
@@ -109,6 +216,25 @@ Sysbench OLTP and CPU; and DCPerf SparkBench.
 
 All four Git submodule checkouts match the parent-repository gitlinks.
 FleetBench is not used by the paper and is not part of this artifact.
+
+To acquire the exact third-party sources from a Git checkout:
+
+```bash
+git submodule update --init --recursive
+git -C deps/benchbase rev-parse HEAD
+git -C deps/Tailbench rev-parse HEAD
+git -C deps/DCPerf rev-parse HEAD
+git -C deps/mutilate rev-parse HEAD
+```
+
+The expected hashes are the four commits in the table above. BenchBase builds
+with `cd deps/benchbase && ./mvnw clean package -P postgres -DskipTests`.
+Mutilate builds with `cd deps/mutilate && autoreconf -fi && ./configure &&
+make -j"$(nproc)"`. TailBench and DCPerf have workload-specific build/data
+steps in their retained upstream/fork READMEs; their large inputs are pinned in
+`artifact/downloads.lock.json`. These are acquisition instructions for
+archived/full experiments. `install_tpcc.sh` builds only BenchBase; it does not
+build unrelated workloads.
 
 ### AE software environment
 
@@ -154,9 +280,8 @@ The AE snapshot selects PostgreSQL 14.22; this is distinct from PostgreSQL
 The paper and retained comparison runs use temperature `0.7`. Their
 identifiers and reference date are centralized in
 `src/barebones_optimizer/model_versions.py` and `artifact/versions.json`.
-Legacy exploratory configurations retained elsewhere in `config/` may name
-other endpoints; the table above is the authoritative set for the paper and
-the imported memory/model-backend comparisons.
+The table above is the authoritative set for the paper and retained archived
+comparisons; obsolete exploratory configuration grids are excluded.
 
 Hosted APIs do not expose downloadable model weights that the artifact can
 checksum. Stable Gemini identifiers are provider-managed endpoints, while the

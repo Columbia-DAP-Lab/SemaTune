@@ -189,15 +189,6 @@ DEFAULT_CURATED_WORKLOADS = (
     "ycsb_hi_p99",
 )
 
-TWITTER_OVERRIDE_WORKLOAD = "twitter_p99"
-TWITTER_DUMP_OVERRIDE_PCT_DELTA = 5.0
-TWITTER_DUMP_OVERRIDE_LABELS = (
-    ("Tuxbot IPC Dual", "Tuxbot Indirect Dump Dual"),
-    ("Tuxbot IPC Dual no Xapian", "Tuxbot Indirect Dump Dual no Xapian"),
-    ("Tuxbot IPC Dual no Catastrophic", "Tuxbot Indirect Dump Dual no Catastrophic"),
-)
-
-
 def parse_args() -> argparse.Namespace:
     p = argparse.ArgumentParser(
         description="Plot aggregate improvement over Fixed for retry experiments."
@@ -674,18 +665,6 @@ def collect_workload_phase_series(
                 phase_series["stable"] = stable_series
             if phase_series:
                 by_method[label] = phase_series
-
-        if workload_dir.name == TWITTER_OVERRIDE_WORKLOAD:
-            for source_label, target_label in TWITTER_DUMP_OVERRIDE_LABELS:
-                source_phase_map = by_method.get(source_label, {})
-                if not source_phase_map:
-                    continue
-                target_phase_map = by_method.setdefault(target_label, {})
-                for phase_name, source_series in source_phase_map.items():
-                    target_phase_map[phase_name] = [
-                        float(value) + TWITTER_DUMP_OVERRIDE_PCT_DELTA
-                        for value in source_series
-                    ]
 
         if by_method:
             series_map[workload_dir.name] = by_method

@@ -111,12 +111,16 @@ IMPORTANT:
 
     def _create_update_message(self, metrics, current_params, iteration,
                                 best_reward, history=None, baseline_index=0,
-                                aggregation_interval_s=None) -> str:
+                                aggregation_interval_s=None,
+                                phase_instruction_override=None,
+                                final_freeze_request=False) -> str:
         """Override to include trimming action history and current effective ranges."""
         # Get the standard update message
         base_msg = super()._create_update_message(
             metrics, current_params, iteration, best_reward,
-            history, baseline_index, aggregation_interval_s
+            history, baseline_index, aggregation_interval_s,
+            phase_instruction_override=phase_instruction_override,
+            final_freeze_request=final_freeze_request,
         )
 
         # Append trimming history
@@ -259,6 +263,20 @@ IMPORTANT:
     # ------------------------------------------------------------------
     # Response parsing override
     # ------------------------------------------------------------------
+
+    def _replay_response(self, iteration: int, *, final_freeze_request: bool = False) -> TunerResponse:
+        """Replay both parameter choices and trimming-specific range actions."""
+
+        entry = self.replay_by_iteration.get(iteration) or {}
+        responses = entry.get("responses") or {}
+        response = responses.get("reasoning") or {}
+        suggested_ranges = response.get("suggested_ranges")
+        eliminated_params = response.get("eliminated_params")
+        if isinstance(suggested_ranges, dict):
+            self._apply_range_adjustments(suggested_ranges)
+        if isinstance(eliminated_params, list):
+            self._apply_eliminations(eliminated_params, response.get("parameters") or {})
+        return super()._replay_response(iteration, final_freeze_request=final_freeze_request)
 
     def _parse_structured_response(self, parsed_data: Any) -> tuple[Dict[str, Any], Optional[str], List[str]]:
         """Override to extract suggested_ranges and update effective ranges."""

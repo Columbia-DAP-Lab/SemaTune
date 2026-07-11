@@ -12,7 +12,7 @@ from typing import Dict, Any
 from collections import deque, namedtuple
 
 from ..benchmark import BenchmarkMetrics
-from .base import TunerInterface, TunerResponse
+from .base import TunerInterface, TunerResponse, unwrap_parameter_value
 
 logger = logging.getLogger(__name__)
 
@@ -78,6 +78,7 @@ class DQNTuner(TunerInterface):
         
         # DQN configuration
         self.grid_points = getattr(config, 'dqn_grid_points', 10)
+        self.max_actions = getattr(config, 'dqn_max_actions', 1000)
         self.learning_rate = getattr(config, 'dqn_learning_rate', 0.001)
         self.epsilon_start = getattr(config, 'dqn_epsilon_start', 1.0)
         self.epsilon_end = getattr(config, 'dqn_epsilon_end', 0.1)
@@ -88,10 +89,37 @@ class DQNTuner(TunerInterface):
         self.hidden_size = getattr(config, 'dqn_hidden_size', 128)
         self.gamma = getattr(config, 'dqn_gamma', 0.99)
         
+        # Bound the joint action space before allocating the network output
+        # layer. With eight paper knobs, the legacy default of ten points per
+        # numeric dimension would otherwise create hundreds of millions of
+        # actions and exhaust memory before the first benchmark window.
+        continuous_params = [k for k, v in self.parameter_ranges.items() if isinstance(v, tuple)]
+        categorical_sizes = [
+            len(v) for v in self.parameter_ranges.values() if not isinstance(v, tuple)
+        ]
+        base_actions = int(np.prod(categorical_sizes)) if categorical_sizes else 1
+        if base_actions > self.max_actions:
+            raise ValueError(
+                f"DQN categorical action space is too large ({base_actions} > {self.max_actions})"
+            )
+        if continuous_params:
+            max_grid = int((self.max_actions / base_actions) ** (1 / len(continuous_params)))
+            max_grid = max(1, max_grid)
+            if self.grid_points > max_grid:
+                logger.warning(
+                    "DQN grid_points reduced from %d to %d to cap action space at %d",
+                    self.grid_points, max_grid, self.max_actions,
+                )
+                self.grid_points = max_grid
+
         # Create discretized parameter space
         self.param_names = list(self.parameter_ranges.keys())
         self.discretized_ranges = self._create_discretized_ranges()
         self.action_space_size = int(np.prod([len(ranges) for ranges in self.discretized_ranges.values()]))
+        if self.action_space_size > self.max_actions:
+            raise ValueError(
+                f"DQN action space is too large ({self.action_space_size} > {self.max_actions})"
+            )
         self.state_size = len(self.param_names) + 3  # parameters + reward + iteration + time_since_change
         
         # Initialize DQN components
@@ -159,7 +187,7 @@ class DQNTuner(TunerInterface):
             param_values = self.discretized_ranges[param_name]
             # Get value from parameters, or use first value from range as default
             if param_name in parameters:
-                value = parameters[param_name]
+                value = unwrap_parameter_value(parameters[param_name])
             else:
                 value = param_values[0] if param_values else 0
             
@@ -186,7 +214,7 @@ class DQNTuner(TunerInterface):
                     param_values = self.discretized_ranges.get(param_name, [0])
                     param_value = param_values[0] if param_values else 0
             else:
-                param_value = parameters[param_name]
+                param_value = unwrap_parameter_value(parameters[param_name])
             
             if isinstance(self.parameter_ranges[param_name], tuple):
                 min_val, max_val = self.parameter_ranges[param_name]
@@ -328,4 +356,3 @@ class DQNTuner(TunerInterface):
             confidence=1.0 - self.epsilon,
             justification=f"DQN (epsilon={self.epsilon:.3f})"
         )
-

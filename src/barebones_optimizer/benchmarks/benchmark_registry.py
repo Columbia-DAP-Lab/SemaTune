@@ -322,7 +322,7 @@ class BenchmarkType(Enum):
         base_command=[],  # Command varies by app
         description="Tailbench latency-critical applications (8 apps: img-dnn, masstree, moses, shore, silo, specjbb, sphinx, xapian)"
     )
-    
+
     @classmethod
     def from_string(cls, name: str) -> 'BenchmarkType':
         """Get benchmark type from string name.

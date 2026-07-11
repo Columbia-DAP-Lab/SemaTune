@@ -159,6 +159,19 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--right-trim-pts", type=float, default=3.0)
     p.add_argument("--fallback-fixed-paths", nargs="*", default=[])
     p.add_argument("--fallback-tuner-paths", nargs="*", default=[])
+    p.add_argument(
+        "--sysbench-app-no-memory-workload-dir",
+        default="",
+        help=(
+            "Regular Sysbench OLTP workload result directory used as the App/No-Memory "
+            "fallback when that tuner is absent from results_rag/sysbench_oltp."
+        ),
+    )
+    p.add_argument(
+        "--sysbench-app-no-memory-fixed-dir",
+        default="",
+        help="Fixed-baseline directory paired with --sysbench-app-no-memory-workload-dir.",
+    )
     p.add_argument("--write-csv", action="store_true")
     p.add_argument(
         "--sysbench-oltp-app-vs-indirect-factor",
@@ -168,6 +181,22 @@ def parse_args() -> argparse.Namespace:
         help=(
             "Impute sysbench app no-mem as F× the sysbench indirect no-mem series "
             "when the app baseline directory is missing; 0 disables."
+        ),
+    )
+    p.add_argument(
+        "--paper-geomean-overrides",
+        action="store_true",
+        help=(
+            "Replace computed geomean rows with the constants used by the submitted-paper plot. "
+            "Disabled by default so artifact checks expose missing raw inputs."
+        ),
+    )
+    p.add_argument(
+        "--paper-baseline-overrides",
+        action="store_true",
+        help=(
+            "Reuse only the submitted App/System No-Memory aggregate values. "
+            "Top-1 and Top-3 memory rows remain computed from archived histories."
         ),
     )
     return p.parse_args()
@@ -222,6 +251,18 @@ def inject_sysbench_app_from_indirect(
     if not out:
         return False
     methods["app_nomem"] = out
+    return True
+
+
+def inject_sysbench_app_from_regular(
+    workload_phase_series: Dict[str, Dict[str, Dict[str, List[float]]]],
+    regular_phase_series: Dict[str, List[float]],
+) -> bool:
+    if not regular_phase_series or SYSBENCH_OLTP_ROOT not in workload_phase_series:
+        return False
+    workload_phase_series[SYSBENCH_OLTP_ROOT]["app_nomem"] = {
+        phase: list(values) for phase, values in regular_phase_series.items()
+    }
     return True
 
 
@@ -479,12 +520,17 @@ def _fmt_float(value: Optional[float]) -> str:
     return f"{float(value):.2f}"
 
 
-def apply_hardcoded_geomean_summary(summary_rows: Sequence[Dict[str, object]]) -> List[Dict[str, object]]:
+def apply_hardcoded_geomean_summary(
+    summary_rows: Sequence[Dict[str, object]],
+    methods: Optional[set[str]] = None,
+) -> List[Dict[str, object]]:
     out: List[Dict[str, object]] = []
     for row in summary_rows:
         updated = dict(row)
         key = (str(updated.get("method")), str(updated.get("phase")))
         override = HARDCODED_GEOMEAN_SUMMARY.get(key)
+        if methods is not None and key[0] not in methods:
+            override = None
         if override is not None:
             pct = float(override["pct"])
             err = float(override["err"])
@@ -636,6 +682,29 @@ def main() -> None:
 
     fallback_fixed_map = resolve_fixed_dirs(args.fallback_fixed_paths)
     fallback_tuner_map = _build_fallback_tuner_map(args.fallback_tuner_paths)
+    regular_sysbench_app_series: Dict[str, List[float]] = {}
+    if args.sysbench_app_no_memory_workload_dir:
+        sysbench_workload = Path(args.sysbench_app_no_memory_workload_dir).resolve()
+        sysbench_fixed = Path(args.sysbench_app_no_memory_fixed_dir).resolve()
+        if not sysbench_workload.is_dir():
+            raise SystemExit(
+                f"Not a Sysbench App/No-Memory workload directory: {sysbench_workload}"
+            )
+        if not sysbench_fixed.is_dir():
+            raise SystemExit(f"Not a Sysbench App/No-Memory fixed directory: {sysbench_fixed}")
+        regular_map = collect_workload_phase_series(
+            workload_dirs=[sysbench_workload],
+            fallback_fixed_map={sysbench_workload.name: sysbench_fixed},
+            fallback_tuner_map={},
+            columns=[("app_nomem", LLM_DUAL_APP_DIR)],
+            tuning_window=tuning_window,
+            stable_window=stable_window,
+        )
+        regular_sysbench_app_series = (
+            regular_map.get(sysbench_workload.name, {}).get("app_nomem", {})
+        )
+        if not regular_sysbench_app_series:
+            raise SystemExit("No usable regular Sysbench App/No-Memory series found.")
     columns = list(PLOT_COLUMNS)
 
     for root in benchmark_roots:
@@ -647,6 +716,8 @@ def main() -> None:
             tuning_window=tuning_window,
             stable_window=stable_window,
         )
+        if root.name == SYSBENCH_OLTP_ROOT and regular_sysbench_app_series:
+            inject_sysbench_app_from_regular(workload_phase_series, regular_sysbench_app_series)
         if root.name == SYSBENCH_OLTP_ROOT and sb_fac > 0:
             if inject_sysbench_app_from_indirect(workload_phase_series, sb_fac):
                 print(
@@ -705,6 +776,8 @@ def main() -> None:
             tuning_window=tuning_window,
             stable_window=stable_window,
         )
+        if regular_sysbench_app_series:
+            inject_sysbench_app_from_regular(workload_phase_series, regular_sysbench_app_series)
         if sb_fac > 0:
             if inject_sysbench_app_from_indirect(workload_phase_series, sb_fac):
                 print(
@@ -725,7 +798,13 @@ def main() -> None:
         columns_global, summary_rows = filter_columns_with_data(columns_global, summary_rows)
         if not columns_global:
             raise SystemExit("No aggregate data for geomean plot.")
-        summary_rows = apply_hardcoded_geomean_summary(summary_rows)
+        if args.paper_geomean_overrides:
+            summary_rows = apply_hardcoded_geomean_summary(summary_rows)
+        elif args.paper_baseline_overrides:
+            summary_rows = apply_hardcoded_geomean_summary(
+                summary_rows,
+                methods={"app_nomem", "sys_nomem"},
+            )
         pdf_path = out_dir / "rag_memory_app_system_geomean.pdf"
         plot_grouped_memory_bars(
             summary_rows=summary_rows,

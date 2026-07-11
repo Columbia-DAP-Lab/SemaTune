@@ -27,12 +27,13 @@ from datetime import datetime
 
 from .config import SimpleConfig
 from .benchmark import BenchmarkInterface, BenchmarkMetrics
-from .tuners import LLMTuner, TunerResponse
+from .tuners.base import TunerResponse
+from .tuners.llm import LLMTuner
 from .parameter_manager import (
     ParameterManager,
-    get_default_parameters,
+    get_selected_default_parameters,
     get_new_parameter_names,
-    reset_all_parameters_to_defaults,
+    reset_selected_parameters_to_defaults,
     reset_new_parameters_to_system_defaults,
 )
 from .token_bookkeeping import summarize_token_bookkeeping
@@ -277,13 +278,26 @@ class SimpleDualLoopOptimizer:
                 if not self.benchmark.pre_execute():
                     raise RuntimeError("Benchmark pre-execution failed")
             
-            # For new parameters, always reset to live system defaults at run start.
-            logger.info("Resetting new parameters to system defaults at run start...")
-            reset_new_parameters_to_system_defaults(self.param_manager, refresh_snapshot=True)
+            experiment_params = (
+                set(self.config.parameter_ranges.keys())
+                | set(self.config.fixed_parameters.keys())
+            )
+
+            # For new parameters, reset only those selected by this experiment.
+            new_params_to_reset = experiment_params & get_new_parameter_names()
+            if new_params_to_reset:
+                logger.info(
+                    "Resetting selected new parameters to system defaults at run start: %s",
+                    sorted(new_params_to_reset),
+                )
+                reset_new_parameters_to_system_defaults(
+                    self.param_manager,
+                    parameters_to_reset=new_params_to_reset,
+                    refresh_snapshot=True,
+                )
             
-            # Initialize with fixed parameters
-            default_params = get_default_parameters()
-            initial_params = default_params.copy()
+            # Initialize only the parameters selected by this experiment.
+            initial_params = get_selected_default_parameters(experiment_params)
             initial_params.update(self.config.fixed_parameters)
             self.current_parameters = initial_params.copy()
             logger.info(f"Starting with parameters: {self.current_parameters}")
@@ -817,6 +831,7 @@ class SimpleDualLoopOptimizer:
                         "parameters_applied_timestamp": None,
                         "proposed_parameters": dict(response.parameters) if (response and response.parameters) else None,
                         "justification": response.justification if (response and hasattr(response, 'justification')) else None,
+                        "converged": response.converged if (response and hasattr(response, 'converged')) else None,
                         "token_metrics": response.token_metrics if (response and hasattr(response, 'token_metrics')) else None,
                         "response_number": quick_response_count + 1
                     }
@@ -860,6 +875,7 @@ class SimpleDualLoopOptimizer:
                         "parameters_applied_timestamp": None,
                         "proposed_parameters": dict(response.parameters) if (response and response.parameters) else None,
                         "justification": response.justification if (response and hasattr(response, 'justification')) else None,
+                        "converged": response.converged if (response and hasattr(response, 'converged')) else None,
                         "token_metrics": response.token_metrics if (response and hasattr(response, 'token_metrics')) else None,
                     }
                     
@@ -963,6 +979,7 @@ class SimpleDualLoopOptimizer:
                     "parameters_applied_timestamp": None,
                     "proposed_parameters": dict(response.parameters) if (response and response.parameters) else None,
                     "justification": response.justification if (response and hasattr(response, 'justification')) else None,
+                    "converged": response.converged if (response and hasattr(response, 'converged')) else None,
                     "token_metrics": response.token_metrics if (response and hasattr(response, 'token_metrics')) else None,
                 }
                 
@@ -998,6 +1015,7 @@ class SimpleDualLoopOptimizer:
                     "parameters_applied_timestamp": None,
                     "proposed_parameters": dict(response.parameters) if (response and response.parameters) else None,
                     "justification": response.justification if (response and hasattr(response, 'justification')) else None,
+                    "converged": response.converged if (response and hasattr(response, 'converged')) else None,
                     "token_metrics": response.token_metrics if (response and hasattr(response, 'token_metrics')) else None,
                 }
                 
@@ -1064,6 +1082,7 @@ class SimpleDualLoopOptimizer:
                 "parameters_applied_timestamp": None,
                 "proposed_parameters": dict(response.parameters) if (response and response.parameters) else None,
                 "justification": response.justification if (response and hasattr(response, 'justification')) else None,
+                "converged": response.converged if (response and hasattr(response, 'converged')) else None,
                 "token_metrics": response.token_metrics if (response and hasattr(response, 'token_metrics')) else None,
             }
 
@@ -1162,7 +1181,14 @@ class SimpleDualLoopOptimizer:
 
     def _ensure_final_actor_before_stable(self, iteration: int) -> Optional[Dict[str, Any]]:
         """Wait for the required final Actor reply before stable measurement."""
-        if self.pending_reasoning_future and not self.pending_reasoning_future.done():
+        # A response dispatched during the last tuning window only sees history
+        # through the preceding window.  When the config requests the explicit
+        # stable gate, always refresh after the completed last measurement;
+        # otherwise replay timing (or an unusually fast provider response) can
+        # incorrectly promote that stale response to the final decision.
+        if getattr(self.config, "dual_loop_force_final_actor_before_stable", False):
+            self._start_refreshed_final_actor_request(iteration)
+        elif self.pending_reasoning_future and not self.pending_reasoning_future.done():
             self._start_refreshed_final_actor_request(iteration)
         elif self.final_actor_timing is not None:
             return self.final_actor_timing
@@ -1188,6 +1214,7 @@ class SimpleDualLoopOptimizer:
                 "parameters_applied_timestamp": None,
                 "proposed_parameters": dict(response.parameters) if (response and response.parameters) else None,
                 "justification": response.justification if (response and hasattr(response, 'justification')) else None,
+                "converged": response.converged if (response and hasattr(response, 'converged')) else None,
                 "token_metrics": response.token_metrics if (response and hasattr(response, 'token_metrics')) else None,
             }
 
@@ -1306,7 +1333,10 @@ class SimpleDualLoopOptimizer:
                 if k in self.config.parameter_ranges:
                     # Handle per-core
                     from .parameter_manager import is_per_core_parameter
-                    if is_per_core_parameter(k) and self.config.pin_to_cores:
+                    bind_cores = is_per_core_parameter(k) and self.config.pin_to_cores
+                    if k in {"busy_poll", "napi_busy_poll", "busy_read", "netdev_budget", "netdev_budget_usecs"}:
+                        bind_cores = bind_cores and getattr(self.config, "bind_network_irqs", True)
+                    if bind_cores:
                         val_obj = {"value": v, "cores": self.config.pin_to_cores}
                         current_tunables[k] = val_obj
                     else:
@@ -1392,11 +1422,21 @@ class SimpleDualLoopOptimizer:
         
         # Reset parameters (this can be interrupted)
         try:
-            logger.info("Resetting base parameters to defaults...")
-            reset_all_parameters_to_defaults(self.param_manager, include_new_parameters=False)
+            experiment_params = (
+                set(self.config.parameter_ranges.keys())
+                | set(self.config.fixed_parameters.keys())
+            )
+            base_params_to_reset = experiment_params - get_new_parameter_names()
+            logger.info(
+                "Resetting selected base parameters to defaults: %s",
+                sorted(base_params_to_reset),
+            )
+            reset_selected_parameters_to_defaults(
+                self.param_manager,
+                base_params_to_reset,
+            )
             
             new_param_names = get_new_parameter_names()
-            experiment_params = set(self.config.parameter_ranges.keys()) | set(self.config.fixed_parameters.keys())
             new_params_to_reset = experiment_params & new_param_names
             if new_params_to_reset:
                 logger.info(

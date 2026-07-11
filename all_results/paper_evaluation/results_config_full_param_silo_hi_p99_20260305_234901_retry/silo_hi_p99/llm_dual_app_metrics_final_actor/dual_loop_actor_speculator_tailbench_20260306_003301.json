@@ -1,0 +1,5413 @@
+{
+  "config": {
+    "benchmark": "tailbench",
+    "pin_to_cores": "0-9",
+    "sysbench_script": "/usr/share/sysbench/oltp_read_write.lua",
+    "sysbench_host": "127.0.0.1",
+    "sysbench_port": 5432,
+    "sysbench_user": "admin",
+    "sysbench_password": "",
+    "sysbench_db": "benchdb",
+    "sysbench_tables": 4,
+    "sysbench_table_size": 100000,
+    "sysbench_threads": 16,
+    "sysbench_rate": null,
+    "sysbench_cpu_max_prime": null,
+    "benchbase_jar_path": "deps/benchbase/target/benchbase-postgres/benchbase.jar",
+    "benchbase_config_file": "config/benchbase/tpcc_config_template.xml",
+    "benchbase_timeout_buffer_seconds": 40,
+    "benchbase_timeout_retries": 1,
+    "mutilate_client_host": null,
+    "mutilate_target": "127.0.0.1:11211",
+    "mutilate_threads": 8,
+    "mutilate_clients": 8,
+    "mutilate_qps": 500000,
+    "mutilate_iadist": "fixed:0",
+    "mutilate_depth": 1,
+    "mutilate_bin_path": "~/mutilate/mutilate",
+    "mutilate_memcached_bin": "memcached",
+    "tailbench_app": "silo",
+    "tailbench_root": "deps/Tailbench/tailbench",
+    "tailbench_data_root": "deps/Tailbench/tailbench.inputs",
+    "tailbench_qps": 2700,
+    "tailbench_threads": 40,
+    "tailbench_warmupreqs": 2700,
+    "tailbench_maxreqs": 2000000000,
+    "tailbench_minsleepns": 0,
+    "tailbench_metrics_interval_sec": 1,
+    "tailbench_output_dir": null,
+    "tailbench_jdk_path": "/usr/lib/jvm/java-8-openjdk-amd64",
+    "tailbench_xapian_db_path": null,
+    "tailbench_silo_scale_factor": null,
+    "tailbench_sphinx_audio_samples": null,
+    "dcperf_path": null,
+    "dcperf_benchmark_name": null,
+    "dcperf_worker_cores": null,
+    "dcperf_max_runtime": 3600,
+    "django_backend_cores": null,
+    "django_client_cores": null,
+    "tuner_type": "llm",
+    "parameter_ranges": {
+      "min_granularity_ns": [
+        100000,
+        100000000
+      ],
+      "latency_ns": [
+        100000,
+        100000000
+      ],
+      "cstate_max": [
+        "POLL",
+        "C6",
+        "C3",
+        "C1E",
+        "C1"
+      ],
+      "napi_busy_poll": [
+        0,
+        1000
+      ],
+      "wakeup_granularity_ns": [
+        100000,
+        100000000
+      ],
+      "migration_cost_ns": [
+        100000,
+        100000000
+      ],
+      "max_perf_pct": [
+        0,
+        100
+      ],
+      "min_perf_pct": [
+        0,
+        100
+      ]
+    },
+    "parameter_types": null,
+    "parameters_to_tune": [
+      "min_granularity_ns",
+      "latency_ns",
+      "cstate_max",
+      "napi_busy_poll",
+      "wakeup_granularity_ns",
+      "migration_cost_ns",
+      "max_perf_pct",
+      "min_perf_pct"
+    ],
+    "fixed_parameters": {},
+    "optimization_metric": "latency_p99",
+    "optimization_goal": "minimize",
+    "max_iterations": 30,
+    "post_tuning_windows": 20,
+    "window_duration": 5,
+    "respect_config_window_duration": false,
+    "continuous_apply": false,
+    "tuning_mode": "in-window",
+    "experiment_profile": "tuxbot_app_dual_30_20_final_actor",
+    "constraint_metric": null,
+    "constraint_threshold": null,
+    "constraint_direction": "less_than",
+    "constraint_penalty": 10.0,
+    "results_dir": "results_config_full_param_silo_hi_p99_20260305_234901/silo_hi_p99/llm_dual_app_metrics_final_actor/",
+    "llm_api_key": "<REDACTED_GEMINI_API_KEY>",
+    "openrouter_api_key": null,
+    "llm_model_name": "gemini-2.5-flash",
+    "llm_secondary_model": "gemini-2.5-flash-lite",
+    "llm_replay_file": null,
+    "llm_actor_model": "gemini-2.5-flash",
+    "llm_speculator_model": "gemini-2.5-flash-lite",
+    "llm_thinking_level": null,
+    "llm_thinking_budget": null,
+    "llm_temperature": 0.7,
+    "workload_description": null,
+    "llm_additional_metrics": [
+      "throughput",
+      "goodput",
+      "latency_avg",
+      "latency_p95",
+      "latency_p99",
+      "queries_per_hour"
+    ],
+    "llm_actor_additional_metrics": [
+      "throughput",
+      "goodput",
+      "latency_avg",
+      "latency_p95",
+      "latency_p99",
+      "queries_per_hour"
+    ],
+    "llm_speculator_additional_metrics": [
+      "throughput",
+      "goodput",
+      "latency_avg",
+      "latency_p95",
+      "latency_p99",
+      "queries_per_hour"
+    ],
+    "llm_speculator_hide_primary_metric": false,
+    "llm_speculator_aggregation_interval_s": null,
+    "dual_loop_actor_only_final": false,
+    "dual_loop_force_final_actor_before_stable": true,
+    "llm_explore_until_last_iteration": true,
+    "trimming_enabled": false,
+    "trimming_cycles": 5,
+    "trimming_model_name": null,
+    "trimming_strategy": "single_loop",
+    "trimming_suggest_params": true,
+    "trimming_aggressiveness": "normal",
+    "use_perf_stat": true,
+    "use_indirect_optimization": false,
+    "llm_indirect_history_show_all_metrics": true,
+    "llm_indirect_prompt_style": "signature_compare",
+    "omit_explicit_pairwise_comparison_instruction": false,
+    "llm_full_metrics_prompt_mode": true,
+    "llm_full_metrics_explicit_signature_compare": false,
+    "previous_run_gist": null,
+    "workload_change_type": null,
+    "workload_change_interval": null,
+    "workload_change_param": null
+  },
+  "best_parameters": {
+    "min_granularity_ns": 100000,
+    "latency_ns": 100000,
+    "cstate_max": {
+      "value": "POLL",
+      "cores": "0-9"
+    },
+    "napi_busy_poll": {
+      "value": 30,
+      "cores": "0-9"
+    },
+    "wakeup_granularity_ns": 100000,
+    "migration_cost_ns": 100000,
+    "max_perf_pct": {
+      "value": 100,
+      "cores": "0-9"
+    },
+    "min_perf_pct": {
+      "value": 100,
+      "cores": "0-9"
+    }
+  },
+  "best_reward": 1.096,
+  "iterations": 50,
+  "total_time": 518.3860647678375,
+  "history": [
+    {
+      "iteration": 1,
+      "timestamp": 1772778288.4890456,
+      "parameters": {
+        "min_granularity_ns": 100000,
+        "latency_ns": 100000,
+        "cstate_max": {
+          "value": "C1",
+          "cores": "0-9"
+        },
+        "napi_busy_poll": {
+          "value": 0,
+          "cores": "0-9"
+        },
+        "wakeup_granularity_ns": 100000,
+        "migration_cost_ns": 100000,
+        "max_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        },
+        "min_perf_pct": {
+          "value": 0,
+          "cores": "0-9"
+        }
+      },
+      "metrics": {
+        "throughput": 2758.75,
+        "goodput": 2758.75,
+        "latency_avg": 1.648829089261441,
+        "latency_p95": 6.952,
+        "request_count": 11035.0,
+        "intervals_aggregated": 4,
+        "app_name": "silo",
+        "latency_p50": 1.09,
+        "latency_p99": 13.067,
+        "latency_max": 35.508,
+        "msec_cpu_clock": 30042.96,
+        "cpus_utilized": 10.0,
+        "context_switches": 41467.0,
+        "context_switches_per_sec": 1.38,
+        "cpu_migrations": 2162.0,
+        "cpu_migrations_per_sec": 71.964,
+        "page_faults": 21938.0,
+        "page_faults_per_sec": 730.221,
+        "cycles": 5130376377.0,
+        "ghz": 0.171,
+        "instructions": 1165107327.0,
+        "instructions_per_cycle": 0.23,
+        "branches": 234648395.0,
+        "branches_per_sec": 7.81,
+        "branch_misses": 6984081.0,
+        "branch_miss_rate_pct": 2.98,
+        "time_elapsed_seconds": 3.004243105,
+        "all_quick_tuner_timings": [
+          {
+            "tuner_call_time": 1772778283.3983107,
+            "tuner_response_time": 1772778284.3237762,
+            "tuner_duration": 0.9254655838012695,
+            "tuner_response_time_ms": 925.4655838012695,
+            "tuner_type": "speculator_quick",
+            "parameters_applied": true,
+            "parameters_applied_timestamp": 1772778287.7863388,
+            "proposed_parameters": {
+              "min_granularity_ns": 100000,
+              "latency_ns": 100000,
+              "cstate_max": "C1",
+              "napi_busy_poll": 0,
+              "wakeup_granularity_ns": 100000,
+              "migration_cost_ns": 100000,
+              "max_perf_pct": 100,
+              "min_perf_pct": 0
+            },
+            "justification": "Starting with aggressive low values for latency-related parameters and maximum performance to explore the lowest latency potential. C1 for C-state provides a balance between power saving and quick wakeups.",
+            "token_metrics": {
+              "input_tokens": 826,
+              "output_tokens": 166,
+              "total_tokens": 992
+            },
+            "response_number": 1
+          }
+        ],
+        "quick_response_count": 1
+      },
+      "reward": 13.067,
+      "tuner_timing": {
+        "quick": {
+          "tuner_call_time": 1772778283.3983107,
+          "tuner_response_time": 1772778284.3237762,
+          "tuner_duration": 0.9254655838012695,
+          "tuner_response_time_ms": 925.4655838012695,
+          "tuner_type": "speculator_quick",
+          "parameters_applied": true,
+          "parameters_applied_timestamp": 1772778287.7863388,
+          "proposed_parameters": {
+            "min_granularity_ns": 100000,
+            "latency_ns": 100000,
+            "cstate_max": "C1",
+            "napi_busy_poll": 0,
+            "wakeup_granularity_ns": 100000,
+            "migration_cost_ns": 100000,
+            "max_perf_pct": 100,
+            "min_perf_pct": 0
+          },
+          "justification": "Starting with aggressive low values for latency-related parameters and maximum performance to explore the lowest latency potential. C1 for C-state provides a balance between power saving and quick wakeups.",
+          "token_metrics": {
+            "input_tokens": 826,
+            "output_tokens": 166,
+            "total_tokens": 992
+          },
+          "response_number": 1
+        }
+      },
+      "post_tuning_phase": false,
+      "system_metrics": {
+        "window_start_time": 1772778283.421849,
+        "window_end_time": 1772778288.438453,
+        "perf_start_time": 1772778284.4315293,
+        "perf_end_time": 1772778287.4315293,
+        "system_metrics_start_time": 1772778284.4321952,
+        "system_metrics_end_time": 1772778287.4221177,
+        "power_socket0_watts": 28.593046333333334,
+        "power_ram_watts": 8.083270333333333,
+        "cstate_poll_pct": 0.006040749181417477,
+        "cstate_c1_pct": 83.75510616158162,
+        "cstate_c1e_pct": 2.9912175904833718,
+        "cstate_c6_pct": 13.247635498753588,
+        "cpu_load_cores_pct": 19.766942871475248,
+        "cpu_load_socket0_pct": 10.725962166821013,
+        "perf_metrics": {
+          "msec_cpu_clock": 30042.96,
+          "cpus_utilized": 10.0,
+          "context_switches": 41467.0,
+          "context_switches_per_sec": 1.38,
+          "cpu_migrations": 2162.0,
+          "cpu_migrations_per_sec": 71.964,
+          "page_faults": 21938.0,
+          "page_faults_per_sec": 730.221,
+          "cycles": 5130376377.0,
+          "ghz": 0.171,
+          "instructions": 1165107327.0,
+          "instructions_per_cycle": 0.23,
+          "branches": 234648395.0,
+          "branches_per_sec": 7.81,
+          "branch_misses": 6984081.0,
+          "branch_miss_rate_pct": 2.98,
+          "time_elapsed_seconds": 3.004243105
+        }
+      }
+    },
+    {
+      "iteration": 2,
+      "timestamp": 1772778296.5731483,
+      "parameters": {
+        "min_granularity_ns": 500000,
+        "latency_ns": 2000000,
+        "cstate_max": {
+          "value": "C1",
+          "cores": "0-9"
+        },
+        "napi_busy_poll": {
+          "value": 200,
+          "cores": "0-9"
+        },
+        "wakeup_granularity_ns": 500000,
+        "migration_cost_ns": 300000,
+        "max_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        },
+        "min_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        }
+      },
+      "metrics": {
+        "throughput": 2719.25,
+        "goodput": 2719.25,
+        "latency_avg": 1.4840950629769238,
+        "latency_p95": 5.631,
+        "request_count": 10877.0,
+        "intervals_aggregated": 4,
+        "app_name": "silo",
+        "latency_p50": 0.873,
+        "latency_p99": 14.463,
+        "latency_max": 37.445,
+        "msec_cpu_clock": 30029.93,
+        "cpus_utilized": 10.001,
+        "context_switches": 40944.0,
+        "context_switches_per_sec": 1.363,
+        "cpu_migrations": 2127.0,
+        "cpu_migrations_per_sec": 70.829,
+        "page_faults": 25373.0,
+        "page_faults_per_sec": 844.924,
+        "cycles": 5087590368.0,
+        "ghz": 0.169,
+        "instructions": 1173787227.0,
+        "instructions_per_cycle": 0.23,
+        "branches": 236409044.0,
+        "branches_per_sec": 7.872,
+        "branch_misses": 6038752.0,
+        "branch_miss_rate_pct": 2.55,
+        "time_elapsed_seconds": 3.002546435,
+        "all_quick_tuner_timings": [
+          {
+            "tuner_call_time": 1772778288.4892974,
+            "tuner_response_time": 1772778289.5018976,
+            "tuner_duration": 1.0126001834869385,
+            "tuner_response_time_ms": 1012.6001834869385,
+            "tuner_type": "speculator_quick",
+            "parameters_applied": true,
+            "parameters_applied_timestamp": 1772778292.9773557,
+            "proposed_parameters": {
+              "min_granularity_ns": 100000,
+              "latency_ns": 100000,
+              "cstate_max": "C1",
+              "napi_busy_poll": 0,
+              "wakeup_granularity_ns": 100000,
+              "migration_cost_ns": 100000,
+              "max_perf_pct": 100,
+              "min_perf_pct": 0
+            },
+            "justification": "Continuing exploration with low latency settings, maintaining the previous best configuration to establish a baseline while probing slightly higher values for latency_ns and wakeup_granularity_ns to observe potential improvements or trade-offs.",
+            "token_metrics": {
+              "input_tokens": 1328,
+              "output_tokens": 170,
+              "total_tokens": 1498
+            },
+            "response_number": 1
+          }
+        ],
+        "quick_response_count": 1
+      },
+      "reward": 14.463,
+      "tuner_timing": {
+        "quick": {
+          "tuner_call_time": 1772778288.4892974,
+          "tuner_response_time": 1772778289.5018976,
+          "tuner_duration": 1.0126001834869385,
+          "tuner_response_time_ms": 1012.6001834869385,
+          "tuner_type": "speculator_quick",
+          "parameters_applied": true,
+          "parameters_applied_timestamp": 1772778292.9773557,
+          "proposed_parameters": {
+            "min_granularity_ns": 100000,
+            "latency_ns": 100000,
+            "cstate_max": "C1",
+            "napi_busy_poll": 0,
+            "wakeup_granularity_ns": 100000,
+            "migration_cost_ns": 100000,
+            "max_perf_pct": 100,
+            "min_perf_pct": 0
+          },
+          "justification": "Continuing exploration with low latency settings, maintaining the previous best configuration to establish a baseline while probing slightly higher values for latency_ns and wakeup_granularity_ns to observe potential improvements or trade-offs.",
+          "token_metrics": {
+            "input_tokens": 1328,
+            "output_tokens": 170,
+            "total_tokens": 1498
+          },
+          "response_number": 1
+        },
+        "reasoning": {
+          "tuner_call_time": 1772778283.4054627,
+          "tuner_start_iteration": 1,
+          "tuner_response_time": 1772778292.9778192,
+          "tuner_duration": 9.572356462478638,
+          "tuner_response_time_ms": 9572.356462478638,
+          "tuner_type": "actor_reasoning",
+          "parameters_applied": true,
+          "parameters_applied_timestamp": 1772778296.4720685,
+          "proposed_parameters": {
+            "min_granularity_ns": 500000,
+            "latency_ns": 2000000,
+            "cstate_max": "C1",
+            "napi_busy_poll": 200,
+            "wakeup_granularity_ns": 500000,
+            "migration_cost_ns": 300000,
+            "max_perf_pct": 100,
+            "min_perf_pct": 100
+          },
+          "justification": "This initial configuration aims to reduce p99 latency by setting lower scheduling and wakeup granularities, enabling shallow C-states, and maximizing CPU performance. NAPI busy polling is moderately enabled to assess its impact on network-related latency.",
+          "token_metrics": {
+            "input_tokens": 847,
+            "output_tokens": 181,
+            "total_tokens": 1887
+          }
+        }
+      },
+      "post_tuning_phase": false,
+      "system_metrics": {
+        "window_start_time": 1772778288.499712,
+        "window_end_time": 1772778293.5066404,
+        "perf_start_time": 1772778289.5008388,
+        "perf_end_time": 1772778292.5008388,
+        "system_metrics_start_time": 1772778289.5016868,
+        "system_metrics_end_time": 1772778292.5002217,
+        "power_socket0_watts": 28.788642999999997,
+        "power_ram_watts": 8.069383,
+        "cstate_poll_pct": 0.015518989433978466,
+        "cstate_c1_pct": 99.98448101056603,
+        "cstate_c1e_pct": 0.0,
+        "cstate_c6_pct": 0.0,
+        "cpu_load_cores_pct": 20.214506472016467,
+        "cpu_load_socket0_pct": 11.274400539925756,
+        "perf_metrics": {
+          "msec_cpu_clock": 30029.93,
+          "cpus_utilized": 10.001,
+          "context_switches": 40944.0,
+          "context_switches_per_sec": 1.363,
+          "cpu_migrations": 2127.0,
+          "cpu_migrations_per_sec": 70.829,
+          "page_faults": 25373.0,
+          "page_faults_per_sec": 844.924,
+          "cycles": 5087590368.0,
+          "ghz": 0.169,
+          "instructions": 1173787227.0,
+          "instructions_per_cycle": 0.23,
+          "branches": 236409044.0,
+          "branches_per_sec": 7.872,
+          "branch_misses": 6038752.0,
+          "branch_miss_rate_pct": 2.55,
+          "time_elapsed_seconds": 3.002546435
+        }
+      }
+    },
+    {
+      "iteration": 3,
+      "timestamp": 1772778301.6956284,
+      "parameters": {
+        "min_granularity_ns": 500000,
+        "latency_ns": 2000000,
+        "cstate_max": {
+          "value": "C1",
+          "cores": "0-9"
+        },
+        "napi_busy_poll": {
+          "value": 200,
+          "cores": "0-9"
+        },
+        "wakeup_granularity_ns": 500000,
+        "migration_cost_ns": 300000,
+        "max_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        },
+        "min_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        }
+      },
+      "metrics": {
+        "throughput": 2715.25,
+        "goodput": 2715.25,
+        "latency_avg": 0.534282202375472,
+        "latency_p95": 1.201,
+        "request_count": 10861.0,
+        "intervals_aggregated": 4,
+        "app_name": "silo",
+        "latency_p50": 0.445,
+        "latency_p99": 2.298,
+        "latency_max": 7.107,
+        "msec_cpu_clock": 30014.25,
+        "cpus_utilized": 10.0,
+        "context_switches": 31692.0,
+        "context_switches_per_sec": 1.056,
+        "cpu_migrations": 493.0,
+        "cpu_migrations_per_sec": 16.426,
+        "page_faults": 27819.0,
+        "page_faults_per_sec": 926.86,
+        "cycles": 10812319656.0,
+        "ghz": 0.36,
+        "instructions": 1061068308.0,
+        "instructions_per_cycle": 0.1,
+        "branches": 211924301.0,
+        "branches_per_sec": 7.061,
+        "branch_misses": 5068488.0,
+        "branch_miss_rate_pct": 2.39,
+        "time_elapsed_seconds": 3.001492663,
+        "all_quick_tuner_timings": [],
+        "quick_response_count": 0
+      },
+      "reward": 2.298,
+      "tuner_timing": {},
+      "post_tuning_phase": false,
+      "system_metrics": {
+        "window_start_time": 1772778296.5862908,
+        "window_end_time": 1772778301.5927787,
+        "perf_start_time": 1772778297.5868773,
+        "perf_end_time": 1772778300.5868773,
+        "system_metrics_start_time": 1772778297.5878575,
+        "system_metrics_end_time": 1772778300.5864415,
+        "power_socket0_watts": 34.700839333333334,
+        "power_ram_watts": 7.863848333333333,
+        "cstate_poll_pct": 0.006142842003426483,
+        "cstate_c1_pct": 99.99385715799657,
+        "cstate_c1e_pct": 0.0,
+        "cstate_c6_pct": 0.0,
+        "cpu_load_cores_pct": 13.619261666985208,
+        "cpu_load_socket0_pct": 6.809630833492604,
+        "perf_metrics": {
+          "msec_cpu_clock": 30014.25,
+          "cpus_utilized": 10.0,
+          "context_switches": 31692.0,
+          "context_switches_per_sec": 1.056,
+          "cpu_migrations": 493.0,
+          "cpu_migrations_per_sec": 16.426,
+          "page_faults": 27819.0,
+          "page_faults_per_sec": 926.86,
+          "cycles": 10812319656.0,
+          "ghz": 0.36,
+          "instructions": 1061068308.0,
+          "instructions_per_cycle": 0.1,
+          "branches": 211924301.0,
+          "branches_per_sec": 7.061,
+          "branch_misses": 5068488.0,
+          "branch_miss_rate_pct": 2.39,
+          "time_elapsed_seconds": 3.001492663
+        }
+      }
+    },
+    {
+      "iteration": 4,
+      "timestamp": 1772778306.7579453,
+      "parameters": {
+        "min_granularity_ns": 100000,
+        "latency_ns": 100000,
+        "cstate_max": {
+          "value": "POLL",
+          "cores": "0-9"
+        },
+        "napi_busy_poll": {
+          "value": 50,
+          "cores": "0-9"
+        },
+        "wakeup_granularity_ns": 100000,
+        "migration_cost_ns": 100000,
+        "max_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        },
+        "min_perf_pct": {
+          "value": 0,
+          "cores": "0-9"
+        }
+      },
+      "metrics": {
+        "throughput": 2652.75,
+        "goodput": 2652.75,
+        "latency_avg": 0.4482265573461502,
+        "latency_p95": 1.205,
+        "request_count": 10611.0,
+        "intervals_aggregated": 4,
+        "app_name": "silo",
+        "latency_p50": 0.423,
+        "latency_p99": 1.877,
+        "latency_max": 4.857,
+        "msec_cpu_clock": 30026.92,
+        "cpus_utilized": 10.0,
+        "context_switches": 27748.0,
+        "context_switches_per_sec": 924.104,
+        "cpu_migrations": 385.0,
+        "cpu_migrations_per_sec": 12.822,
+        "page_faults": 21914.0,
+        "page_faults_per_sec": 729.812,
+        "cycles": 41673368868.0,
+        "ghz": 1.388,
+        "instructions": 2522665592.0,
+        "instructions_per_cycle": 0.06,
+        "branches": 676307514.0,
+        "branches_per_sec": 22.523,
+        "branch_misses": 7006674.0,
+        "branch_miss_rate_pct": 1.04,
+        "time_elapsed_seconds": 3.002694247,
+        "all_quick_tuner_timings": [],
+        "quick_response_count": 0
+      },
+      "reward": 1.877,
+      "tuner_timing": {
+        "reasoning": {
+          "tuner_call_time": 1772778296.5738518,
+          "tuner_start_iteration": 3,
+          "tuner_response_time": 1772778304.1016555,
+          "tuner_duration": 7.527803659439087,
+          "tuner_response_time_ms": 7527.803659439087,
+          "tuner_type": "actor_reasoning",
+          "parameters_applied": true,
+          "parameters_applied_timestamp": 1772778305.3537664,
+          "proposed_parameters": {
+            "min_granularity_ns": 100000,
+            "latency_ns": 100000,
+            "cstate_max": "POLL",
+            "napi_busy_poll": 50,
+            "wakeup_granularity_ns": 100000,
+            "migration_cost_ns": 100000,
+            "max_perf_pct": 100,
+            "min_perf_pct": 0
+          },
+          "justification": "The best latency was achieved with low granularity and latency parameters. This configuration maintains these low values while exploring the impact of a 'POLL' C-state and a moderate 'napi_busy_poll' to further reduce latency.",
+          "token_metrics": {
+            "input_tokens": 1637,
+            "output_tokens": 177,
+            "total_tokens": 3135
+          }
+        }
+      },
+      "post_tuning_phase": false,
+      "system_metrics": {
+        "window_start_time": 1772778301.6963377,
+        "window_end_time": 1772778306.7030323,
+        "perf_start_time": 1772778302.6966999,
+        "perf_end_time": 1772778305.6966999,
+        "system_metrics_start_time": 1772778302.6977108,
+        "system_metrics_end_time": 1772778305.6964064,
+        "power_socket0_watts": 41.63099733333333,
+        "power_ram_watts": 7.718595333333333,
+        "cstate_poll_pct": 46.89874527392752,
+        "cstate_c1_pct": 53.10125472607248,
+        "cstate_c1e_pct": 0.0,
+        "cstate_c6_pct": 0.0,
+        "cpu_load_cores_pct": 11.50877096155387,
+        "cpu_load_socket0_pct": 6.064395539464129,
+        "perf_metrics": {
+          "msec_cpu_clock": 30026.92,
+          "cpus_utilized": 10.0,
+          "context_switches": 27748.0,
+          "context_switches_per_sec": 924.104,
+          "cpu_migrations": 385.0,
+          "cpu_migrations_per_sec": 12.822,
+          "page_faults": 21914.0,
+          "page_faults_per_sec": 729.812,
+          "cycles": 41673368868.0,
+          "ghz": 1.388,
+          "instructions": 2522665592.0,
+          "instructions_per_cycle": 0.06,
+          "branches": 676307514.0,
+          "branches_per_sec": 22.523,
+          "branch_misses": 7006674.0,
+          "branch_miss_rate_pct": 1.04,
+          "time_elapsed_seconds": 3.002694247
+        }
+      }
+    },
+    {
+      "iteration": 5,
+      "timestamp": 1772778311.8796525,
+      "parameters": {
+        "min_granularity_ns": 100000,
+        "latency_ns": 100000,
+        "cstate_max": {
+          "value": "POLL",
+          "cores": "0-9"
+        },
+        "napi_busy_poll": {
+          "value": 50,
+          "cores": "0-9"
+        },
+        "wakeup_granularity_ns": 100000,
+        "migration_cost_ns": 100000,
+        "max_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        },
+        "min_perf_pct": {
+          "value": 0,
+          "cores": "0-9"
+        }
+      },
+      "metrics": {
+        "throughput": 2738.75,
+        "goodput": 2738.75,
+        "latency_avg": 0.34328388863532633,
+        "latency_p95": 0.649,
+        "request_count": 10955.0,
+        "intervals_aggregated": 4,
+        "app_name": "silo",
+        "latency_p50": 0.27,
+        "latency_p99": 1.189,
+        "latency_max": 4.375,
+        "msec_cpu_clock": 30029.34,
+        "cpus_utilized": 10.0,
+        "context_switches": 26776.0,
+        "context_switches_per_sec": 891.661,
+        "cpu_migrations": 213.0,
+        "cpu_migrations_per_sec": 7.093,
+        "page_faults": 31031.0,
+        "page_faults_per_sec": 1.033,
+        "cycles": 75073012092.0,
+        "ghz": 2.5,
+        "instructions": 4113174393.0,
+        "instructions_per_cycle": 0.05,
+        "branches": 1177288859.0,
+        "branches_per_sec": 39.205,
+        "branch_misses": 8660432.0,
+        "branch_miss_rate_pct": 0.74,
+        "time_elapsed_seconds": 3.00284795,
+        "all_quick_tuner_timings": [],
+        "quick_response_count": 0
+      },
+      "reward": 1.189,
+      "tuner_timing": {},
+      "post_tuning_phase": false,
+      "system_metrics": {
+        "window_start_time": 1772778306.7674668,
+        "window_end_time": 1772778311.7746224,
+        "perf_start_time": 1772778307.7682676,
+        "perf_end_time": 1772778310.7682676,
+        "system_metrics_start_time": 1772778307.7691395,
+        "system_metrics_end_time": 1772778310.767697,
+        "power_socket0_watts": 49.06034,
+        "power_ram_watts": 7.738582,
+        "cstate_poll_pct": 100.0,
+        "cstate_c1_pct": 0.0,
+        "cstate_c1e_pct": 0.0,
+        "cstate_c6_pct": 0.0,
+        "cpu_load_cores_pct": 10.2793585345664,
+        "cpu_load_socket0_pct": 5.1396792672832,
+        "perf_metrics": {
+          "msec_cpu_clock": 30029.34,
+          "cpus_utilized": 10.0,
+          "context_switches": 26776.0,
+          "context_switches_per_sec": 891.661,
+          "cpu_migrations": 213.0,
+          "cpu_migrations_per_sec": 7.093,
+          "page_faults": 31031.0,
+          "page_faults_per_sec": 1.033,
+          "cycles": 75073012092.0,
+          "ghz": 2.5,
+          "instructions": 4113174393.0,
+          "instructions_per_cycle": 0.05,
+          "branches": 1177288859.0,
+          "branches_per_sec": 39.205,
+          "branch_misses": 8660432.0,
+          "branch_miss_rate_pct": 0.74,
+          "time_elapsed_seconds": 3.00284795
+        }
+      }
+    },
+    {
+      "iteration": 6,
+      "timestamp": 1772778317.7204626,
+      "parameters": {
+        "min_granularity_ns": 100000,
+        "latency_ns": 100000,
+        "cstate_max": {
+          "value": "POLL",
+          "cores": "0-9"
+        },
+        "napi_busy_poll": {
+          "value": 100,
+          "cores": "0-9"
+        },
+        "wakeup_granularity_ns": 100000,
+        "migration_cost_ns": 100000,
+        "max_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        },
+        "min_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        }
+      },
+      "metrics": {
+        "throughput": 2707.8,
+        "goodput": 2707.8,
+        "latency_avg": 0.34186439175714606,
+        "latency_p95": 0.708,
+        "request_count": 13539.0,
+        "intervals_aggregated": 5,
+        "app_name": "silo",
+        "latency_p50": 0.271,
+        "latency_p99": 1.262,
+        "latency_max": 5.89,
+        "msec_cpu_clock": 30023.09,
+        "cpus_utilized": 10.0,
+        "context_switches": 25969.0,
+        "context_switches_per_sec": 864.967,
+        "cpu_migrations": 193.0,
+        "cpu_migrations_per_sec": 6.428,
+        "page_faults": 20271.0,
+        "page_faults_per_sec": 675.18,
+        "cycles": 75057419047.0,
+        "ghz": 2.5,
+        "instructions": 4074568471.0,
+        "instructions_per_cycle": 0.05,
+        "branches": 1169886502.0,
+        "branches_per_sec": 38.966,
+        "branch_misses": 8653567.0,
+        "branch_miss_rate_pct": 0.74,
+        "time_elapsed_seconds": 3.002271124,
+        "all_quick_tuner_timings": [],
+        "quick_response_count": 0
+      },
+      "reward": 1.262,
+      "tuner_timing": {
+        "reasoning": {
+          "tuner_call_time": 1772778306.7583497,
+          "tuner_start_iteration": 5,
+          "tuner_response_time": 1772778314.486565,
+          "tuner_duration": 7.728215456008911,
+          "tuner_response_time_ms": 7728.215456008911,
+          "tuner_type": "actor_reasoning",
+          "parameters_applied": true,
+          "parameters_applied_timestamp": 1772778317.619704,
+          "proposed_parameters": {
+            "min_granularity_ns": 100000,
+            "latency_ns": 100000,
+            "cstate_max": "POLL",
+            "napi_busy_poll": 100,
+            "wakeup_granularity_ns": 100000,
+            "migration_cost_ns": 100000,
+            "max_perf_pct": 100,
+            "min_perf_pct": 100
+          },
+          "justification": "Building on the strong performance of low scheduler latencies and C-state POLL from iteration 4, this configuration increases napi_busy_poll to explore further network processing optimization and sets min_perf_pct to 100 to ensure consistent maximum CPU frequency for critical low-latency tasks.",
+          "token_metrics": {
+            "input_tokens": 2061,
+            "output_tokens": 192,
+            "total_tokens": 3750
+          }
+        }
+      },
+      "post_tuning_phase": false,
+      "system_metrics": {
+        "window_start_time": 1772778311.8808997,
+        "window_end_time": 1772778316.8865893,
+        "perf_start_time": 1772778312.8817,
+        "perf_end_time": 1772778315.8817,
+        "system_metrics_start_time": 1772778312.8825653,
+        "system_metrics_end_time": 1772778315.8811233,
+        "power_socket0_watts": 49.14735566666667,
+        "power_ram_watts": 7.729055333333332,
+        "cstate_poll_pct": 100.0,
+        "cstate_c1_pct": 0.0,
+        "cstate_c1e_pct": 0.0,
+        "cstate_c6_pct": 0.0,
+        "cpu_load_cores_pct": 10.282490659444084,
+        "cpu_load_socket0_pct": 5.173925068284134,
+        "perf_metrics": {
+          "msec_cpu_clock": 30023.09,
+          "cpus_utilized": 10.0,
+          "context_switches": 25969.0,
+          "context_switches_per_sec": 864.967,
+          "cpu_migrations": 193.0,
+          "cpu_migrations_per_sec": 6.428,
+          "page_faults": 20271.0,
+          "page_faults_per_sec": 675.18,
+          "cycles": 75057419047.0,
+          "ghz": 2.5,
+          "instructions": 4074568471.0,
+          "instructions_per_cycle": 0.05,
+          "branches": 1169886502.0,
+          "branches_per_sec": 38.966,
+          "branch_misses": 8653567.0,
+          "branch_miss_rate_pct": 0.74,
+          "time_elapsed_seconds": 3.002271124
+        }
+      }
+    },
+    {
+      "iteration": 7,
+      "timestamp": 1772778322.7358422,
+      "parameters": {
+        "min_granularity_ns": 100000,
+        "latency_ns": 100000,
+        "cstate_max": {
+          "value": "POLL",
+          "cores": "0-9"
+        },
+        "napi_busy_poll": {
+          "value": 100,
+          "cores": "0-9"
+        },
+        "wakeup_granularity_ns": 100000,
+        "migration_cost_ns": 100000,
+        "max_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        },
+        "min_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        }
+      },
+      "metrics": {
+        "throughput": 2713.75,
+        "goodput": 2713.75,
+        "latency_avg": 0.3390441271303547,
+        "latency_p95": 0.62,
+        "request_count": 10855.0,
+        "intervals_aggregated": 4,
+        "app_name": "silo",
+        "latency_p50": 0.267,
+        "latency_p99": 1.181,
+        "latency_max": 3.696,
+        "msec_cpu_clock": 30034.69,
+        "cpus_utilized": 10.0,
+        "context_switches": 26812.0,
+        "context_switches_per_sec": 892.701,
+        "cpu_migrations": 182.0,
+        "cpu_migrations_per_sec": 6.06,
+        "page_faults": 19726.0,
+        "page_faults_per_sec": 656.774,
+        "cycles": 75086401075.0,
+        "ghz": 2.5,
+        "instructions": 4074665360.0,
+        "instructions_per_cycle": 0.05,
+        "branches": 1169458087.0,
+        "branches_per_sec": 38.937,
+        "branch_misses": 8686299.0,
+        "branch_miss_rate_pct": 0.74,
+        "time_elapsed_seconds": 3.003528697,
+        "all_quick_tuner_timings": [],
+        "quick_response_count": 0
+      },
+      "reward": 1.181,
+      "tuner_timing": {},
+      "post_tuning_phase": false,
+      "system_metrics": {
+        "window_start_time": 1772778317.72424,
+        "window_end_time": 1772778322.7302284,
+        "perf_start_time": 1772778318.7245724,
+        "perf_end_time": 1772778321.7245724,
+        "system_metrics_start_time": 1772778318.7256002,
+        "system_metrics_end_time": 1772778321.724347,
+        "power_socket0_watts": 48.95039566666667,
+        "power_ram_watts": 7.691839999999999,
+        "cstate_poll_pct": 100.0,
+        "cstate_c1_pct": 0.0,
+        "cstate_c1e_pct": 0.0,
+        "cstate_c6_pct": 0.0,
+        "cpu_load_cores_pct": 10.087775115030931,
+        "cpu_load_socket0_pct": 5.043887557515466,
+        "perf_metrics": {
+          "msec_cpu_clock": 30034.69,
+          "cpus_utilized": 10.0,
+          "context_switches": 26812.0,
+          "context_switches_per_sec": 892.701,
+          "cpu_migrations": 182.0,
+          "cpu_migrations_per_sec": 6.06,
+          "page_faults": 19726.0,
+          "page_faults_per_sec": 656.774,
+          "cycles": 75086401075.0,
+          "ghz": 2.5,
+          "instructions": 4074665360.0,
+          "instructions_per_cycle": 0.05,
+          "branches": 1169458087.0,
+          "branches_per_sec": 38.937,
+          "branch_misses": 8686299.0,
+          "branch_miss_rate_pct": 0.74,
+          "time_elapsed_seconds": 3.003528697
+        }
+      }
+    },
+    {
+      "iteration": 8,
+      "timestamp": 1772778327.7479892,
+      "parameters": {
+        "min_granularity_ns": 100000,
+        "latency_ns": 100000,
+        "cstate_max": {
+          "value": "POLL",
+          "cores": "0-9"
+        },
+        "napi_busy_poll": {
+          "value": 100,
+          "cores": "0-9"
+        },
+        "wakeup_granularity_ns": 100000,
+        "migration_cost_ns": 100000,
+        "max_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        },
+        "min_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        }
+      },
+      "metrics": {
+        "throughput": 2703.5,
+        "goodput": 2703.5,
+        "latency_avg": 0.33447743665618646,
+        "latency_p95": 0.625,
+        "request_count": 10814.0,
+        "intervals_aggregated": 4,
+        "app_name": "silo",
+        "latency_p50": 0.266,
+        "latency_p99": 1.138,
+        "latency_max": 3.2,
+        "msec_cpu_clock": 30008.3,
+        "cpus_utilized": 10.0,
+        "context_switches": 26193.0,
+        "context_switches_per_sec": 872.859,
+        "cpu_migrations": 184.0,
+        "cpu_migrations_per_sec": 6.132,
+        "page_faults": 19677.0,
+        "page_faults_per_sec": 655.719,
+        "cycles": 75020429685.0,
+        "ghz": 2.5,
+        "instructions": 4092550061.0,
+        "instructions_per_cycle": 0.05,
+        "branches": 1174213423.0,
+        "branches_per_sec": 39.13,
+        "branch_misses": 8729391.0,
+        "branch_miss_rate_pct": 0.74,
+        "time_elapsed_seconds": 3.000805445,
+        "all_quick_tuner_timings": [],
+        "quick_response_count": 0
+      },
+      "reward": 1.138,
+      "tuner_timing": {},
+      "post_tuning_phase": false,
+      "system_metrics": {
+        "window_start_time": 1772778322.736521,
+        "window_end_time": 1772778327.7424603,
+        "perf_start_time": 1772778323.7368162,
+        "perf_end_time": 1772778326.7368162,
+        "system_metrics_start_time": 1772778323.7378473,
+        "system_metrics_end_time": 1772778326.736584,
+        "power_socket0_watts": 48.95574633333334,
+        "power_ram_watts": 7.673633333333334,
+        "cstate_poll_pct": 100.0,
+        "cstate_c1_pct": 0.0,
+        "cstate_c1e_pct": 0.0,
+        "cstate_c6_pct": 0.0,
+        "cpu_load_cores_pct": 10.278001207816473,
+        "cpu_load_socket0_pct": 5.1390006039082365,
+        "perf_metrics": {
+          "msec_cpu_clock": 30008.3,
+          "cpus_utilized": 10.0,
+          "context_switches": 26193.0,
+          "context_switches_per_sec": 872.859,
+          "cpu_migrations": 184.0,
+          "cpu_migrations_per_sec": 6.132,
+          "page_faults": 19677.0,
+          "page_faults_per_sec": 655.719,
+          "cycles": 75020429685.0,
+          "ghz": 2.5,
+          "instructions": 4092550061.0,
+          "instructions_per_cycle": 0.05,
+          "branches": 1174213423.0,
+          "branches_per_sec": 39.13,
+          "branch_misses": 8729391.0,
+          "branch_miss_rate_pct": 0.74,
+          "time_elapsed_seconds": 3.000805445
+        }
+      }
+    },
+    {
+      "iteration": 9,
+      "timestamp": 1772778332.7873898,
+      "parameters": {
+        "min_granularity_ns": 100000,
+        "latency_ns": 100000,
+        "cstate_max": {
+          "value": "C1",
+          "cores": "0-9"
+        },
+        "napi_busy_poll": {
+          "value": 50,
+          "cores": "0-9"
+        },
+        "wakeup_granularity_ns": 100000,
+        "migration_cost_ns": 100000,
+        "max_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        },
+        "min_perf_pct": {
+          "value": 0,
+          "cores": "0-9"
+        }
+      },
+      "metrics": {
+        "throughput": 2699.5,
+        "goodput": 2699.5,
+        "latency_avg": 0.7924596221522504,
+        "latency_p95": 5.241,
+        "request_count": 10798.0,
+        "intervals_aggregated": 4,
+        "app_name": "silo",
+        "latency_p50": 0.923,
+        "latency_p99": 11.804,
+        "latency_max": 23.267,
+        "msec_cpu_clock": 30019.15,
+        "cpus_utilized": 9.999,
+        "context_switches": 34106.0,
+        "context_switches_per_sec": 1.136,
+        "cpu_migrations": 1170.0,
+        "cpu_migrations_per_sec": 38.975,
+        "page_faults": 21963.0,
+        "page_faults_per_sec": 731.633,
+        "cycles": 14148577445.0,
+        "ghz": 0.471,
+        "instructions": 1465224244.0,
+        "instructions_per_cycle": 0.1,
+        "branches": 334812068.0,
+        "branches_per_sec": 11.153,
+        "branch_misses": 6038844.0,
+        "branch_miss_rate_pct": 1.8,
+        "time_elapsed_seconds": 3.002292375,
+        "all_quick_tuner_timings": [],
+        "quick_response_count": 0
+      },
+      "reward": 11.804,
+      "tuner_timing": {
+        "reasoning": {
+          "tuner_call_time": 1772778317.720888,
+          "tuner_start_iteration": 7,
+          "tuner_response_time": 1772778328.9512267,
+          "tuner_duration": 11.23033881187439,
+          "tuner_response_time_ms": 11230.33881187439,
+          "tuner_type": "actor_reasoning",
+          "parameters_applied": true,
+          "parameters_applied_timestamp": 1772778330.1809764,
+          "proposed_parameters": {
+            "min_granularity_ns": 100000,
+            "latency_ns": 100000,
+            "cstate_max": "C1",
+            "napi_busy_poll": 50,
+            "wakeup_granularity_ns": 100000,
+            "migration_cost_ns": 100000,
+            "max_perf_pct": 100,
+            "min_perf_pct": 0
+          },
+          "justification": "Exploring the impact of a less aggressive C-state (C1) on latency, while maintaining previously identified optimal low-latency settings for scheduler and power management parameters from the best performing iteration (Iter 5).",
+          "token_metrics": {
+            "input_tokens": 2388,
+            "output_tokens": 172,
+            "total_tokens": 4604
+          }
+        }
+      },
+      "post_tuning_phase": false,
+      "system_metrics": {
+        "window_start_time": 1772778327.7486043,
+        "window_end_time": 1772778332.7546196,
+        "perf_start_time": 1772778328.748904,
+        "perf_end_time": 1772778331.748904,
+        "system_metrics_start_time": 1772778328.7499406,
+        "system_metrics_end_time": 1772778331.7486749,
+        "power_socket0_watts": 35.15072766666667,
+        "power_ram_watts": 7.871855333333333,
+        "cstate_poll_pct": 13.768487333602854,
+        "cstate_c1_pct": 86.23151266639714,
+        "cstate_c1e_pct": 0.0,
+        "cstate_c6_pct": 0.0,
+        "cpu_load_cores_pct": 14.864895653062158,
+        "cpu_load_socket0_pct": 7.645687597110078,
+        "perf_metrics": {
+          "msec_cpu_clock": 30019.15,
+          "cpus_utilized": 9.999,
+          "context_switches": 34106.0,
+          "context_switches_per_sec": 1.136,
+          "cpu_migrations": 1170.0,
+          "cpu_migrations_per_sec": 38.975,
+          "page_faults": 21963.0,
+          "page_faults_per_sec": 731.633,
+          "cycles": 14148577445.0,
+          "ghz": 0.471,
+          "instructions": 1465224244.0,
+          "instructions_per_cycle": 0.1,
+          "branches": 334812068.0,
+          "branches_per_sec": 11.153,
+          "branch_misses": 6038844.0,
+          "branch_miss_rate_pct": 1.8,
+          "time_elapsed_seconds": 3.002292375
+        }
+      }
+    },
+    {
+      "iteration": 10,
+      "timestamp": 1772778337.9033976,
+      "parameters": {
+        "min_granularity_ns": 100000,
+        "latency_ns": 100000,
+        "cstate_max": {
+          "value": "C1",
+          "cores": "0-9"
+        },
+        "napi_busy_poll": {
+          "value": 50,
+          "cores": "0-9"
+        },
+        "wakeup_granularity_ns": 100000,
+        "migration_cost_ns": 100000,
+        "max_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        },
+        "min_perf_pct": {
+          "value": 0,
+          "cores": "0-9"
+        }
+      },
+      "metrics": {
+        "throughput": 2743.5,
+        "goodput": 2743.5,
+        "latency_avg": 1.3059815928558411,
+        "latency_p95": 4.591,
+        "request_count": 10974.0,
+        "intervals_aggregated": 4,
+        "app_name": "silo",
+        "latency_p50": 0.859,
+        "latency_p99": 14.022,
+        "latency_max": 27.279,
+        "msec_cpu_clock": 30040.95,
+        "cpus_utilized": 10.0,
+        "context_switches": 38854.0,
+        "context_switches_per_sec": 1.293,
+        "cpu_migrations": 1701.0,
+        "cpu_migrations_per_sec": 56.623,
+        "page_faults": 19955.0,
+        "page_faults_per_sec": 664.26,
+        "cycles": 4840725070.0,
+        "ghz": 0.161,
+        "instructions": 1076788665.0,
+        "instructions_per_cycle": 0.22,
+        "branches": 216605911.0,
+        "branches_per_sec": 7.21,
+        "branch_misses": 5174225.0,
+        "branch_miss_rate_pct": 2.39,
+        "time_elapsed_seconds": 3.004047752,
+        "all_quick_tuner_timings": [],
+        "quick_response_count": 0
+      },
+      "reward": 14.022,
+      "tuner_timing": {},
+      "post_tuning_phase": false,
+      "system_metrics": {
+        "window_start_time": 1772778332.797244,
+        "window_end_time": 1772778337.8048947,
+        "perf_start_time": 1772778333.798312,
+        "perf_end_time": 1772778336.798312,
+        "system_metrics_start_time": 1772778333.7991607,
+        "system_metrics_end_time": 1772778336.7977052,
+        "power_socket0_watts": 28.841235,
+        "power_ram_watts": 7.994403000000001,
+        "cstate_poll_pct": 0.011143869781493678,
+        "cstate_c1_pct": 99.9888561302185,
+        "cstate_c1e_pct": 0.0,
+        "cstate_c6_pct": 0.0,
+        "cpu_load_cores_pct": 18.684783571560548,
+        "cpu_load_socket0_pct": 9.342391785780274,
+        "perf_metrics": {
+          "msec_cpu_clock": 30040.95,
+          "cpus_utilized": 10.0,
+          "context_switches": 38854.0,
+          "context_switches_per_sec": 1.293,
+          "cpu_migrations": 1701.0,
+          "cpu_migrations_per_sec": 56.623,
+          "page_faults": 19955.0,
+          "page_faults_per_sec": 664.26,
+          "cycles": 4840725070.0,
+          "ghz": 0.161,
+          "instructions": 1076788665.0,
+          "instructions_per_cycle": 0.22,
+          "branches": 216605911.0,
+          "branches_per_sec": 7.21,
+          "branch_misses": 5174225.0,
+          "branch_miss_rate_pct": 2.39,
+          "time_elapsed_seconds": 3.004047752
+        }
+      }
+    },
+    {
+      "iteration": 11,
+      "timestamp": 1772778345.2796905,
+      "parameters": {
+        "min_granularity_ns": 100000,
+        "latency_ns": 100000,
+        "cstate_max": {
+          "value": "POLL",
+          "cores": "0-9"
+        },
+        "napi_busy_poll": {
+          "value": 150,
+          "cores": "0-9"
+        },
+        "wakeup_granularity_ns": 100000,
+        "migration_cost_ns": 100000,
+        "max_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        },
+        "min_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        }
+      },
+      "metrics": {
+        "throughput": 2739.0,
+        "goodput": 2739.0,
+        "latency_avg": 1.2876199342825847,
+        "latency_p95": 4.233,
+        "request_count": 10956.0,
+        "intervals_aggregated": 4,
+        "app_name": "silo",
+        "latency_p50": 0.876,
+        "latency_p99": 10.151,
+        "latency_max": 27.882,
+        "msec_cpu_clock": 30032.49,
+        "cpus_utilized": 10.0,
+        "context_switches": 39311.0,
+        "context_switches_per_sec": 1.309,
+        "cpu_migrations": 1755.0,
+        "cpu_migrations_per_sec": 58.437,
+        "page_faults": 40472.0,
+        "page_faults_per_sec": 1.348,
+        "cycles": 4960025934.0,
+        "ghz": 0.165,
+        "instructions": 1123189457.0,
+        "instructions_per_cycle": 0.23,
+        "branches": 225180273.0,
+        "branches_per_sec": 7.498,
+        "branch_misses": 5293257.0,
+        "branch_miss_rate_pct": 2.35,
+        "time_elapsed_seconds": 3.003225947,
+        "all_quick_tuner_timings": [],
+        "quick_response_count": 0
+      },
+      "reward": 10.151,
+      "tuner_timing": {
+        "reasoning": {
+          "tuner_call_time": 1772778332.7878306,
+          "tuner_start_iteration": 10,
+          "tuner_response_time": 1772778342.0139484,
+          "tuner_duration": 9.226117849349976,
+          "tuner_response_time_ms": 9226.117849349976,
+          "tuner_type": "actor_reasoning",
+          "parameters_applied": true,
+          "parameters_applied_timestamp": 1772778345.1788957,
+          "proposed_parameters": {
+            "min_granularity_ns": 100000,
+            "latency_ns": 100000,
+            "cstate_max": "POLL",
+            "napi_busy_poll": 150,
+            "wakeup_granularity_ns": 100000,
+            "migration_cost_ns": 100000,
+            "max_perf_pct": 100,
+            "min_perf_pct": 100
+          },
+          "justification": "The best performing configurations consistently use minimal granularity settings, POLL C-state, and full performance. This iteration explores a slightly higher napi_busy_poll value to determine if further busy polling reduces P99 latency while maintaining other optimal settings.",
+          "token_metrics": {
+            "input_tokens": 2882,
+            "output_tokens": 161,
+            "total_tokens": 4745
+          }
+        }
+      },
+      "post_tuning_phase": false,
+      "system_metrics": {
+        "window_start_time": 1772778337.9046926,
+        "window_end_time": 1772778342.9106312,
+        "perf_start_time": 1772778338.905491,
+        "perf_end_time": 1772778341.905491,
+        "system_metrics_start_time": 1772778338.9063673,
+        "system_metrics_end_time": 1772778341.9049113,
+        "power_socket0_watts": 28.785347333333334,
+        "power_ram_watts": 7.9971976666666675,
+        "cstate_poll_pct": 0.011897603349783167,
+        "cstate_c1_pct": 99.98810239665022,
+        "cstate_c1e_pct": 0.0,
+        "cstate_c6_pct": 0.0,
+        "cpu_load_cores_pct": 19.10760238196598,
+        "cpu_load_socket0_pct": 9.55380119098299,
+        "perf_metrics": {
+          "msec_cpu_clock": 30032.49,
+          "cpus_utilized": 10.0,
+          "context_switches": 39311.0,
+          "context_switches_per_sec": 1.309,
+          "cpu_migrations": 1755.0,
+          "cpu_migrations_per_sec": 58.437,
+          "page_faults": 40472.0,
+          "page_faults_per_sec": 1.348,
+          "cycles": 4960025934.0,
+          "ghz": 0.165,
+          "instructions": 1123189457.0,
+          "instructions_per_cycle": 0.23,
+          "branches": 225180273.0,
+          "branches_per_sec": 7.498,
+          "branch_misses": 5293257.0,
+          "branch_miss_rate_pct": 2.35,
+          "time_elapsed_seconds": 3.003225947
+        }
+      }
+    },
+    {
+      "iteration": 12,
+      "timestamp": 1772778350.2949255,
+      "parameters": {
+        "min_granularity_ns": 100000,
+        "latency_ns": 100000,
+        "cstate_max": {
+          "value": "POLL",
+          "cores": "0-9"
+        },
+        "napi_busy_poll": {
+          "value": 150,
+          "cores": "0-9"
+        },
+        "wakeup_granularity_ns": 100000,
+        "migration_cost_ns": 100000,
+        "max_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        },
+        "min_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        }
+      },
+      "metrics": {
+        "throughput": 2719.0,
+        "goodput": 2719.0,
+        "latency_avg": 0.3432016182420007,
+        "latency_p95": 0.625,
+        "request_count": 13595.0,
+        "intervals_aggregated": 5,
+        "app_name": "silo",
+        "latency_p50": 0.27,
+        "latency_p99": 1.262,
+        "latency_max": 5.511,
+        "msec_cpu_clock": 30025.11,
+        "cpus_utilized": 10.0,
+        "context_switches": 26614.0,
+        "context_switches_per_sec": 886.391,
+        "cpu_migrations": 235.0,
+        "cpu_migrations_per_sec": 7.827,
+        "page_faults": 31406.0,
+        "page_faults_per_sec": 1.046,
+        "cycles": 75062445544.0,
+        "ghz": 2.5,
+        "instructions": 4101351626.0,
+        "instructions_per_cycle": 0.05,
+        "branches": 1174429263.0,
+        "branches_per_sec": 39.115,
+        "branch_misses": 8745046.0,
+        "branch_miss_rate_pct": 0.74,
+        "time_elapsed_seconds": 3.002613169,
+        "all_quick_tuner_timings": [],
+        "quick_response_count": 0
+      },
+      "reward": 1.262,
+      "tuner_timing": {},
+      "post_tuning_phase": false,
+      "system_metrics": {
+        "window_start_time": 1772778345.283558,
+        "window_end_time": 1772778350.2895257,
+        "perf_start_time": 1772778346.2838647,
+        "perf_end_time": 1772778349.2838647,
+        "system_metrics_start_time": 1772778346.284887,
+        "system_metrics_end_time": 1772778349.2836318,
+        "power_socket0_watts": 49.04410466666667,
+        "power_ram_watts": 7.688958666666667,
+        "cstate_poll_pct": 100.0,
+        "cstate_c1_pct": 0.0,
+        "cstate_c1e_pct": 0.0,
+        "cstate_c6_pct": 0.0,
+        "cpu_load_cores_pct": 10.92113568701162,
+        "cpu_load_socket0_pct": 5.46056784350581,
+        "perf_metrics": {
+          "msec_cpu_clock": 30025.11,
+          "cpus_utilized": 10.0,
+          "context_switches": 26614.0,
+          "context_switches_per_sec": 886.391,
+          "cpu_migrations": 235.0,
+          "cpu_migrations_per_sec": 7.827,
+          "page_faults": 31406.0,
+          "page_faults_per_sec": 1.046,
+          "cycles": 75062445544.0,
+          "ghz": 2.5,
+          "instructions": 4101351626.0,
+          "instructions_per_cycle": 0.05,
+          "branches": 1174429263.0,
+          "branches_per_sec": 39.115,
+          "branch_misses": 8745046.0,
+          "branch_miss_rate_pct": 0.74,
+          "time_elapsed_seconds": 3.002613169
+        }
+      }
+    },
+    {
+      "iteration": 13,
+      "timestamp": 1772778356.252672,
+      "parameters": {
+        "min_granularity_ns": 100000,
+        "latency_ns": 100000,
+        "cstate_max": {
+          "value": "POLL",
+          "cores": "0-9"
+        },
+        "napi_busy_poll": {
+          "value": 25,
+          "cores": "0-9"
+        },
+        "wakeup_granularity_ns": 100000,
+        "migration_cost_ns": 100000,
+        "max_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        },
+        "min_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        }
+      },
+      "metrics": {
+        "throughput": 2720.2,
+        "goodput": 2720.2,
+        "latency_avg": 0.33583295345930453,
+        "latency_p95": 0.587,
+        "request_count": 13601.0,
+        "intervals_aggregated": 5,
+        "app_name": "silo",
+        "latency_p50": 0.268,
+        "latency_p99": 1.128,
+        "latency_max": 4.464,
+        "msec_cpu_clock": 30027.83,
+        "cpus_utilized": 10.0,
+        "context_switches": 26335.0,
+        "context_switches_per_sec": 877.02,
+        "cpu_migrations": 160.0,
+        "cpu_migrations_per_sec": 5.328,
+        "page_faults": 20669.0,
+        "page_faults_per_sec": 688.328,
+        "cycles": 75069250800.0,
+        "ghz": 2.5,
+        "instructions": 4063339309.0,
+        "instructions_per_cycle": 0.05,
+        "branches": 1167276133.0,
+        "branches_per_sec": 38.873,
+        "branch_misses": 8669913.0,
+        "branch_miss_rate_pct": 0.74,
+        "time_elapsed_seconds": 3.002770908,
+        "all_quick_tuner_timings": [],
+        "quick_response_count": 0
+      },
+      "reward": 1.128,
+      "tuner_timing": {
+        "reasoning": {
+          "tuner_call_time": 1772778345.2801301,
+          "tuner_start_iteration": 12,
+          "tuner_response_time": 1772778354.9057333,
+          "tuner_duration": 9.625603199005127,
+          "tuner_response_time_ms": 9625.603199005127,
+          "tuner_type": "actor_reasoning",
+          "parameters_applied": true,
+          "parameters_applied_timestamp": 1772778356.151757,
+          "proposed_parameters": {
+            "min_granularity_ns": 100000,
+            "latency_ns": 100000,
+            "cstate_max": "POLL",
+            "napi_busy_poll": 25,
+            "wakeup_granularity_ns": 100000,
+            "migration_cost_ns": 100000,
+            "max_perf_pct": 100,
+            "min_perf_pct": 100
+          },
+          "justification": "Previous best configurations show that minimal scheduling parameters, C-state POLL, and full performance are crucial for low latency. This configuration further explores the effect of a lower napi_busy_poll value (25) while maintaining other optimal settings to determine its impact on p99 latency.",
+          "token_metrics": {
+            "input_tokens": 3217,
+            "output_tokens": 152,
+            "total_tokens": 5129
+          }
+        }
+      },
+      "post_tuning_phase": false,
+      "system_metrics": {
+        "window_start_time": 1772778350.2956514,
+        "window_end_time": 1772778355.3016145,
+        "perf_start_time": 1772778351.295956,
+        "perf_end_time": 1772778354.295956,
+        "system_metrics_start_time": 1772778351.29698,
+        "system_metrics_end_time": 1772778354.2957127,
+        "power_socket0_watts": 49.05694233333333,
+        "power_ram_watts": 7.673858,
+        "cstate_poll_pct": 100.0,
+        "cstate_c1_pct": 0.0,
+        "cstate_c1e_pct": 0.0,
+        "cstate_c6_pct": 0.0,
+        "cpu_load_cores_pct": 10.415604122480744,
+        "cpu_load_socket0_pct": 5.207802061240372,
+        "perf_metrics": {
+          "msec_cpu_clock": 30027.83,
+          "cpus_utilized": 10.0,
+          "context_switches": 26335.0,
+          "context_switches_per_sec": 877.02,
+          "cpu_migrations": 160.0,
+          "cpu_migrations_per_sec": 5.328,
+          "page_faults": 20669.0,
+          "page_faults_per_sec": 688.328,
+          "cycles": 75069250800.0,
+          "ghz": 2.5,
+          "instructions": 4063339309.0,
+          "instructions_per_cycle": 0.05,
+          "branches": 1167276133.0,
+          "branches_per_sec": 38.873,
+          "branch_misses": 8669913.0,
+          "branch_miss_rate_pct": 0.74,
+          "time_elapsed_seconds": 3.002770908
+        }
+      }
+    },
+    {
+      "iteration": 14,
+      "timestamp": 1772778361.2669747,
+      "parameters": {
+        "min_granularity_ns": 100000,
+        "latency_ns": 100000,
+        "cstate_max": {
+          "value": "POLL",
+          "cores": "0-9"
+        },
+        "napi_busy_poll": {
+          "value": 25,
+          "cores": "0-9"
+        },
+        "wakeup_granularity_ns": 100000,
+        "migration_cost_ns": 100000,
+        "max_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        },
+        "min_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        }
+      },
+      "metrics": {
+        "throughput": 2692.0,
+        "goodput": 2692.0,
+        "latency_avg": 0.33848707280832097,
+        "latency_p95": 0.628,
+        "request_count": 13460.0,
+        "intervals_aggregated": 5,
+        "app_name": "silo",
+        "latency_p50": 0.266,
+        "latency_p99": 1.219,
+        "latency_max": 5.738,
+        "msec_cpu_clock": 30034.04,
+        "cpus_utilized": 10.0,
+        "context_switches": 25369.0,
+        "context_switches_per_sec": 844.675,
+        "cpu_migrations": 178.0,
+        "cpu_migrations_per_sec": 5.927,
+        "page_faults": 23369.0,
+        "page_faults_per_sec": 778.084,
+        "cycles": 75084790302.0,
+        "ghz": 2.5,
+        "instructions": 4067686168.0,
+        "instructions_per_cycle": 0.05,
+        "branches": 1169116557.0,
+        "branches_per_sec": 38.926,
+        "branch_misses": 8486390.0,
+        "branch_miss_rate_pct": 0.73,
+        "time_elapsed_seconds": 3.003512619,
+        "all_quick_tuner_timings": [],
+        "quick_response_count": 0
+      },
+      "reward": 1.219,
+      "tuner_timing": {},
+      "post_tuning_phase": false,
+      "system_metrics": {
+        "window_start_time": 1772778356.2561505,
+        "window_end_time": 1772778361.2621453,
+        "perf_start_time": 1772778357.2564578,
+        "perf_end_time": 1772778360.2564578,
+        "system_metrics_start_time": 1772778357.2574797,
+        "system_metrics_end_time": 1772778360.2562232,
+        "power_socket0_watts": 49.11478333333334,
+        "power_ram_watts": 7.624627666666666,
+        "cstate_poll_pct": 100.0,
+        "cstate_c1_pct": 0.0,
+        "cstate_c1e_pct": 0.0,
+        "cstate_c6_pct": 0.0,
+        "cpu_load_cores_pct": 9.514748475983103,
+        "cpu_load_socket0_pct": 4.757374237991551,
+        "perf_metrics": {
+          "msec_cpu_clock": 30034.04,
+          "cpus_utilized": 10.0,
+          "context_switches": 25369.0,
+          "context_switches_per_sec": 844.675,
+          "cpu_migrations": 178.0,
+          "cpu_migrations_per_sec": 5.927,
+          "page_faults": 23369.0,
+          "page_faults_per_sec": 778.084,
+          "cycles": 75084790302.0,
+          "ghz": 2.5,
+          "instructions": 4067686168.0,
+          "instructions_per_cycle": 0.05,
+          "branches": 1169116557.0,
+          "branches_per_sec": 38.926,
+          "branch_misses": 8486390.0,
+          "branch_miss_rate_pct": 0.73,
+          "time_elapsed_seconds": 3.003512619
+        }
+      }
+    },
+    {
+      "iteration": 15,
+      "timestamp": 1772778366.3548875,
+      "parameters": {
+        "min_granularity_ns": 100000,
+        "latency_ns": 100000,
+        "cstate_max": {
+          "value": "POLL",
+          "cores": "0-9"
+        },
+        "napi_busy_poll": {
+          "value": 40,
+          "cores": "0-9"
+        },
+        "wakeup_granularity_ns": 100000,
+        "migration_cost_ns": 100000,
+        "max_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        },
+        "min_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        }
+      },
+      "metrics": {
+        "throughput": 2731.4,
+        "goodput": 2731.4,
+        "latency_avg": 0.34587339825730395,
+        "latency_p95": 0.691,
+        "request_count": 13657.0,
+        "intervals_aggregated": 5,
+        "app_name": "silo",
+        "latency_p50": 0.273,
+        "latency_p99": 1.32,
+        "latency_max": 4.644,
+        "msec_cpu_clock": 30020.48,
+        "cpus_utilized": 9.999,
+        "context_switches": 26630.0,
+        "context_switches_per_sec": 887.061,
+        "cpu_migrations": 249.0,
+        "cpu_migrations_per_sec": 8.294,
+        "page_faults": 34079.0,
+        "page_faults_per_sec": 1.135,
+        "cycles": 75050888555.0,
+        "ghz": 2.5,
+        "instructions": 4160672197.0,
+        "instructions_per_cycle": 0.06,
+        "branches": 1185563873.0,
+        "branches_per_sec": 39.492,
+        "branch_misses": 9228147.0,
+        "branch_miss_rate_pct": 0.78,
+        "time_elapsed_seconds": 3.002255336,
+        "all_quick_tuner_timings": [],
+        "quick_response_count": 0
+      },
+      "reward": 1.32,
+      "tuner_timing": {
+        "reasoning": {
+          "tuner_call_time": 1772778356.2527986,
+          "tuner_start_iteration": 14,
+          "tuner_response_time": 1772778362.1692665,
+          "tuner_duration": 5.916467905044556,
+          "tuner_response_time_ms": 5916.467905044556,
+          "tuner_type": "actor_reasoning",
+          "parameters_applied": true,
+          "parameters_applied_timestamp": 1772778363.4481914,
+          "proposed_parameters": {
+            "min_granularity_ns": 100000,
+            "latency_ns": 100000,
+            "cstate_max": "POLL",
+            "napi_busy_poll": 40,
+            "wakeup_granularity_ns": 100000,
+            "migration_cost_ns": 100000,
+            "max_perf_pct": 100,
+            "min_perf_pct": 100
+          },
+          "justification": "The current best latency_p99 was achieved with napi_busy_poll=25, while other low latency configurations used 50 or 100. This explores a value between 25 and 50 to further refine the optimal napi_busy_poll setting for minimal latency, maintaining other parameters that consistently yielded low latency results.",
+          "token_metrics": {
+            "input_tokens": 3211,
+            "output_tokens": 204,
+            "total_tokens": 4409
+          }
+        }
+      },
+      "post_tuning_phase": false,
+      "system_metrics": {
+        "window_start_time": 1772778361.267369,
+        "window_end_time": 1772778366.2733557,
+        "perf_start_time": 1772778362.2676613,
+        "perf_end_time": 1772778365.2676613,
+        "system_metrics_start_time": 1772778362.2686923,
+        "system_metrics_end_time": 1772778365.2674234,
+        "power_socket0_watts": 49.30531366666667,
+        "power_ram_watts": 7.716060666666667,
+        "cstate_poll_pct": 100.0,
+        "cstate_c1_pct": 0.0,
+        "cstate_c1e_pct": 0.0,
+        "cstate_c6_pct": 0.0,
+        "cpu_load_cores_pct": 10.61370578550757,
+        "cpu_load_socket0_pct": 5.651135367831675,
+        "perf_metrics": {
+          "msec_cpu_clock": 30020.48,
+          "cpus_utilized": 9.999,
+          "context_switches": 26630.0,
+          "context_switches_per_sec": 887.061,
+          "cpu_migrations": 249.0,
+          "cpu_migrations_per_sec": 8.294,
+          "page_faults": 34079.0,
+          "page_faults_per_sec": 1.135,
+          "cycles": 75050888555.0,
+          "ghz": 2.5,
+          "instructions": 4160672197.0,
+          "instructions_per_cycle": 0.06,
+          "branches": 1185563873.0,
+          "branches_per_sec": 39.492,
+          "branch_misses": 9228147.0,
+          "branch_miss_rate_pct": 0.78,
+          "time_elapsed_seconds": 3.002255336
+        }
+      }
+    },
+    {
+      "iteration": 16,
+      "timestamp": 1772778371.3690226,
+      "parameters": {
+        "min_granularity_ns": 100000,
+        "latency_ns": 100000,
+        "cstate_max": {
+          "value": "POLL",
+          "cores": "0-9"
+        },
+        "napi_busy_poll": {
+          "value": 40,
+          "cores": "0-9"
+        },
+        "wakeup_granularity_ns": 100000,
+        "migration_cost_ns": 100000,
+        "max_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        },
+        "min_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        }
+      },
+      "metrics": {
+        "throughput": 2734.2,
+        "goodput": 2734.2,
+        "latency_avg": 0.3525663082437276,
+        "latency_p95": 0.757,
+        "request_count": 13671.0,
+        "intervals_aggregated": 5,
+        "app_name": "silo",
+        "latency_p50": 0.27,
+        "latency_p99": 2.36,
+        "latency_max": 5.527,
+        "msec_cpu_clock": 30036.0,
+        "cpus_utilized": 10.0,
+        "context_switches": 26630.0,
+        "context_switches_per_sec": 886.603,
+        "cpu_migrations": 232.0,
+        "cpu_migrations_per_sec": 7.724,
+        "page_faults": 28202.0,
+        "page_faults_per_sec": 938.94,
+        "cycles": 75089669712.0,
+        "ghz": 2.5,
+        "instructions": 4061567974.0,
+        "instructions_per_cycle": 0.05,
+        "branches": 1166871071.0,
+        "branches_per_sec": 38.849,
+        "branch_misses": 8539263.0,
+        "branch_miss_rate_pct": 0.73,
+        "time_elapsed_seconds": 3.00374237,
+        "all_quick_tuner_timings": [],
+        "quick_response_count": 0
+      },
+      "reward": 2.36,
+      "tuner_timing": {},
+      "post_tuning_phase": false,
+      "system_metrics": {
+        "window_start_time": 1772778366.3581824,
+        "window_end_time": 1772778371.3641784,
+        "perf_start_time": 1772778367.3584783,
+        "perf_end_time": 1772778370.3584783,
+        "system_metrics_start_time": 1772778367.3595085,
+        "system_metrics_end_time": 1772778370.3582518,
+        "power_socket0_watts": 49.244096000000006,
+        "power_ram_watts": 7.653223333333333,
+        "cstate_poll_pct": 100.0,
+        "cstate_c1_pct": 0.0,
+        "cstate_c1e_pct": 0.0,
+        "cstate_c6_pct": 0.0,
+        "cpu_load_cores_pct": 9.779240020596447,
+        "cpu_load_socket0_pct": 4.8896200102982235,
+        "perf_metrics": {
+          "msec_cpu_clock": 30036.0,
+          "cpus_utilized": 10.0,
+          "context_switches": 26630.0,
+          "context_switches_per_sec": 886.603,
+          "cpu_migrations": 232.0,
+          "cpu_migrations_per_sec": 7.724,
+          "page_faults": 28202.0,
+          "page_faults_per_sec": 938.94,
+          "cycles": 75089669712.0,
+          "ghz": 2.5,
+          "instructions": 4061567974.0,
+          "instructions_per_cycle": 0.05,
+          "branches": 1166871071.0,
+          "branches_per_sec": 38.849,
+          "branch_misses": 8539263.0,
+          "branch_miss_rate_pct": 0.73,
+          "time_elapsed_seconds": 3.00374237
+        }
+      }
+    },
+    {
+      "iteration": 17,
+      "timestamp": 1772778376.4337099,
+      "parameters": {
+        "min_granularity_ns": 100000,
+        "latency_ns": 100000,
+        "cstate_max": {
+          "value": "POLL",
+          "cores": "0-9"
+        },
+        "napi_busy_poll": {
+          "value": 20,
+          "cores": "0-9"
+        },
+        "wakeup_granularity_ns": 100000,
+        "migration_cost_ns": 100000,
+        "max_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        },
+        "min_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        }
+      },
+      "metrics": {
+        "throughput": 2692.8,
+        "goodput": 2692.8,
+        "latency_avg": 0.34083652703505646,
+        "latency_p95": 0.646,
+        "request_count": 13464.0,
+        "intervals_aggregated": 5,
+        "app_name": "silo",
+        "latency_p50": 0.27,
+        "latency_p99": 1.232,
+        "latency_max": 5.996,
+        "msec_cpu_clock": 30029.38,
+        "cpus_utilized": 10.0,
+        "context_switches": 26526.0,
+        "context_switches_per_sec": 883.335,
+        "cpu_migrations": 213.0,
+        "cpu_migrations_per_sec": 7.093,
+        "page_faults": 24269.0,
+        "page_faults_per_sec": 808.175,
+        "cycles": 75073133944.0,
+        "ghz": 2.5,
+        "instructions": 4114068732.0,
+        "instructions_per_cycle": 0.05,
+        "branches": 1175862933.0,
+        "branches_per_sec": 39.157,
+        "branch_misses": 9103744.0,
+        "branch_miss_rate_pct": 0.77,
+        "time_elapsed_seconds": 3.002963104,
+        "all_quick_tuner_timings": [],
+        "quick_response_count": 0
+      },
+      "reward": 1.232,
+      "tuner_timing": {
+        "reasoning": {
+          "tuner_call_time": 1772778366.3550153,
+          "tuner_start_iteration": 16,
+          "tuner_response_time": 1772778373.874872,
+          "tuner_duration": 7.519856691360474,
+          "tuner_response_time_ms": 7519.856691360474,
+          "tuner_type": "actor_reasoning",
+          "parameters_applied": true,
+          "parameters_applied_timestamp": 1772778375.1304026,
+          "proposed_parameters": {
+            "min_granularity_ns": 100000,
+            "latency_ns": 100000,
+            "cstate_max": "POLL",
+            "napi_busy_poll": 20,
+            "wakeup_granularity_ns": 100000,
+            "migration_cost_ns": 100000,
+            "max_perf_pct": 100,
+            "min_perf_pct": 100
+          },
+          "justification": "Maintaining minimum scheduling granularities and preventing deep C-states (`POLL`) consistently yields the best latency. We are exploring a slightly lower `napi_busy_poll` value to confirm the local optimum observed around 25.",
+          "token_metrics": {
+            "input_tokens": 3213,
+            "output_tokens": 179,
+            "total_tokens": 4837
+          }
+        }
+      },
+      "post_tuning_phase": false,
+      "system_metrics": {
+        "window_start_time": 1772778371.369471,
+        "window_end_time": 1772778376.3754587,
+        "perf_start_time": 1772778372.3697846,
+        "perf_end_time": 1772778375.3697846,
+        "system_metrics_start_time": 1772778372.37063,
+        "system_metrics_end_time": 1772778375.369537,
+        "power_socket0_watts": 49.290625,
+        "power_ram_watts": 7.687362333333334,
+        "cstate_poll_pct": 100.0,
+        "cstate_c1_pct": 0.0,
+        "cstate_c1e_pct": 0.0,
+        "cstate_c6_pct": 0.0,
+        "cpu_load_cores_pct": 10.471468691426695,
+        "cpu_load_socket0_pct": 5.515304655685522,
+        "perf_metrics": {
+          "msec_cpu_clock": 30029.38,
+          "cpus_utilized": 10.0,
+          "context_switches": 26526.0,
+          "context_switches_per_sec": 883.335,
+          "cpu_migrations": 213.0,
+          "cpu_migrations_per_sec": 7.093,
+          "page_faults": 24269.0,
+          "page_faults_per_sec": 808.175,
+          "cycles": 75073133944.0,
+          "ghz": 2.5,
+          "instructions": 4114068732.0,
+          "instructions_per_cycle": 0.05,
+          "branches": 1175862933.0,
+          "branches_per_sec": 39.157,
+          "branch_misses": 9103744.0,
+          "branch_miss_rate_pct": 0.77,
+          "time_elapsed_seconds": 3.002963104
+        }
+      }
+    },
+    {
+      "iteration": 18,
+      "timestamp": 1772778381.5473442,
+      "parameters": {
+        "min_granularity_ns": 100000,
+        "latency_ns": 100000,
+        "cstate_max": {
+          "value": "POLL",
+          "cores": "0-9"
+        },
+        "napi_busy_poll": {
+          "value": 20,
+          "cores": "0-9"
+        },
+        "wakeup_granularity_ns": 100000,
+        "migration_cost_ns": 100000,
+        "max_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        },
+        "min_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        }
+      },
+      "metrics": {
+        "throughput": 2727.0,
+        "goodput": 2727.0,
+        "latency_avg": 0.33780366703336995,
+        "latency_p95": 0.632,
+        "request_count": 13635.0,
+        "intervals_aggregated": 5,
+        "app_name": "silo",
+        "latency_p50": 0.267,
+        "latency_p99": 1.333,
+        "latency_max": 5.56,
+        "msec_cpu_clock": 30032.21,
+        "cpus_utilized": 10.0,
+        "context_switches": 26618.0,
+        "context_switches_per_sec": 886.315,
+        "cpu_migrations": 234.0,
+        "cpu_migrations_per_sec": 7.792,
+        "page_faults": 18687.0,
+        "page_faults_per_sec": 622.232,
+        "cycles": 75080214748.0,
+        "ghz": 2.5,
+        "instructions": 4051929508.0,
+        "instructions_per_cycle": 0.05,
+        "branches": 1164677133.0,
+        "branches_per_sec": 38.781,
+        "branch_misses": 8554924.0,
+        "branch_miss_rate_pct": 0.73,
+        "time_elapsed_seconds": 3.003259888,
+        "all_quick_tuner_timings": [],
+        "quick_response_count": 0
+      },
+      "reward": 1.333,
+      "tuner_timing": {},
+      "post_tuning_phase": false,
+      "system_metrics": {
+        "window_start_time": 1772778376.4370818,
+        "window_end_time": 1772778381.4431045,
+        "perf_start_time": 1772778377.437439,
+        "perf_end_time": 1772778380.437439,
+        "system_metrics_start_time": 1772778377.4384673,
+        "system_metrics_end_time": 1772778380.437171,
+        "power_socket0_watts": 49.18580733333334,
+        "power_ram_watts": 7.676724,
+        "cstate_poll_pct": 100.0,
+        "cstate_c1_pct": 0.0,
+        "cstate_c1e_pct": 0.0,
+        "cstate_c6_pct": 0.0,
+        "cpu_load_cores_pct": 10.050812915608343,
+        "cpu_load_socket0_pct": 5.025406457804172,
+        "perf_metrics": {
+          "msec_cpu_clock": 30032.21,
+          "cpus_utilized": 10.0,
+          "context_switches": 26618.0,
+          "context_switches_per_sec": 886.315,
+          "cpu_migrations": 234.0,
+          "cpu_migrations_per_sec": 7.792,
+          "page_faults": 18687.0,
+          "page_faults_per_sec": 622.232,
+          "cycles": 75080214748.0,
+          "ghz": 2.5,
+          "instructions": 4051929508.0,
+          "instructions_per_cycle": 0.05,
+          "branches": 1164677133.0,
+          "branches_per_sec": 38.781,
+          "branch_misses": 8554924.0,
+          "branch_miss_rate_pct": 0.73,
+          "time_elapsed_seconds": 3.003259888
+        }
+      }
+    },
+    {
+      "iteration": 19,
+      "timestamp": 1772778386.641209,
+      "parameters": {
+        "min_granularity_ns": 100000,
+        "latency_ns": 100000,
+        "cstate_max": {
+          "value": "POLL",
+          "cores": "0-9"
+        },
+        "napi_busy_poll": {
+          "value": 30,
+          "cores": "0-9"
+        },
+        "wakeup_granularity_ns": 100000,
+        "migration_cost_ns": 100000,
+        "max_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        },
+        "min_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        }
+      },
+      "metrics": {
+        "throughput": 2670.8,
+        "goodput": 2670.8,
+        "latency_avg": 0.3375909090909091,
+        "latency_p95": 0.651,
+        "request_count": 13354.0,
+        "intervals_aggregated": 5,
+        "app_name": "silo",
+        "latency_p50": 0.268,
+        "latency_p99": 1.184,
+        "latency_max": 4.529,
+        "msec_cpu_clock": 30024.54,
+        "cpus_utilized": 10.0,
+        "context_switches": 26020.0,
+        "context_switches_per_sec": 866.625,
+        "cpu_migrations": 208.0,
+        "cpu_migrations_per_sec": 6.928,
+        "page_faults": 22181.0,
+        "page_faults_per_sec": 738.762,
+        "cycles": 75061013998.0,
+        "ghz": 2.5,
+        "instructions": 4130560383.0,
+        "instructions_per_cycle": 0.06,
+        "branches": 1180198583.0,
+        "branches_per_sec": 39.308,
+        "branch_misses": 9213570.0,
+        "branch_miss_rate_pct": 0.78,
+        "time_elapsed_seconds": 3.002437667,
+        "all_quick_tuner_timings": [],
+        "quick_response_count": 0
+      },
+      "reward": 1.184,
+      "tuner_timing": {
+        "reasoning": {
+          "tuner_call_time": 1772778376.433842,
+          "tuner_start_iteration": 18,
+          "tuner_response_time": 1772778383.953405,
+          "tuner_duration": 7.5195629596710205,
+          "tuner_response_time_ms": 7519.5629596710205,
+          "tuner_type": "actor_reasoning",
+          "parameters_applied": true,
+          "parameters_applied_timestamp": 1772778385.2379587,
+          "proposed_parameters": {
+            "min_granularity_ns": 100000,
+            "latency_ns": 100000,
+            "cstate_max": "POLL",
+            "napi_busy_poll": 30,
+            "wakeup_granularity_ns": 100000,
+            "migration_cost_ns": 100000,
+            "max_perf_pct": 100,
+            "min_perf_pct": 100
+          },
+          "justification": "Previous tests indicate that cstate_max=POLL and minimum latency-related parameters are optimal. We are exploring a value for napi_busy_poll slightly higher than the current best of 25 to further refine the local optimum for p99 latency.",
+          "token_metrics": {
+            "input_tokens": 3216,
+            "output_tokens": 148,
+            "total_tokens": 4676
+          }
+        }
+      },
+      "post_tuning_phase": false,
+      "system_metrics": {
+        "window_start_time": 1772778381.5481973,
+        "window_end_time": 1772778386.5541391,
+        "perf_start_time": 1772778382.5484884,
+        "perf_end_time": 1772778385.5484884,
+        "system_metrics_start_time": 1772778382.5495174,
+        "system_metrics_end_time": 1772778385.548258,
+        "power_socket0_watts": 49.14753866666666,
+        "power_ram_watts": 7.686424,
+        "cstate_poll_pct": 100.0,
+        "cstate_c1_pct": 0.0,
+        "cstate_c1e_pct": 0.0,
+        "cstate_c6_pct": 0.0,
+        "cpu_load_cores_pct": 9.948336670887764,
+        "cpu_load_socket0_pct": 5.351929935133263,
+        "perf_metrics": {
+          "msec_cpu_clock": 30024.54,
+          "cpus_utilized": 10.0,
+          "context_switches": 26020.0,
+          "context_switches_per_sec": 866.625,
+          "cpu_migrations": 208.0,
+          "cpu_migrations_per_sec": 6.928,
+          "page_faults": 22181.0,
+          "page_faults_per_sec": 738.762,
+          "cycles": 75061013998.0,
+          "ghz": 2.5,
+          "instructions": 4130560383.0,
+          "instructions_per_cycle": 0.06,
+          "branches": 1180198583.0,
+          "branches_per_sec": 39.308,
+          "branch_misses": 9213570.0,
+          "branch_miss_rate_pct": 0.78,
+          "time_elapsed_seconds": 3.002437667
+        }
+      }
+    },
+    {
+      "iteration": 20,
+      "timestamp": 1772778391.6559646,
+      "parameters": {
+        "min_granularity_ns": 100000,
+        "latency_ns": 100000,
+        "cstate_max": {
+          "value": "POLL",
+          "cores": "0-9"
+        },
+        "napi_busy_poll": {
+          "value": 30,
+          "cores": "0-9"
+        },
+        "wakeup_granularity_ns": 100000,
+        "migration_cost_ns": 100000,
+        "max_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        },
+        "min_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        }
+      },
+      "metrics": {
+        "throughput": 2721.8,
+        "goodput": 2721.8,
+        "latency_avg": 0.3348283488867661,
+        "latency_p95": 0.605,
+        "request_count": 13609.0,
+        "intervals_aggregated": 5,
+        "app_name": "silo",
+        "latency_p50": 0.267,
+        "latency_p99": 1.096,
+        "latency_max": 4.491,
+        "msec_cpu_clock": 30010.95,
+        "cpus_utilized": 10.0,
+        "context_switches": 26850.0,
+        "context_switches_per_sec": 894.674,
+        "cpu_migrations": 222.0,
+        "cpu_migrations_per_sec": 7.397,
+        "page_faults": 17595.0,
+        "page_faults_per_sec": 586.286,
+        "cycles": 75027039886.0,
+        "ghz": 2.5,
+        "instructions": 4062842986.0,
+        "instructions_per_cycle": 0.05,
+        "branches": 1167399243.0,
+        "branches_per_sec": 38.899,
+        "branch_misses": 8633555.0,
+        "branch_miss_rate_pct": 0.74,
+        "time_elapsed_seconds": 3.001237022,
+        "all_quick_tuner_timings": [],
+        "quick_response_count": 0
+      },
+      "reward": 1.096,
+      "tuner_timing": {},
+      "post_tuning_phase": false,
+      "system_metrics": {
+        "window_start_time": 1772778386.6446166,
+        "window_end_time": 1772778391.6505601,
+        "perf_start_time": 1772778387.644908,
+        "perf_end_time": 1772778390.644908,
+        "system_metrics_start_time": 1772778387.6459463,
+        "system_metrics_end_time": 1772778390.6446853,
+        "power_socket0_watts": 49.03425766666667,
+        "power_ram_watts": 7.677514333333334,
+        "cstate_poll_pct": 100.0,
+        "cstate_c1_pct": 0.0,
+        "cstate_c1e_pct": 0.0,
+        "cstate_c6_pct": 0.0,
+        "cpu_load_cores_pct": 10.033192895824152,
+        "cpu_load_socket0_pct": 5.016596447912076,
+        "perf_metrics": {
+          "msec_cpu_clock": 30010.95,
+          "cpus_utilized": 10.0,
+          "context_switches": 26850.0,
+          "context_switches_per_sec": 894.674,
+          "cpu_migrations": 222.0,
+          "cpu_migrations_per_sec": 7.397,
+          "page_faults": 17595.0,
+          "page_faults_per_sec": 586.286,
+          "cycles": 75027039886.0,
+          "ghz": 2.5,
+          "instructions": 4062842986.0,
+          "instructions_per_cycle": 0.05,
+          "branches": 1167399243.0,
+          "branches_per_sec": 38.899,
+          "branch_misses": 8633555.0,
+          "branch_miss_rate_pct": 0.74,
+          "time_elapsed_seconds": 3.001237022
+        }
+      }
+    },
+    {
+      "iteration": 21,
+      "timestamp": 1772778396.7179785,
+      "parameters": {
+        "min_granularity_ns": 100000,
+        "latency_ns": 100000,
+        "cstate_max": {
+          "value": "POLL",
+          "cores": "0-9"
+        },
+        "napi_busy_poll": {
+          "value": 35,
+          "cores": "0-9"
+        },
+        "wakeup_granularity_ns": 100000,
+        "migration_cost_ns": 100000,
+        "max_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        },
+        "min_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        }
+      },
+      "metrics": {
+        "throughput": 2673.2,
+        "goodput": 2673.2,
+        "latency_avg": 0.3357236271135717,
+        "latency_p95": 0.629,
+        "request_count": 13366.0,
+        "intervals_aggregated": 5,
+        "app_name": "silo",
+        "latency_p50": 0.266,
+        "latency_p99": 1.251,
+        "latency_max": 5.873,
+        "msec_cpu_clock": 30021.51,
+        "cpus_utilized": 10.0,
+        "context_switches": 25627.0,
+        "context_switches_per_sec": 853.621,
+        "cpu_migrations": 205.0,
+        "cpu_migrations_per_sec": 6.828,
+        "page_faults": 20578.0,
+        "page_faults_per_sec": 685.442,
+        "cycles": 75053447466.0,
+        "ghz": 2.5,
+        "instructions": 4111389425.0,
+        "instructions_per_cycle": 0.05,
+        "branches": 1177254480.0,
+        "branches_per_sec": 39.214,
+        "branch_misses": 9074027.0,
+        "branch_miss_rate_pct": 0.77,
+        "time_elapsed_seconds": 3.002186366,
+        "all_quick_tuner_timings": [],
+        "quick_response_count": 0
+      },
+      "reward": 1.251,
+      "tuner_timing": {
+        "reasoning": {
+          "tuner_call_time": 1772778386.6413414,
+          "tuner_start_iteration": 20,
+          "tuner_response_time": 1772778393.3600805,
+          "tuner_duration": 6.718739032745361,
+          "tuner_response_time_ms": 6718.739032745361,
+          "tuner_type": "actor_reasoning",
+          "parameters_applied": true,
+          "parameters_applied_timestamp": 1772778394.6129432,
+          "proposed_parameters": {
+            "min_granularity_ns": 100000,
+            "latency_ns": 100000,
+            "cstate_max": "POLL",
+            "napi_busy_poll": 35,
+            "wakeup_granularity_ns": 100000,
+            "migration_cost_ns": 100000,
+            "max_perf_pct": 100,
+            "min_perf_pct": 100
+          },
+          "justification": "Continuing to explore the impact of napi_busy_poll on latency_p99 within the low-latency parameter space, while maintaining minimal scheduling overheads and preventing deep C-states for optimal responsiveness. This iteration probes a slightly higher busy_poll value near the best performing region.",
+          "token_metrics": {
+            "input_tokens": 3218,
+            "output_tokens": 169,
+            "total_tokens": 4588
+          }
+        }
+      },
+      "post_tuning_phase": false,
+      "system_metrics": {
+        "window_start_time": 1772778391.656411,
+        "window_end_time": 1772778396.6623743,
+        "perf_start_time": 1772778392.6567075,
+        "perf_end_time": 1772778395.6567075,
+        "system_metrics_start_time": 1772778392.6577253,
+        "system_metrics_end_time": 1772778395.6564727,
+        "power_socket0_watts": 48.98547033333333,
+        "power_ram_watts": 7.668916,
+        "cstate_poll_pct": 100.0,
+        "cstate_c1_pct": 0.0,
+        "cstate_c1e_pct": 0.0,
+        "cstate_c6_pct": 0.0,
+        "cpu_load_cores_pct": 9.928355271129055,
+        "cpu_load_socket0_pct": 5.242618243760127,
+        "perf_metrics": {
+          "msec_cpu_clock": 30021.51,
+          "cpus_utilized": 10.0,
+          "context_switches": 25627.0,
+          "context_switches_per_sec": 853.621,
+          "cpu_migrations": 205.0,
+          "cpu_migrations_per_sec": 6.828,
+          "page_faults": 20578.0,
+          "page_faults_per_sec": 685.442,
+          "cycles": 75053447466.0,
+          "ghz": 2.5,
+          "instructions": 4111389425.0,
+          "instructions_per_cycle": 0.05,
+          "branches": 1177254480.0,
+          "branches_per_sec": 39.214,
+          "branch_misses": 9074027.0,
+          "branch_miss_rate_pct": 0.77,
+          "time_elapsed_seconds": 3.002186366
+        }
+      }
+    },
+    {
+      "iteration": 22,
+      "timestamp": 1772778401.7324908,
+      "parameters": {
+        "min_granularity_ns": 100000,
+        "latency_ns": 100000,
+        "cstate_max": {
+          "value": "POLL",
+          "cores": "0-9"
+        },
+        "napi_busy_poll": {
+          "value": 35,
+          "cores": "0-9"
+        },
+        "wakeup_granularity_ns": 100000,
+        "migration_cost_ns": 100000,
+        "max_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        },
+        "min_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        }
+      },
+      "metrics": {
+        "throughput": 2722.0,
+        "goodput": 2722.0,
+        "latency_avg": 0.33393056576047025,
+        "latency_p95": 0.663,
+        "request_count": 13610.0,
+        "intervals_aggregated": 5,
+        "app_name": "silo",
+        "latency_p50": 0.266,
+        "latency_p99": 1.218,
+        "latency_max": 3.892,
+        "msec_cpu_clock": 30032.24,
+        "cpus_utilized": 10.0,
+        "context_switches": 25733.0,
+        "context_switches_per_sec": 856.846,
+        "cpu_migrations": 179.0,
+        "cpu_migrations_per_sec": 5.96,
+        "page_faults": 18678.0,
+        "page_faults_per_sec": 621.932,
+        "cycles": 75080265061.0,
+        "ghz": 2.5,
+        "instructions": 4034843017.0,
+        "instructions_per_cycle": 0.05,
+        "branches": 1161754474.0,
+        "branches_per_sec": 38.684,
+        "branch_misses": 8385768.0,
+        "branch_miss_rate_pct": 0.72,
+        "time_elapsed_seconds": 3.003223114,
+        "all_quick_tuner_timings": [],
+        "quick_response_count": 0
+      },
+      "reward": 1.218,
+      "tuner_timing": {},
+      "post_tuning_phase": false,
+      "system_metrics": {
+        "window_start_time": 1772778396.7213967,
+        "window_end_time": 1772778401.7275422,
+        "perf_start_time": 1772778397.7217114,
+        "perf_end_time": 1772778400.7217114,
+        "system_metrics_start_time": 1772778397.7227414,
+        "system_metrics_end_time": 1772778400.7214663,
+        "power_socket0_watts": 48.828142333333325,
+        "power_ram_watts": 7.647613333333333,
+        "cstate_poll_pct": 100.0,
+        "cstate_c1_pct": 0.0,
+        "cstate_c1e_pct": 0.0,
+        "cstate_c6_pct": 0.0,
+        "cpu_load_cores_pct": 10.100932392353654,
+        "cpu_load_socket0_pct": 5.050466196176827,
+        "perf_metrics": {
+          "msec_cpu_clock": 30032.24,
+          "cpus_utilized": 10.0,
+          "context_switches": 25733.0,
+          "context_switches_per_sec": 856.846,
+          "cpu_migrations": 179.0,
+          "cpu_migrations_per_sec": 5.96,
+          "page_faults": 18678.0,
+          "page_faults_per_sec": 621.932,
+          "cycles": 75080265061.0,
+          "ghz": 2.5,
+          "instructions": 4034843017.0,
+          "instructions_per_cycle": 0.05,
+          "branches": 1161754474.0,
+          "branches_per_sec": 38.684,
+          "branch_misses": 8385768.0,
+          "branch_miss_rate_pct": 0.72,
+          "time_elapsed_seconds": 3.003223114
+        }
+      }
+    },
+    {
+      "iteration": 23,
+      "timestamp": 1772778406.8041654,
+      "parameters": {
+        "min_granularity_ns": 100000,
+        "latency_ns": 100000,
+        "cstate_max": {
+          "value": "POLL",
+          "cores": "0-9"
+        },
+        "napi_busy_poll": {
+          "value": 28,
+          "cores": "0-9"
+        },
+        "wakeup_granularity_ns": 100000,
+        "migration_cost_ns": 100000,
+        "max_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        },
+        "min_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        }
+      },
+      "metrics": {
+        "throughput": 2706.8,
+        "goodput": 2706.8,
+        "latency_avg": 0.34005526821338844,
+        "latency_p95": 0.654,
+        "request_count": 13534.0,
+        "intervals_aggregated": 5,
+        "app_name": "silo",
+        "latency_p50": 0.27,
+        "latency_p99": 1.143,
+        "latency_max": 4.778,
+        "msec_cpu_clock": 30018.39,
+        "cpus_utilized": 9.999,
+        "context_switches": 26321.0,
+        "context_switches_per_sec": 876.829,
+        "cpu_migrations": 233.0,
+        "cpu_migrations_per_sec": 7.762,
+        "page_faults": 19879.0,
+        "page_faults_per_sec": 662.227,
+        "cycles": 75045660856.0,
+        "ghz": 2.5,
+        "instructions": 4075090181.0,
+        "instructions_per_cycle": 0.05,
+        "branches": 1168772163.0,
+        "branches_per_sec": 38.935,
+        "branch_misses": 8802454.0,
+        "branch_miss_rate_pct": 0.75,
+        "time_elapsed_seconds": 3.001995861,
+        "all_quick_tuner_timings": [],
+        "quick_response_count": 0
+      },
+      "reward": 1.143,
+      "tuner_timing": {
+        "reasoning": {
+          "tuner_call_time": 1772778396.7181635,
+          "tuner_start_iteration": 22,
+          "tuner_response_time": 1772778404.8395836,
+          "tuner_duration": 8.12142014503479,
+          "tuner_response_time_ms": 8121.42014503479,
+          "tuner_type": "actor_reasoning",
+          "parameters_applied": true,
+          "parameters_applied_timestamp": 1772778406.1022313,
+          "proposed_parameters": {
+            "min_granularity_ns": 100000,
+            "latency_ns": 100000,
+            "cstate_max": "POLL",
+            "napi_busy_poll": 28,
+            "wakeup_granularity_ns": 100000,
+            "migration_cost_ns": 100000,
+            "max_perf_pct": 100,
+            "min_perf_pct": 100
+          },
+          "justification": "The best observed latency_p99 values are clustered around napi_busy_poll settings of 25 and 30. This adjustment explores a value between these two to further refine the optimal range for minimizing p99 latency.",
+          "token_metrics": {
+            "input_tokens": 3219,
+            "output_tokens": 180,
+            "total_tokens": 4801
+          }
+        }
+      },
+      "post_tuning_phase": false,
+      "system_metrics": {
+        "window_start_time": 1772778401.7329419,
+        "window_end_time": 1772778406.7389145,
+        "perf_start_time": 1772778402.7332535,
+        "perf_end_time": 1772778405.7332535,
+        "system_metrics_start_time": 1772778402.7342792,
+        "system_metrics_end_time": 1772778405.733008,
+        "power_socket0_watts": 48.82136766666667,
+        "power_ram_watts": 7.686903999999999,
+        "cstate_poll_pct": 100.0,
+        "cstate_c1_pct": 0.0,
+        "cstate_c1e_pct": 0.0,
+        "cstate_c6_pct": 0.0,
+        "cpu_load_cores_pct": 10.515009698364791,
+        "cpu_load_socket0_pct": 5.39151825052253,
+        "perf_metrics": {
+          "msec_cpu_clock": 30018.39,
+          "cpus_utilized": 9.999,
+          "context_switches": 26321.0,
+          "context_switches_per_sec": 876.829,
+          "cpu_migrations": 233.0,
+          "cpu_migrations_per_sec": 7.762,
+          "page_faults": 19879.0,
+          "page_faults_per_sec": 662.227,
+          "cycles": 75045660856.0,
+          "ghz": 2.5,
+          "instructions": 4075090181.0,
+          "instructions_per_cycle": 0.05,
+          "branches": 1168772163.0,
+          "branches_per_sec": 38.935,
+          "branch_misses": 8802454.0,
+          "branch_miss_rate_pct": 0.75,
+          "time_elapsed_seconds": 3.001995861
+        }
+      }
+    },
+    {
+      "iteration": 24,
+      "timestamp": 1772778411.8186393,
+      "parameters": {
+        "min_granularity_ns": 100000,
+        "latency_ns": 100000,
+        "cstate_max": {
+          "value": "POLL",
+          "cores": "0-9"
+        },
+        "napi_busy_poll": {
+          "value": 28,
+          "cores": "0-9"
+        },
+        "wakeup_granularity_ns": 100000,
+        "migration_cost_ns": 100000,
+        "max_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        },
+        "min_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        }
+      },
+      "metrics": {
+        "throughput": 2700.6,
+        "goodput": 2700.6,
+        "latency_avg": 0.33812041768495893,
+        "latency_p95": 0.634,
+        "request_count": 13503.0,
+        "intervals_aggregated": 5,
+        "app_name": "silo",
+        "latency_p50": 0.271,
+        "latency_p99": 1.175,
+        "latency_max": 5.046,
+        "msec_cpu_clock": 30024.48,
+        "cpus_utilized": 10.0,
+        "context_switches": 26194.0,
+        "context_switches_per_sec": 872.421,
+        "cpu_migrations": 172.0,
+        "cpu_migrations_per_sec": 5.729,
+        "page_faults": 25940.0,
+        "page_faults_per_sec": 863.962,
+        "cycles": 75060876789.0,
+        "ghz": 2.5,
+        "instructions": 4082437145.0,
+        "instructions_per_cycle": 0.05,
+        "branches": 1171366683.0,
+        "branches_per_sec": 39.014,
+        "branch_misses": 8666017.0,
+        "branch_miss_rate_pct": 0.74,
+        "time_elapsed_seconds": 3.002372866,
+        "all_quick_tuner_timings": [],
+        "quick_response_count": 0
+      },
+      "reward": 1.175,
+      "tuner_timing": {},
+      "post_tuning_phase": false,
+      "system_metrics": {
+        "window_start_time": 1772778406.8075554,
+        "window_end_time": 1772778411.8135288,
+        "perf_start_time": 1772778407.8078597,
+        "perf_end_time": 1772778410.8078597,
+        "system_metrics_start_time": 1772778407.8088808,
+        "system_metrics_end_time": 1772778410.8076253,
+        "power_socket0_watts": 48.76735133333333,
+        "power_ram_watts": 7.654890666666667,
+        "cstate_poll_pct": 100.0,
+        "cstate_c1_pct": 0.0,
+        "cstate_c1e_pct": 0.0,
+        "cstate_c6_pct": 0.0,
+        "cpu_load_cores_pct": 10.440469543693062,
+        "cpu_load_socket0_pct": 5.220234771846531,
+        "perf_metrics": {
+          "msec_cpu_clock": 30024.48,
+          "cpus_utilized": 10.0,
+          "context_switches": 26194.0,
+          "context_switches_per_sec": 872.421,
+          "cpu_migrations": 172.0,
+          "cpu_migrations_per_sec": 5.729,
+          "page_faults": 25940.0,
+          "page_faults_per_sec": 863.962,
+          "cycles": 75060876789.0,
+          "ghz": 2.5,
+          "instructions": 4082437145.0,
+          "instructions_per_cycle": 0.05,
+          "branches": 1171366683.0,
+          "branches_per_sec": 39.014,
+          "branch_misses": 8666017.0,
+          "branch_miss_rate_pct": 0.74,
+          "time_elapsed_seconds": 3.002372866
+        }
+      }
+    },
+    {
+      "iteration": 25,
+      "timestamp": 1772778416.889102,
+      "parameters": {
+        "min_granularity_ns": 100000,
+        "latency_ns": 100000,
+        "cstate_max": {
+          "value": "POLL",
+          "cores": "0-9"
+        },
+        "napi_busy_poll": {
+          "value": 31,
+          "cores": "0-9"
+        },
+        "wakeup_granularity_ns": 100000,
+        "migration_cost_ns": 100000,
+        "max_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        },
+        "min_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        }
+      },
+      "metrics": {
+        "throughput": 2716.6,
+        "goodput": 2716.6,
+        "latency_avg": 0.3434339247588898,
+        "latency_p95": 0.655,
+        "request_count": 13583.0,
+        "intervals_aggregated": 5,
+        "app_name": "silo",
+        "latency_p50": 0.28,
+        "latency_p99": 1.237,
+        "latency_max": 4.273,
+        "msec_cpu_clock": 30034.39,
+        "cpus_utilized": 10.0,
+        "context_switches": 26628.0,
+        "context_switches_per_sec": 886.584,
+        "cpu_migrations": 250.0,
+        "cpu_migrations_per_sec": 8.324,
+        "page_faults": 38474.0,
+        "page_faults_per_sec": 1.281,
+        "cycles": 75085659767.0,
+        "ghz": 2.5,
+        "instructions": 4157296686.0,
+        "instructions_per_cycle": 0.06,
+        "branches": 1185109846.0,
+        "branches_per_sec": 39.458,
+        "branch_misses": 9173398.0,
+        "branch_miss_rate_pct": 0.77,
+        "time_elapsed_seconds": 3.003438486,
+        "all_quick_tuner_timings": [],
+        "quick_response_count": 0
+      },
+      "reward": 1.237,
+      "tuner_timing": {
+        "reasoning": {
+          "tuner_call_time": 1772778406.8043003,
+          "tuner_start_iteration": 24,
+          "tuner_response_time": 1772778413.7231596,
+          "tuner_duration": 6.918859243392944,
+          "tuner_response_time_ms": 6918.859243392944,
+          "tuner_type": "actor_reasoning",
+          "parameters_applied": true,
+          "parameters_applied_timestamp": 1772778414.984534,
+          "proposed_parameters": {
+            "min_granularity_ns": 100000,
+            "latency_ns": 100000,
+            "cstate_max": "POLL",
+            "napi_busy_poll": 31,
+            "wakeup_granularity_ns": 100000,
+            "migration_cost_ns": 100000,
+            "max_perf_pct": 100,
+            "min_perf_pct": 100
+          },
+          "justification": "Continuing exploration around the best performing napi_busy_poll value of 30, we are probing 31 to further refine the optimal range and confirm the observed trend of lower latency in this region.",
+          "token_metrics": {
+            "input_tokens": 3215,
+            "output_tokens": 153,
+            "total_tokens": 4559
+          }
+        }
+      },
+      "post_tuning_phase": false,
+      "system_metrics": {
+        "window_start_time": 1772778411.819015,
+        "window_end_time": 1772778416.8249075,
+        "perf_start_time": 1772778412.8192558,
+        "perf_end_time": 1772778415.8192558,
+        "system_metrics_start_time": 1772778412.8202808,
+        "system_metrics_end_time": 1772778415.8190737,
+        "power_socket0_watts": 48.92502533333334,
+        "power_ram_watts": 7.7079260000000005,
+        "cstate_poll_pct": 100.0,
+        "cstate_c1_pct": 0.0,
+        "cstate_c1e_pct": 0.0,
+        "cstate_c6_pct": 0.0,
+        "cpu_load_cores_pct": 10.223120000501572,
+        "cpu_load_socket0_pct": 5.3251303768962925,
+        "perf_metrics": {
+          "msec_cpu_clock": 30034.39,
+          "cpus_utilized": 10.0,
+          "context_switches": 26628.0,
+          "context_switches_per_sec": 886.584,
+          "cpu_migrations": 250.0,
+          "cpu_migrations_per_sec": 8.324,
+          "page_faults": 38474.0,
+          "page_faults_per_sec": 1.281,
+          "cycles": 75085659767.0,
+          "ghz": 2.5,
+          "instructions": 4157296686.0,
+          "instructions_per_cycle": 0.06,
+          "branches": 1185109846.0,
+          "branches_per_sec": 39.458,
+          "branch_misses": 9173398.0,
+          "branch_miss_rate_pct": 0.77,
+          "time_elapsed_seconds": 3.003438486
+        }
+      }
+    },
+    {
+      "iteration": 26,
+      "timestamp": 1772778421.9033828,
+      "parameters": {
+        "min_granularity_ns": 100000,
+        "latency_ns": 100000,
+        "cstate_max": {
+          "value": "POLL",
+          "cores": "0-9"
+        },
+        "napi_busy_poll": {
+          "value": 31,
+          "cores": "0-9"
+        },
+        "wakeup_granularity_ns": 100000,
+        "migration_cost_ns": 100000,
+        "max_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        },
+        "min_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        }
+      },
+      "metrics": {
+        "throughput": 2699.0,
+        "goodput": 2699.0,
+        "latency_avg": 0.34115998517969615,
+        "latency_p95": 0.634,
+        "request_count": 13495.0,
+        "intervals_aggregated": 5,
+        "app_name": "silo",
+        "latency_p50": 0.271,
+        "latency_p99": 1.222,
+        "latency_max": 5.616,
+        "msec_cpu_clock": 30018.14,
+        "cpus_utilized": 10.0,
+        "context_switches": 26077.0,
+        "context_switches_per_sec": 868.708,
+        "cpu_migrations": 198.0,
+        "cpu_migrations_per_sec": 6.596,
+        "page_faults": 24134.0,
+        "page_faults_per_sec": 803.98,
+        "cycles": 75045027013.0,
+        "ghz": 2.5,
+        "instructions": 4084851650.0,
+        "instructions_per_cycle": 0.05,
+        "branches": 1172290067.0,
+        "branches_per_sec": 39.053,
+        "branch_misses": 8697922.0,
+        "branch_miss_rate_pct": 0.74,
+        "time_elapsed_seconds": 3.001841615,
+        "all_quick_tuner_timings": [],
+        "quick_response_count": 0
+      },
+      "reward": 1.222,
+      "tuner_timing": {},
+      "post_tuning_phase": false,
+      "system_metrics": {
+        "window_start_time": 1772778416.8925352,
+        "window_end_time": 1772778421.8986437,
+        "perf_start_time": 1772778417.8929336,
+        "perf_end_time": 1772778420.8929336,
+        "system_metrics_start_time": 1772778417.8939629,
+        "system_metrics_end_time": 1772778420.8926952,
+        "power_socket0_watts": 48.741412,
+        "power_ram_watts": 7.6422126666666665,
+        "cstate_poll_pct": 100.0,
+        "cstate_c1_pct": 0.0,
+        "cstate_c1e_pct": 0.0,
+        "cstate_c6_pct": 0.0,
+        "cpu_load_cores_pct": 10.33853556847444,
+        "cpu_load_socket0_pct": 5.16926778423722,
+        "perf_metrics": {
+          "msec_cpu_clock": 30018.14,
+          "cpus_utilized": 10.0,
+          "context_switches": 26077.0,
+          "context_switches_per_sec": 868.708,
+          "cpu_migrations": 198.0,
+          "cpu_migrations_per_sec": 6.596,
+          "page_faults": 24134.0,
+          "page_faults_per_sec": 803.98,
+          "cycles": 75045027013.0,
+          "ghz": 2.5,
+          "instructions": 4084851650.0,
+          "instructions_per_cycle": 0.05,
+          "branches": 1172290067.0,
+          "branches_per_sec": 39.053,
+          "branch_misses": 8697922.0,
+          "branch_miss_rate_pct": 0.74,
+          "time_elapsed_seconds": 3.001841615
+        }
+      }
+    },
+    {
+      "iteration": 27,
+      "timestamp": 1772778426.915126,
+      "parameters": {
+        "min_granularity_ns": 100000,
+        "latency_ns": 100000,
+        "cstate_max": {
+          "value": "POLL",
+          "cores": "0-9"
+        },
+        "napi_busy_poll": {
+          "value": 31,
+          "cores": "0-9"
+        },
+        "wakeup_granularity_ns": 100000,
+        "migration_cost_ns": 100000,
+        "max_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        },
+        "min_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        }
+      },
+      "metrics": {
+        "throughput": 2700.0,
+        "goodput": 2700.0,
+        "latency_avg": 0.34329296296296297,
+        "latency_p95": 0.616,
+        "request_count": 13500.0,
+        "intervals_aggregated": 5,
+        "app_name": "silo",
+        "latency_p50": 0.268,
+        "latency_p99": 1.349,
+        "latency_max": 8.041,
+        "msec_cpu_clock": 30025.68,
+        "cpus_utilized": 10.0,
+        "context_switches": 26078.0,
+        "context_switches_per_sec": 868.523,
+        "cpu_migrations": 188.0,
+        "cpu_migrations_per_sec": 6.261,
+        "page_faults": 24639.0,
+        "page_faults_per_sec": 820.598,
+        "cycles": 75063871112.0,
+        "ghz": 2.5,
+        "instructions": 4080107857.0,
+        "instructions_per_cycle": 0.05,
+        "branches": 1171041972.0,
+        "branches_per_sec": 39.001,
+        "branch_misses": 8618155.0,
+        "branch_miss_rate_pct": 0.74,
+        "time_elapsed_seconds": 3.002607296,
+        "all_quick_tuner_timings": [
+          {
+            "tuner_call_time": 1772778296.5733147,
+            "tuner_response_time": 1772778426.4136195,
+            "tuner_duration": 129.84030485153198,
+            "tuner_response_time_ms": 129840.30485153198,
+            "tuner_type": "speculator_quick",
+            "parameters_applied": false,
+            "parameters_applied_timestamp": null,
+            "proposed_parameters": null,
+            "justification": null,
+            "token_metrics": {
+              "input_tokens": 1615,
+              "output_tokens": 65525,
+              "total_tokens": 67140
+            },
+            "response_number": 1
+          }
+        ],
+        "quick_response_count": 1
+      },
+      "reward": 1.349,
+      "tuner_timing": {
+        "quick": {
+          "tuner_call_time": 1772778296.5733147,
+          "tuner_response_time": 1772778426.4136195,
+          "tuner_duration": 129.84030485153198,
+          "tuner_response_time_ms": 129840.30485153198,
+          "tuner_type": "speculator_quick",
+          "parameters_applied": false,
+          "parameters_applied_timestamp": null,
+          "proposed_parameters": null,
+          "justification": null,
+          "token_metrics": {
+            "input_tokens": 1615,
+            "output_tokens": 65525,
+            "total_tokens": 67140
+          },
+          "response_number": 1
+        }
+      },
+      "post_tuning_phase": false,
+      "system_metrics": {
+        "window_start_time": 1772778421.903774,
+        "window_end_time": 1772778426.9097147,
+        "perf_start_time": 1772778422.9040592,
+        "perf_end_time": 1772778425.9040592,
+        "system_metrics_start_time": 1772778422.9050922,
+        "system_metrics_end_time": 1772778425.9038296,
+        "power_socket0_watts": 48.65986900000001,
+        "power_ram_watts": 7.628437333333333,
+        "cstate_poll_pct": 100.0,
+        "cstate_c1_pct": 0.0,
+        "cstate_c1e_pct": 0.0,
+        "cstate_c6_pct": 0.0,
+        "cpu_load_cores_pct": 10.333395335690593,
+        "cpu_load_socket0_pct": 5.1666976678452965,
+        "perf_metrics": {
+          "msec_cpu_clock": 30025.68,
+          "cpus_utilized": 10.0,
+          "context_switches": 26078.0,
+          "context_switches_per_sec": 868.523,
+          "cpu_migrations": 188.0,
+          "cpu_migrations_per_sec": 6.261,
+          "page_faults": 24639.0,
+          "page_faults_per_sec": 820.598,
+          "cycles": 75063871112.0,
+          "ghz": 2.5,
+          "instructions": 4080107857.0,
+          "instructions_per_cycle": 0.05,
+          "branches": 1171041972.0,
+          "branches_per_sec": 39.001,
+          "branch_misses": 8618155.0,
+          "branch_miss_rate_pct": 0.74,
+          "time_elapsed_seconds": 3.002607296
+        }
+      }
+    },
+    {
+      "iteration": 28,
+      "timestamp": 1772778431.9285944,
+      "parameters": {
+        "min_granularity_ns": 100000,
+        "latency_ns": 100000,
+        "cstate_max": {
+          "value": "POLL",
+          "cores": "0-9"
+        },
+        "napi_busy_poll": {
+          "value": 31,
+          "cores": "0-9"
+        },
+        "wakeup_granularity_ns": 100000,
+        "migration_cost_ns": 100000,
+        "max_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        },
+        "min_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        }
+      },
+      "metrics": {
+        "throughput": 2722.4,
+        "goodput": 2722.4,
+        "latency_avg": 0.3442001910079342,
+        "latency_p95": 0.624,
+        "request_count": 13612.0,
+        "intervals_aggregated": 5,
+        "app_name": "silo",
+        "latency_p50": 0.267,
+        "latency_p99": 1.319,
+        "latency_max": 6.37,
+        "msec_cpu_clock": 30035.55,
+        "cpus_utilized": 10.0,
+        "context_switches": 26095.0,
+        "context_switches_per_sec": 868.804,
+        "cpu_migrations": 230.0,
+        "cpu_migrations_per_sec": 7.658,
+        "page_faults": 20869.0,
+        "page_faults_per_sec": 694.81,
+        "cycles": 75088564469.0,
+        "ghz": 2.5,
+        "instructions": 4076945677.0,
+        "instructions_per_cycle": 0.05,
+        "branches": 1171046920.0,
+        "branches_per_sec": 38.989,
+        "branch_misses": 8642905.0,
+        "branch_miss_rate_pct": 0.74,
+        "time_elapsed_seconds": 3.003688299,
+        "all_quick_tuner_timings": [],
+        "quick_response_count": 0
+      },
+      "reward": 1.319,
+      "tuner_timing": {},
+      "post_tuning_phase": false,
+      "system_metrics": {
+        "window_start_time": 1772778426.918697,
+        "window_end_time": 1772778431.9248085,
+        "perf_start_time": 1772778427.9190824,
+        "perf_end_time": 1772778430.9190824,
+        "system_metrics_start_time": 1772778427.9201155,
+        "system_metrics_end_time": 1772778430.9188542,
+        "power_socket0_watts": 48.69439433333334,
+        "power_ram_watts": 7.653748333333333,
+        "cstate_poll_pct": 100.0,
+        "cstate_c1_pct": 0.0,
+        "cstate_c1e_pct": 0.0,
+        "cstate_c6_pct": 0.0,
+        "cpu_load_cores_pct": 10.402756293012917,
+        "cpu_load_socket0_pct": 5.201378146506459,
+        "perf_metrics": {
+          "msec_cpu_clock": 30035.55,
+          "cpus_utilized": 10.0,
+          "context_switches": 26095.0,
+          "context_switches_per_sec": 868.804,
+          "cpu_migrations": 230.0,
+          "cpu_migrations_per_sec": 7.658,
+          "page_faults": 20869.0,
+          "page_faults_per_sec": 694.81,
+          "cycles": 75088564469.0,
+          "ghz": 2.5,
+          "instructions": 4076945677.0,
+          "instructions_per_cycle": 0.05,
+          "branches": 1171046920.0,
+          "branches_per_sec": 38.989,
+          "branch_misses": 8642905.0,
+          "branch_miss_rate_pct": 0.74,
+          "time_elapsed_seconds": 3.003688299
+        }
+      }
+    },
+    {
+      "iteration": 29,
+      "timestamp": 1772778436.9400797,
+      "parameters": {
+        "min_granularity_ns": 100000,
+        "latency_ns": 100000,
+        "cstate_max": {
+          "value": "POLL",
+          "cores": "0-9"
+        },
+        "napi_busy_poll": {
+          "value": 31,
+          "cores": "0-9"
+        },
+        "wakeup_granularity_ns": 100000,
+        "migration_cost_ns": 100000,
+        "max_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        },
+        "min_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        }
+      },
+      "metrics": {
+        "throughput": 2714.8,
+        "goodput": 2714.8,
+        "latency_avg": 0.3398697509945484,
+        "latency_p95": 0.66,
+        "request_count": 13574.0,
+        "intervals_aggregated": 5,
+        "app_name": "silo",
+        "latency_p50": 0.27,
+        "latency_p99": 1.162,
+        "latency_max": 4.009,
+        "msec_cpu_clock": 30018.16,
+        "cpus_utilized": 10.0,
+        "context_switches": 26512.0,
+        "context_switches_per_sec": 883.199,
+        "cpu_migrations": 219.0,
+        "cpu_migrations_per_sec": 7.296,
+        "page_faults": 24350.0,
+        "page_faults_per_sec": 811.176,
+        "cycles": 75045086384.0,
+        "ghz": 2.5,
+        "instructions": 4111925118.0,
+        "instructions_per_cycle": 0.05,
+        "branches": 1177047714.0,
+        "branches_per_sec": 39.211,
+        "branch_misses": 8858581.0,
+        "branch_miss_rate_pct": 0.75,
+        "time_elapsed_seconds": 3.001910321,
+        "all_quick_tuner_timings": [],
+        "quick_response_count": 0
+      },
+      "reward": 1.162,
+      "tuner_timing": {},
+      "post_tuning_phase": false,
+      "system_metrics": {
+        "window_start_time": 1772778431.9290526,
+        "window_end_time": 1772778436.9350126,
+        "perf_start_time": 1772778432.9293563,
+        "perf_end_time": 1772778435.9293563,
+        "system_metrics_start_time": 1772778432.930392,
+        "system_metrics_end_time": 1772778435.929118,
+        "power_socket0_watts": 48.697181666666665,
+        "power_ram_watts": 7.665943333333334,
+        "cstate_poll_pct": 100.0,
+        "cstate_c1_pct": 0.0,
+        "cstate_c1e_pct": 0.0,
+        "cstate_c6_pct": 0.0,
+        "cpu_load_cores_pct": 10.513625882981705,
+        "cpu_load_socket0_pct": 5.256812941490852,
+        "perf_metrics": {
+          "msec_cpu_clock": 30018.16,
+          "cpus_utilized": 10.0,
+          "context_switches": 26512.0,
+          "context_switches_per_sec": 883.199,
+          "cpu_migrations": 219.0,
+          "cpu_migrations_per_sec": 7.296,
+          "page_faults": 24350.0,
+          "page_faults_per_sec": 811.176,
+          "cycles": 75045086384.0,
+          "ghz": 2.5,
+          "instructions": 4111925118.0,
+          "instructions_per_cycle": 0.05,
+          "branches": 1177047714.0,
+          "branches_per_sec": 39.211,
+          "branch_misses": 8858581.0,
+          "branch_miss_rate_pct": 0.75,
+          "time_elapsed_seconds": 3.001910321
+        }
+      }
+    },
+    {
+      "iteration": 30,
+      "timestamp": 1772778441.9517682,
+      "parameters": {
+        "min_granularity_ns": 100000,
+        "latency_ns": 100000,
+        "cstate_max": {
+          "value": "POLL",
+          "cores": "0-9"
+        },
+        "napi_busy_poll": {
+          "value": 31,
+          "cores": "0-9"
+        },
+        "wakeup_granularity_ns": 100000,
+        "migration_cost_ns": 100000,
+        "max_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        },
+        "min_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        }
+      },
+      "metrics": {
+        "throughput": 2710.6,
+        "goodput": 2710.6,
+        "latency_avg": 0.34140839666494505,
+        "latency_p95": 0.663,
+        "request_count": 13553.0,
+        "intervals_aggregated": 5,
+        "app_name": "silo",
+        "latency_p50": 0.267,
+        "latency_p99": 1.211,
+        "latency_max": 5.605,
+        "msec_cpu_clock": 30016.53,
+        "cpus_utilized": 10.0,
+        "context_switches": 26420.0,
+        "context_switches_per_sec": 880.182,
+        "cpu_migrations": 222.0,
+        "cpu_migrations_per_sec": 7.396,
+        "page_faults": 21626.0,
+        "page_faults_per_sec": 720.47,
+        "cycles": 75041010138.0,
+        "ghz": 2.5,
+        "instructions": 4073345104.0,
+        "instructions_per_cycle": 0.05,
+        "branches": 1168681780.0,
+        "branches_per_sec": 38.935,
+        "branch_misses": 8656720.0,
+        "branch_miss_rate_pct": 0.74,
+        "time_elapsed_seconds": 3.001677981,
+        "all_quick_tuner_timings": [],
+        "quick_response_count": 0
+      },
+      "reward": 1.211,
+      "tuner_timing": {
+        "reasoning_final_before_stable": {
+          "tuner_call_time": 1772778441.9520035,
+          "tuner_start_iteration": 31,
+          "tuner_response_time": 1772778659.6815827,
+          "tuner_duration": 217.72957921028137,
+          "tuner_response_time_ms": 217729.57921028137,
+          "tuner_type": "actor_reasoning",
+          "parameters_applied": true,
+          "parameters_applied_timestamp": 1772778660.933901,
+          "proposed_parameters": {
+            "min_granularity_ns": 100000,
+            "latency_ns": 100000,
+            "cstate_max": "POLL",
+            "napi_busy_poll": 30,
+            "wakeup_granularity_ns": 100000,
+            "migration_cost_ns": 100000,
+            "max_perf_pct": 100,
+            "min_perf_pct": 100
+          },
+          "justification": "The configuration with napi_busy_poll=30 yielded the lowest latency_p99 of 1.10, which is the best observed performance. Other parameters were consistently set to their extreme values (min for time-based, max for percentages, POLL for cstate_max) across the best performing trials, indicating this combination is optimal.",
+          "token_metrics": {
+            "input_tokens": 4031,
+            "output_tokens": 204,
+            "total_tokens": 5214
+          }
+        }
+      },
+      "post_tuning_phase": false,
+      "system_metrics": {
+        "window_start_time": 1772778436.9407928,
+        "window_end_time": 1772778441.946745,
+        "perf_start_time": 1772778437.9410417,
+        "perf_end_time": 1772778440.9410417,
+        "system_metrics_start_time": 1772778437.9420643,
+        "system_metrics_end_time": 1772778440.940858,
+        "power_socket0_watts": 48.68206566666667,
+        "power_ram_watts": 7.6668406666666655,
+        "cstate_poll_pct": 100.0,
+        "cstate_c1_pct": 0.0,
+        "cstate_c1e_pct": 0.0,
+        "cstate_c6_pct": 0.0,
+        "cpu_load_cores_pct": 10.231792733524594,
+        "cpu_load_socket0_pct": 5.115896366762297,
+        "perf_metrics": {
+          "msec_cpu_clock": 30016.53,
+          "cpus_utilized": 10.0,
+          "context_switches": 26420.0,
+          "context_switches_per_sec": 880.182,
+          "cpu_migrations": 222.0,
+          "cpu_migrations_per_sec": 7.396,
+          "page_faults": 21626.0,
+          "page_faults_per_sec": 720.47,
+          "cycles": 75041010138.0,
+          "ghz": 2.5,
+          "instructions": 4073345104.0,
+          "instructions_per_cycle": 0.05,
+          "branches": 1168681780.0,
+          "branches_per_sec": 38.935,
+          "branch_misses": 8656720.0,
+          "branch_miss_rate_pct": 0.74,
+          "time_elapsed_seconds": 3.001677981
+        }
+      }
+    },
+    {
+      "iteration": 31,
+      "timestamp": 1772778665.9693778,
+      "parameters": {
+        "min_granularity_ns": 100000,
+        "latency_ns": 100000,
+        "cstate_max": {
+          "value": "POLL",
+          "cores": "0-9"
+        },
+        "napi_busy_poll": {
+          "value": 30,
+          "cores": "0-9"
+        },
+        "wakeup_granularity_ns": 100000,
+        "migration_cost_ns": 100000,
+        "max_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        },
+        "min_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        }
+      },
+      "metrics": {
+        "throughput": 2672.75,
+        "goodput": 2672.75,
+        "latency_avg": 0.34257019923299975,
+        "latency_p95": 0.642,
+        "request_count": 10691.0,
+        "intervals_aggregated": 4,
+        "app_name": "silo",
+        "latency_p50": 0.27,
+        "latency_p99": 1.321,
+        "latency_max": 4.625,
+        "msec_cpu_clock": 30004.81,
+        "cpus_utilized": 10.0,
+        "context_switches": 25791.0,
+        "context_switches_per_sec": 859.562,
+        "cpu_migrations": 215.0,
+        "cpu_migrations_per_sec": 7.166,
+        "page_faults": 21564.0,
+        "page_faults_per_sec": 718.685,
+        "cycles": 75011694901.0,
+        "ghz": 2.5,
+        "instructions": 4085481076.0,
+        "instructions_per_cycle": 0.05,
+        "branches": 1173340810.0,
+        "branches_per_sec": 39.105,
+        "branch_misses": 8673011.0,
+        "branch_miss_rate_pct": 0.74,
+        "time_elapsed_seconds": 3.000575052
+      },
+      "reward": 1.321,
+      "tuner_timing": {},
+      "post_tuning_phase": true,
+      "system_metrics": {
+        "window_start_time": 1772778660.9342012,
+        "window_end_time": 1772778665.9402418,
+        "perf_start_time": 1772778661.9345193,
+        "perf_end_time": 1772778664.9345193,
+        "system_metrics_start_time": 1772778661.9355505,
+        "system_metrics_end_time": 1772778664.9342566,
+        "power_socket0_watts": 51.152070333333334,
+        "power_ram_watts": 7.667309666666665,
+        "cstate_poll_pct": 100.0,
+        "cstate_c1_pct": 0.0,
+        "cstate_c1e_pct": 0.0,
+        "cstate_c6_pct": 0.0,
+        "cpu_load_cores_pct": 9.902888370418998,
+        "cpu_load_socket0_pct": 4.967945835374515,
+        "perf_metrics": {
+          "msec_cpu_clock": 30004.81,
+          "cpus_utilized": 10.0,
+          "context_switches": 25791.0,
+          "context_switches_per_sec": 859.562,
+          "cpu_migrations": 215.0,
+          "cpu_migrations_per_sec": 7.166,
+          "page_faults": 21564.0,
+          "page_faults_per_sec": 718.685,
+          "cycles": 75011694901.0,
+          "ghz": 2.5,
+          "instructions": 4085481076.0,
+          "instructions_per_cycle": 0.05,
+          "branches": 1173340810.0,
+          "branches_per_sec": 39.105,
+          "branch_misses": 8673011.0,
+          "branch_miss_rate_pct": 0.74,
+          "time_elapsed_seconds": 3.000575052
+        }
+      }
+    },
+    {
+      "iteration": 32,
+      "timestamp": 1772778670.9799418,
+      "parameters": {
+        "min_granularity_ns": 100000,
+        "latency_ns": 100000,
+        "cstate_max": {
+          "value": "POLL",
+          "cores": "0-9"
+        },
+        "napi_busy_poll": {
+          "value": 30,
+          "cores": "0-9"
+        },
+        "wakeup_granularity_ns": 100000,
+        "migration_cost_ns": 100000,
+        "max_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        },
+        "min_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        }
+      },
+      "metrics": {
+        "throughput": 2691.0,
+        "goodput": 2691.0,
+        "latency_avg": 0.3350307506503159,
+        "latency_p95": 0.613,
+        "request_count": 10764.0,
+        "intervals_aggregated": 4,
+        "app_name": "silo",
+        "latency_p50": 0.267,
+        "latency_p99": 1.148,
+        "latency_max": 4.398,
+        "msec_cpu_clock": 30030.75,
+        "cpus_utilized": 10.0,
+        "context_switches": 25645.0,
+        "context_switches_per_sec": 853.958,
+        "cpu_migrations": 207.0,
+        "cpu_migrations_per_sec": 6.893,
+        "page_faults": 21179.0,
+        "page_faults_per_sec": 705.244,
+        "cycles": 75076580661.0,
+        "ghz": 2.5,
+        "instructions": 4059377427.0,
+        "instructions_per_cycle": 0.05,
+        "branches": 1167440219.0,
+        "branches_per_sec": 38.875,
+        "branch_misses": 8500274.0,
+        "branch_miss_rate_pct": 0.73,
+        "time_elapsed_seconds": 3.00316382
+      },
+      "reward": 1.148,
+      "tuner_timing": {},
+      "post_tuning_phase": true,
+      "system_metrics": {
+        "window_start_time": 1772778665.9694734,
+        "window_end_time": 1772778670.975439,
+        "perf_start_time": 1772778666.9697666,
+        "perf_end_time": 1772778669.9697666,
+        "system_metrics_start_time": 1772778666.9708066,
+        "system_metrics_end_time": 1772778669.96952,
+        "power_socket0_watts": 51.25611466666667,
+        "power_ram_watts": 7.680529,
+        "cstate_poll_pct": 100.0,
+        "cstate_c1_pct": 0.0,
+        "cstate_c1e_pct": 0.0,
+        "cstate_c6_pct": 0.0,
+        "cpu_load_cores_pct": 10.30584839055083,
+        "cpu_load_socket0_pct": 5.152924195275415,
+        "perf_metrics": {
+          "msec_cpu_clock": 30030.75,
+          "cpus_utilized": 10.0,
+          "context_switches": 25645.0,
+          "context_switches_per_sec": 853.958,
+          "cpu_migrations": 207.0,
+          "cpu_migrations_per_sec": 6.893,
+          "page_faults": 21179.0,
+          "page_faults_per_sec": 705.244,
+          "cycles": 75076580661.0,
+          "ghz": 2.5,
+          "instructions": 4059377427.0,
+          "instructions_per_cycle": 0.05,
+          "branches": 1167440219.0,
+          "branches_per_sec": 38.875,
+          "branch_misses": 8500274.0,
+          "branch_miss_rate_pct": 0.73,
+          "time_elapsed_seconds": 3.00316382
+        }
+      }
+    },
+    {
+      "iteration": 33,
+      "timestamp": 1772778675.990129,
+      "parameters": {
+        "min_granularity_ns": 100000,
+        "latency_ns": 100000,
+        "cstate_max": {
+          "value": "POLL",
+          "cores": "0-9"
+        },
+        "napi_busy_poll": {
+          "value": 30,
+          "cores": "0-9"
+        },
+        "wakeup_granularity_ns": 100000,
+        "migration_cost_ns": 100000,
+        "max_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        },
+        "min_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        }
+      },
+      "metrics": {
+        "throughput": 2678.8,
+        "goodput": 2678.8,
+        "latency_avg": 0.3374904434821562,
+        "latency_p95": 0.615,
+        "request_count": 13394.0,
+        "intervals_aggregated": 5,
+        "app_name": "silo",
+        "latency_p50": 0.27,
+        "latency_p99": 1.263,
+        "latency_max": 4.113,
+        "msec_cpu_clock": 30033.64,
+        "cpus_utilized": 10.0,
+        "context_switches": 25765.0,
+        "context_switches_per_sec": 857.871,
+        "cpu_migrations": 202.0,
+        "cpu_migrations_per_sec": 6.726,
+        "page_faults": 23056.0,
+        "page_faults_per_sec": 767.673,
+        "cycles": 75083787798.0,
+        "ghz": 2.5,
+        "instructions": 4109739409.0,
+        "instructions_per_cycle": 0.05,
+        "branches": 1177926433.0,
+        "branches_per_sec": 39.22,
+        "branch_misses": 8778644.0,
+        "branch_miss_rate_pct": 0.75,
+        "time_elapsed_seconds": 3.003402081
+      },
+      "reward": 1.263,
+      "tuner_timing": {},
+      "post_tuning_phase": true,
+      "system_metrics": {
+        "window_start_time": 1772778670.9800386,
+        "window_end_time": 1772778675.9860258,
+        "perf_start_time": 1772778671.9803374,
+        "perf_end_time": 1772778674.9803374,
+        "system_metrics_start_time": 1772778671.9813688,
+        "system_metrics_end_time": 1772778674.980086,
+        "power_socket0_watts": 51.407929,
+        "power_ram_watts": 7.689973999999999,
+        "cstate_poll_pct": 100.0,
+        "cstate_c1_pct": 0.0,
+        "cstate_c1e_pct": 0.0,
+        "cstate_c6_pct": 0.0,
+        "cpu_load_cores_pct": 9.978153429869588,
+        "cpu_load_socket0_pct": 4.989076714934794,
+        "perf_metrics": {
+          "msec_cpu_clock": 30033.64,
+          "cpus_utilized": 10.0,
+          "context_switches": 25765.0,
+          "context_switches_per_sec": 857.871,
+          "cpu_migrations": 202.0,
+          "cpu_migrations_per_sec": 6.726,
+          "page_faults": 23056.0,
+          "page_faults_per_sec": 767.673,
+          "cycles": 75083787798.0,
+          "ghz": 2.5,
+          "instructions": 4109739409.0,
+          "instructions_per_cycle": 0.05,
+          "branches": 1177926433.0,
+          "branches_per_sec": 39.22,
+          "branch_misses": 8778644.0,
+          "branch_miss_rate_pct": 0.75,
+          "time_elapsed_seconds": 3.003402081
+        }
+      }
+    },
+    {
+      "iteration": 34,
+      "timestamp": 1772778681.0003293,
+      "parameters": {
+        "min_granularity_ns": 100000,
+        "latency_ns": 100000,
+        "cstate_max": {
+          "value": "POLL",
+          "cores": "0-9"
+        },
+        "napi_busy_poll": {
+          "value": 30,
+          "cores": "0-9"
+        },
+        "wakeup_granularity_ns": 100000,
+        "migration_cost_ns": 100000,
+        "max_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        },
+        "min_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        }
+      },
+      "metrics": {
+        "throughput": 2715.4,
+        "goodput": 2715.4,
+        "latency_avg": 0.3375957869927083,
+        "latency_p95": 0.625,
+        "request_count": 13577.0,
+        "intervals_aggregated": 5,
+        "app_name": "silo",
+        "latency_p50": 0.27,
+        "latency_p99": 1.149,
+        "latency_max": 4.172,
+        "msec_cpu_clock": 30022.99,
+        "cpus_utilized": 10.0,
+        "context_switches": 26601.0,
+        "context_switches_per_sec": 886.021,
+        "cpu_migrations": 169.0,
+        "cpu_migrations_per_sec": 5.629,
+        "page_faults": 24231.0,
+        "page_faults_per_sec": 807.082,
+        "cycles": 75057154159.0,
+        "ghz": 2.5,
+        "instructions": 4107890816.0,
+        "instructions_per_cycle": 0.05,
+        "branches": 1176329029.0,
+        "branches_per_sec": 39.181,
+        "branch_misses": 8838047.0,
+        "branch_miss_rate_pct": 0.75,
+        "time_elapsed_seconds": 3.002277169
+      },
+      "reward": 1.149,
+      "tuner_timing": {},
+      "post_tuning_phase": true,
+      "system_metrics": {
+        "window_start_time": 1772778675.990223,
+        "window_end_time": 1772778680.9961972,
+        "perf_start_time": 1772778676.9905214,
+        "perf_end_time": 1772778679.9905214,
+        "system_metrics_start_time": 1772778676.9915612,
+        "system_metrics_end_time": 1772778679.9902694,
+        "power_socket0_watts": 51.53020266666667,
+        "power_ram_watts": 7.709073,
+        "cstate_poll_pct": 100.0,
+        "cstate_c1_pct": 0.0,
+        "cstate_c1e_pct": 0.0,
+        "cstate_c6_pct": 0.0,
+        "cpu_load_cores_pct": 10.436158166198476,
+        "cpu_load_socket0_pct": 5.218079083099238,
+        "perf_metrics": {
+          "msec_cpu_clock": 30022.99,
+          "cpus_utilized": 10.0,
+          "context_switches": 26601.0,
+          "context_switches_per_sec": 886.021,
+          "cpu_migrations": 169.0,
+          "cpu_migrations_per_sec": 5.629,
+          "page_faults": 24231.0,
+          "page_faults_per_sec": 807.082,
+          "cycles": 75057154159.0,
+          "ghz": 2.5,
+          "instructions": 4107890816.0,
+          "instructions_per_cycle": 0.05,
+          "branches": 1176329029.0,
+          "branches_per_sec": 39.181,
+          "branch_misses": 8838047.0,
+          "branch_miss_rate_pct": 0.75,
+          "time_elapsed_seconds": 3.002277169
+        }
+      }
+    },
+    {
+      "iteration": 35,
+      "timestamp": 1772778686.010325,
+      "parameters": {
+        "min_granularity_ns": 100000,
+        "latency_ns": 100000,
+        "cstate_max": {
+          "value": "POLL",
+          "cores": "0-9"
+        },
+        "napi_busy_poll": {
+          "value": 30,
+          "cores": "0-9"
+        },
+        "wakeup_granularity_ns": 100000,
+        "migration_cost_ns": 100000,
+        "max_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        },
+        "min_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        }
+      },
+      "metrics": {
+        "throughput": 2715.25,
+        "goodput": 2715.25,
+        "latency_avg": 0.33626839149249604,
+        "latency_p95": 0.596,
+        "request_count": 10861.0,
+        "intervals_aggregated": 4,
+        "app_name": "silo",
+        "latency_p50": 0.267,
+        "latency_p99": 1.163,
+        "latency_max": 4.883,
+        "msec_cpu_clock": 30014.76,
+        "cpus_utilized": 10.0,
+        "context_switches": 25997.0,
+        "context_switches_per_sec": 866.14,
+        "cpu_migrations": 173.0,
+        "cpu_migrations_per_sec": 5.764,
+        "page_faults": 20164.0,
+        "page_faults_per_sec": 671.803,
+        "cycles": 75036590282.0,
+        "ghz": 2.5,
+        "instructions": 4066319524.0,
+        "instructions_per_cycle": 0.05,
+        "branches": 1168253957.0,
+        "branches_per_sec": 38.923,
+        "branch_misses": 8591069.0,
+        "branch_miss_rate_pct": 0.74,
+        "time_elapsed_seconds": 3.001514125
+      },
+      "reward": 1.163,
+      "tuner_timing": {},
+      "post_tuning_phase": true,
+      "system_metrics": {
+        "window_start_time": 1772778681.0004246,
+        "window_end_time": 1772778686.0064201,
+        "perf_start_time": 1772778682.0007212,
+        "perf_end_time": 1772778685.0007212,
+        "system_metrics_start_time": 1772778682.001764,
+        "system_metrics_end_time": 1772778685.0004709,
+        "power_socket0_watts": 51.707061333333336,
+        "power_ram_watts": 7.686603000000001,
+        "cstate_poll_pct": 100.0,
+        "cstate_c1_pct": 0.0,
+        "cstate_c1e_pct": 0.0,
+        "cstate_c6_pct": 0.0,
+        "cpu_load_cores_pct": 10.209472393462553,
+        "cpu_load_socket0_pct": 5.1047361967312765,
+        "perf_metrics": {
+          "msec_cpu_clock": 30014.76,
+          "cpus_utilized": 10.0,
+          "context_switches": 25997.0,
+          "context_switches_per_sec": 866.14,
+          "cpu_migrations": 173.0,
+          "cpu_migrations_per_sec": 5.764,
+          "page_faults": 20164.0,
+          "page_faults_per_sec": 671.803,
+          "cycles": 75036590282.0,
+          "ghz": 2.5,
+          "instructions": 4066319524.0,
+          "instructions_per_cycle": 0.05,
+          "branches": 1168253957.0,
+          "branches_per_sec": 38.923,
+          "branch_misses": 8591069.0,
+          "branch_miss_rate_pct": 0.74,
+          "time_elapsed_seconds": 3.001514125
+        }
+      }
+    },
+    {
+      "iteration": 36,
+      "timestamp": 1772778691.020559,
+      "parameters": {
+        "min_granularity_ns": 100000,
+        "latency_ns": 100000,
+        "cstate_max": {
+          "value": "POLL",
+          "cores": "0-9"
+        },
+        "napi_busy_poll": {
+          "value": 30,
+          "cores": "0-9"
+        },
+        "wakeup_granularity_ns": 100000,
+        "migration_cost_ns": 100000,
+        "max_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        },
+        "min_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        }
+      },
+      "metrics": {
+        "throughput": 2718.5,
+        "goodput": 2718.5,
+        "latency_avg": 0.33656887989700207,
+        "latency_p95": 0.646,
+        "request_count": 10874.0,
+        "intervals_aggregated": 4,
+        "app_name": "silo",
+        "latency_p50": 0.269,
+        "latency_p99": 1.112,
+        "latency_max": 3.802,
+        "msec_cpu_clock": 30034.25,
+        "cpus_utilized": 10.0,
+        "context_switches": 26425.0,
+        "context_switches_per_sec": 879.829,
+        "cpu_migrations": 208.0,
+        "cpu_migrations_per_sec": 6.925,
+        "page_faults": 20602.0,
+        "page_faults_per_sec": 685.95,
+        "cycles": 75085307454.0,
+        "ghz": 2.5,
+        "instructions": 4058384218.0,
+        "instructions_per_cycle": 0.05,
+        "branches": 1166081926.0,
+        "branches_per_sec": 38.825,
+        "branch_misses": 8511818.0,
+        "branch_miss_rate_pct": 0.73,
+        "time_elapsed_seconds": 3.003447681
+      },
+      "reward": 1.112,
+      "tuner_timing": {},
+      "post_tuning_phase": true,
+      "system_metrics": {
+        "window_start_time": 1772778686.0104191,
+        "window_end_time": 1772778691.0163777,
+        "perf_start_time": 1772778687.0107434,
+        "perf_end_time": 1772778690.0107434,
+        "system_metrics_start_time": 1772778687.011778,
+        "system_metrics_end_time": 1772778690.0104647,
+        "power_socket0_watts": 51.734344666666665,
+        "power_ram_watts": 7.695196,
+        "cstate_poll_pct": 100.0,
+        "cstate_c1_pct": 0.0,
+        "cstate_c1e_pct": 0.0,
+        "cstate_c6_pct": 0.0,
+        "cpu_load_cores_pct": 10.142297321442674,
+        "cpu_load_socket0_pct": 5.071148660721337,
+        "perf_metrics": {
+          "msec_cpu_clock": 30034.25,
+          "cpus_utilized": 10.0,
+          "context_switches": 26425.0,
+          "context_switches_per_sec": 879.829,
+          "cpu_migrations": 208.0,
+          "cpu_migrations_per_sec": 6.925,
+          "page_faults": 20602.0,
+          "page_faults_per_sec": 685.95,
+          "cycles": 75085307454.0,
+          "ghz": 2.5,
+          "instructions": 4058384218.0,
+          "instructions_per_cycle": 0.05,
+          "branches": 1166081926.0,
+          "branches_per_sec": 38.825,
+          "branch_misses": 8511818.0,
+          "branch_miss_rate_pct": 0.73,
+          "time_elapsed_seconds": 3.003447681
+        }
+      }
+    },
+    {
+      "iteration": 37,
+      "timestamp": 1772778696.0306177,
+      "parameters": {
+        "min_granularity_ns": 100000,
+        "latency_ns": 100000,
+        "cstate_max": {
+          "value": "POLL",
+          "cores": "0-9"
+        },
+        "napi_busy_poll": {
+          "value": 30,
+          "cores": "0-9"
+        },
+        "wakeup_granularity_ns": 100000,
+        "migration_cost_ns": 100000,
+        "max_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        },
+        "min_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        }
+      },
+      "metrics": {
+        "throughput": 2711.0,
+        "goodput": 2711.0,
+        "latency_avg": 0.3368063445223165,
+        "latency_p95": 0.599,
+        "request_count": 10844.0,
+        "intervals_aggregated": 4,
+        "app_name": "silo",
+        "latency_p50": 0.267,
+        "latency_p99": 1.141,
+        "latency_max": 4.397,
+        "msec_cpu_clock": 30032.83,
+        "cpus_utilized": 10.0,
+        "context_switches": 25591.0,
+        "context_switches_per_sec": 852.101,
+        "cpu_migrations": 198.0,
+        "cpu_migrations_per_sec": 6.593,
+        "page_faults": 19652.0,
+        "page_faults_per_sec": 654.351,
+        "cycles": 75081755237.0,
+        "ghz": 2.5,
+        "instructions": 4073542644.0,
+        "instructions_per_cycle": 0.05,
+        "branches": 1170618694.0,
+        "branches_per_sec": 38.978,
+        "branch_misses": 8622361.0,
+        "branch_miss_rate_pct": 0.74,
+        "time_elapsed_seconds": 3.003383328
+      },
+      "reward": 1.141,
+      "tuner_timing": {},
+      "post_tuning_phase": true,
+      "system_metrics": {
+        "window_start_time": 1772778691.0206566,
+        "window_end_time": 1772778696.02664,
+        "perf_start_time": 1772778692.020954,
+        "perf_end_time": 1772778695.020954,
+        "system_metrics_start_time": 1772778692.021996,
+        "system_metrics_end_time": 1772778695.0207024,
+        "power_socket0_watts": 51.72008266666666,
+        "power_ram_watts": 7.6622243333333335,
+        "cstate_poll_pct": 100.0,
+        "cstate_c1_pct": 0.0,
+        "cstate_c1e_pct": 0.0,
+        "cstate_c6_pct": 0.0,
+        "cpu_load_cores_pct": 10.105415346119242,
+        "cpu_load_socket0_pct": 5.052707673059621,
+        "perf_metrics": {
+          "msec_cpu_clock": 30032.83,
+          "cpus_utilized": 10.0,
+          "context_switches": 25591.0,
+          "context_switches_per_sec": 852.101,
+          "cpu_migrations": 198.0,
+          "cpu_migrations_per_sec": 6.593,
+          "page_faults": 19652.0,
+          "page_faults_per_sec": 654.351,
+          "cycles": 75081755237.0,
+          "ghz": 2.5,
+          "instructions": 4073542644.0,
+          "instructions_per_cycle": 0.05,
+          "branches": 1170618694.0,
+          "branches_per_sec": 38.978,
+          "branch_misses": 8622361.0,
+          "branch_miss_rate_pct": 0.74,
+          "time_elapsed_seconds": 3.003383328
+        }
+      }
+    },
+    {
+      "iteration": 38,
+      "timestamp": 1772778701.0412157,
+      "parameters": {
+        "min_granularity_ns": 100000,
+        "latency_ns": 100000,
+        "cstate_max": {
+          "value": "POLL",
+          "cores": "0-9"
+        },
+        "napi_busy_poll": {
+          "value": 30,
+          "cores": "0-9"
+        },
+        "wakeup_granularity_ns": 100000,
+        "migration_cost_ns": 100000,
+        "max_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        },
+        "min_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        }
+      },
+      "metrics": {
+        "throughput": 2714.5,
+        "goodput": 2714.5,
+        "latency_avg": 0.3387365997421256,
+        "latency_p95": 0.672,
+        "request_count": 10858.0,
+        "intervals_aggregated": 4,
+        "app_name": "silo",
+        "latency_p50": 0.269,
+        "latency_p99": 1.143,
+        "latency_max": 3.599,
+        "msec_cpu_clock": 30005.91,
+        "cpus_utilized": 10.0,
+        "context_switches": 26505.0,
+        "context_switches_per_sec": 883.326,
+        "cpu_migrations": 175.0,
+        "cpu_migrations_per_sec": 5.832,
+        "page_faults": 21254.0,
+        "page_faults_per_sec": 708.327,
+        "cycles": 75014462516.0,
+        "ghz": 2.5,
+        "instructions": 4092062308.0,
+        "instructions_per_cycle": 0.05,
+        "branches": 1173264995.0,
+        "branches_per_sec": 39.101,
+        "branch_misses": 8711770.0,
+        "branch_miss_rate_pct": 0.74,
+        "time_elapsed_seconds": 3.000525518
+      },
+      "reward": 1.143,
+      "tuner_timing": {},
+      "post_tuning_phase": true,
+      "system_metrics": {
+        "window_start_time": 1772778696.0307214,
+        "window_end_time": 1772778701.036718,
+        "perf_start_time": 1772778697.0310225,
+        "perf_end_time": 1772778700.0310225,
+        "system_metrics_start_time": 1772778697.0320647,
+        "system_metrics_end_time": 1772778700.030772,
+        "power_socket0_watts": 51.792958,
+        "power_ram_watts": 7.699679,
+        "cstate_poll_pct": 100.0,
+        "cstate_c1_pct": 0.0,
+        "cstate_c1e_pct": 0.0,
+        "cstate_c6_pct": 0.0,
+        "cpu_load_cores_pct": 9.889276166512209,
+        "cpu_load_socket0_pct": 4.9446380832561045,
+        "perf_metrics": {
+          "msec_cpu_clock": 30005.91,
+          "cpus_utilized": 10.0,
+          "context_switches": 26505.0,
+          "context_switches_per_sec": 883.326,
+          "cpu_migrations": 175.0,
+          "cpu_migrations_per_sec": 5.832,
+          "page_faults": 21254.0,
+          "page_faults_per_sec": 708.327,
+          "cycles": 75014462516.0,
+          "ghz": 2.5,
+          "instructions": 4092062308.0,
+          "instructions_per_cycle": 0.05,
+          "branches": 1173264995.0,
+          "branches_per_sec": 39.101,
+          "branch_misses": 8711770.0,
+          "branch_miss_rate_pct": 0.74,
+          "time_elapsed_seconds": 3.000525518
+        }
+      }
+    },
+    {
+      "iteration": 39,
+      "timestamp": 1772778706.0515316,
+      "parameters": {
+        "min_granularity_ns": 100000,
+        "latency_ns": 100000,
+        "cstate_max": {
+          "value": "POLL",
+          "cores": "0-9"
+        },
+        "napi_busy_poll": {
+          "value": 30,
+          "cores": "0-9"
+        },
+        "wakeup_granularity_ns": 100000,
+        "migration_cost_ns": 100000,
+        "max_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        },
+        "min_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        }
+      },
+      "metrics": {
+        "throughput": 2688.5,
+        "goodput": 2688.5,
+        "latency_avg": 0.3402172214989771,
+        "latency_p95": 0.663,
+        "request_count": 10754.0,
+        "intervals_aggregated": 4,
+        "app_name": "silo",
+        "latency_p50": 0.268,
+        "latency_p99": 1.177,
+        "latency_max": 4.243,
+        "msec_cpu_clock": 30017.67,
+        "cpus_utilized": 10.0,
+        "context_switches": 26036.0,
+        "context_switches_per_sec": 867.356,
+        "cpu_migrations": 203.0,
+        "cpu_migrations_per_sec": 6.763,
+        "page_faults": 16300.0,
+        "page_faults_per_sec": 543.014,
+        "cycles": 75043857361.0,
+        "ghz": 2.5,
+        "instructions": 4041866283.0,
+        "instructions_per_cycle": 0.05,
+        "branches": 1163777895.0,
+        "branches_per_sec": 38.77,
+        "branch_misses": 8481031.0,
+        "branch_miss_rate_pct": 0.73,
+        "time_elapsed_seconds": 3.001766451
+      },
+      "reward": 1.177,
+      "tuner_timing": {},
+      "post_tuning_phase": true,
+      "system_metrics": {
+        "window_start_time": 1772778701.0413098,
+        "window_end_time": 1772778706.0473042,
+        "perf_start_time": 1772778702.0416024,
+        "perf_end_time": 1772778705.0416024,
+        "system_metrics_start_time": 1772778702.0426462,
+        "system_metrics_end_time": 1772778705.041356,
+        "power_socket0_watts": 51.819244,
+        "power_ram_watts": 7.64746,
+        "cstate_poll_pct": 100.0,
+        "cstate_c1_pct": 0.0,
+        "cstate_c1e_pct": 0.0,
+        "cstate_c6_pct": 0.0,
+        "cpu_load_cores_pct": 9.875684789205266,
+        "cpu_load_socket0_pct": 4.937842394602633,
+        "perf_metrics": {
+          "msec_cpu_clock": 30017.67,
+          "cpus_utilized": 10.0,
+          "context_switches": 26036.0,
+          "context_switches_per_sec": 867.356,
+          "cpu_migrations": 203.0,
+          "cpu_migrations_per_sec": 6.763,
+          "page_faults": 16300.0,
+          "page_faults_per_sec": 543.014,
+          "cycles": 75043857361.0,
+          "ghz": 2.5,
+          "instructions": 4041866283.0,
+          "instructions_per_cycle": 0.05,
+          "branches": 1163777895.0,
+          "branches_per_sec": 38.77,
+          "branch_misses": 8481031.0,
+          "branch_miss_rate_pct": 0.73,
+          "time_elapsed_seconds": 3.001766451
+        }
+      }
+    },
+    {
+      "iteration": 40,
+      "timestamp": 1772778711.0616894,
+      "parameters": {
+        "min_granularity_ns": 100000,
+        "latency_ns": 100000,
+        "cstate_max": {
+          "value": "POLL",
+          "cores": "0-9"
+        },
+        "napi_busy_poll": {
+          "value": 30,
+          "cores": "0-9"
+        },
+        "wakeup_granularity_ns": 100000,
+        "migration_cost_ns": 100000,
+        "max_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        },
+        "min_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        }
+      },
+      "metrics": {
+        "throughput": 2662.25,
+        "goodput": 2662.25,
+        "latency_avg": 0.3385187341534417,
+        "latency_p95": 0.648,
+        "request_count": 10649.0,
+        "intervals_aggregated": 4,
+        "app_name": "silo",
+        "latency_p50": 0.267,
+        "latency_p99": 1.121,
+        "latency_max": 5.245,
+        "msec_cpu_clock": 30034.06,
+        "cpus_utilized": 10.0,
+        "context_switches": 26073.0,
+        "context_switches_per_sec": 868.114,
+        "cpu_migrations": 230.0,
+        "cpu_migrations_per_sec": 7.658,
+        "page_faults": 19990.0,
+        "page_faults_per_sec": 665.578,
+        "cycles": 75084825584.0,
+        "ghz": 2.5,
+        "instructions": 4082053886.0,
+        "instructions_per_cycle": 0.05,
+        "branches": 1172589155.0,
+        "branches_per_sec": 39.042,
+        "branch_misses": 8607068.0,
+        "branch_miss_rate_pct": 0.73,
+        "time_elapsed_seconds": 3.003529715
+      },
+      "reward": 1.121,
+      "tuner_timing": {},
+      "post_tuning_phase": true,
+      "system_metrics": {
+        "window_start_time": 1772778706.051626,
+        "window_end_time": 1772778711.0575802,
+        "perf_start_time": 1772778707.0519154,
+        "perf_end_time": 1772778710.0519154,
+        "system_metrics_start_time": 1772778707.052956,
+        "system_metrics_end_time": 1772778710.0516722,
+        "power_socket0_watts": 51.844207000000004,
+        "power_ram_watts": 7.646057333333334,
+        "cstate_poll_pct": 100.0,
+        "cstate_c1_pct": 0.0,
+        "cstate_c1e_pct": 0.0,
+        "cstate_c6_pct": 0.0,
+        "cpu_load_cores_pct": 9.230612711381708,
+        "cpu_load_socket0_pct": 4.615306355690854,
+        "perf_metrics": {
+          "msec_cpu_clock": 30034.06,
+          "cpus_utilized": 10.0,
+          "context_switches": 26073.0,
+          "context_switches_per_sec": 868.114,
+          "cpu_migrations": 230.0,
+          "cpu_migrations_per_sec": 7.658,
+          "page_faults": 19990.0,
+          "page_faults_per_sec": 665.578,
+          "cycles": 75084825584.0,
+          "ghz": 2.5,
+          "instructions": 4082053886.0,
+          "instructions_per_cycle": 0.05,
+          "branches": 1172589155.0,
+          "branches_per_sec": 39.042,
+          "branch_misses": 8607068.0,
+          "branch_miss_rate_pct": 0.73,
+          "time_elapsed_seconds": 3.003529715
+        }
+      }
+    },
+    {
+      "iteration": 41,
+      "timestamp": 1772778716.0719137,
+      "parameters": {
+        "min_granularity_ns": 100000,
+        "latency_ns": 100000,
+        "cstate_max": {
+          "value": "POLL",
+          "cores": "0-9"
+        },
+        "napi_busy_poll": {
+          "value": 30,
+          "cores": "0-9"
+        },
+        "wakeup_granularity_ns": 100000,
+        "migration_cost_ns": 100000,
+        "max_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        },
+        "min_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        }
+      },
+      "metrics": {
+        "throughput": 2677.5,
+        "goodput": 2677.5,
+        "latency_avg": 0.3422524743230626,
+        "latency_p95": 0.622,
+        "request_count": 10710.0,
+        "intervals_aggregated": 4,
+        "app_name": "silo",
+        "latency_p50": 0.266,
+        "latency_p99": 1.316,
+        "latency_max": 4.445,
+        "msec_cpu_clock": 30036.28,
+        "cpus_utilized": 10.0,
+        "context_switches": 25706.0,
+        "context_switches_per_sec": 855.832,
+        "cpu_migrations": 172.0,
+        "cpu_migrations_per_sec": 5.726,
+        "page_faults": 29211.0,
+        "page_faults_per_sec": 972.524,
+        "cycles": 75090389142.0,
+        "ghz": 2.5,
+        "instructions": 4075375966.0,
+        "instructions_per_cycle": 0.05,
+        "branches": 1171178088.0,
+        "branches_per_sec": 38.992,
+        "branch_misses": 8535924.0,
+        "branch_miss_rate_pct": 0.73,
+        "time_elapsed_seconds": 3.003538223
+      },
+      "reward": 1.316,
+      "tuner_timing": {},
+      "post_tuning_phase": true,
+      "system_metrics": {
+        "window_start_time": 1772778711.0617845,
+        "window_end_time": 1772778716.0677955,
+        "perf_start_time": 1772778712.0620806,
+        "perf_end_time": 1772778715.0620806,
+        "system_metrics_start_time": 1772778712.0631225,
+        "system_metrics_end_time": 1772778715.0618312,
+        "power_socket0_watts": 51.888926,
+        "power_ram_watts": 7.666896333333334,
+        "cstate_poll_pct": 100.0,
+        "cstate_c1_pct": 0.0,
+        "cstate_c1e_pct": 0.0,
+        "cstate_c6_pct": 0.0,
+        "cpu_load_cores_pct": 9.920938278101671,
+        "cpu_load_socket0_pct": 4.9604691390508355,
+        "perf_metrics": {
+          "msec_cpu_clock": 30036.28,
+          "cpus_utilized": 10.0,
+          "context_switches": 25706.0,
+          "context_switches_per_sec": 855.832,
+          "cpu_migrations": 172.0,
+          "cpu_migrations_per_sec": 5.726,
+          "page_faults": 29211.0,
+          "page_faults_per_sec": 972.524,
+          "cycles": 75090389142.0,
+          "ghz": 2.5,
+          "instructions": 4075375966.0,
+          "instructions_per_cycle": 0.05,
+          "branches": 1171178088.0,
+          "branches_per_sec": 38.992,
+          "branch_misses": 8535924.0,
+          "branch_miss_rate_pct": 0.73,
+          "time_elapsed_seconds": 3.003538223
+        }
+      }
+    },
+    {
+      "iteration": 42,
+      "timestamp": 1772778721.084806,
+      "parameters": {
+        "min_granularity_ns": 100000,
+        "latency_ns": 100000,
+        "cstate_max": {
+          "value": "POLL",
+          "cores": "0-9"
+        },
+        "napi_busy_poll": {
+          "value": 30,
+          "cores": "0-9"
+        },
+        "wakeup_granularity_ns": 100000,
+        "migration_cost_ns": 100000,
+        "max_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        },
+        "min_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        }
+      },
+      "metrics": {
+        "throughput": 2742.5,
+        "goodput": 2742.5,
+        "latency_avg": 0.3455305378304466,
+        "latency_p95": 0.661,
+        "request_count": 10970.0,
+        "intervals_aggregated": 4,
+        "app_name": "silo",
+        "latency_p50": 0.271,
+        "latency_p99": 1.263,
+        "latency_max": 4.672,
+        "msec_cpu_clock": 30031.84,
+        "cpus_utilized": 9.999,
+        "context_switches": 26539.0,
+        "context_switches_per_sec": 883.696,
+        "cpu_migrations": 260.0,
+        "cpu_migrations_per_sec": 8.657,
+        "page_faults": 21987.0,
+        "page_faults_per_sec": 732.123,
+        "cycles": 75079269796.0,
+        "ghz": 2.5,
+        "instructions": 4096347860.0,
+        "instructions_per_cycle": 0.05,
+        "branches": 1173839456.0,
+        "branches_per_sec": 39.087,
+        "branch_misses": 8724497.0,
+        "branch_miss_rate_pct": 0.74,
+        "time_elapsed_seconds": 3.003382125
+      },
+      "reward": 1.263,
+      "tuner_timing": {},
+      "post_tuning_phase": true,
+      "system_metrics": {
+        "window_start_time": 1772778716.0720093,
+        "window_end_time": 1772778721.0779157,
+        "perf_start_time": 1772778717.0723014,
+        "perf_end_time": 1772778720.0723014,
+        "system_metrics_start_time": 1772778717.073345,
+        "system_metrics_end_time": 1772778720.0720556,
+        "power_socket0_watts": 51.894723666666664,
+        "power_ram_watts": 7.709455666666667,
+        "cstate_poll_pct": 100.0,
+        "cstate_c1_pct": 0.0,
+        "cstate_c1e_pct": 0.0,
+        "cstate_c6_pct": 0.0,
+        "cpu_load_cores_pct": 10.201738848922263,
+        "cpu_load_socket0_pct": 5.1008694244611315,
+        "perf_metrics": {
+          "msec_cpu_clock": 30031.84,
+          "cpus_utilized": 9.999,
+          "context_switches": 26539.0,
+          "context_switches_per_sec": 883.696,
+          "cpu_migrations": 260.0,
+          "cpu_migrations_per_sec": 8.657,
+          "page_faults": 21987.0,
+          "page_faults_per_sec": 732.123,
+          "cycles": 75079269796.0,
+          "ghz": 2.5,
+          "instructions": 4096347860.0,
+          "instructions_per_cycle": 0.05,
+          "branches": 1173839456.0,
+          "branches_per_sec": 39.087,
+          "branch_misses": 8724497.0,
+          "branch_miss_rate_pct": 0.74,
+          "time_elapsed_seconds": 3.003382125
+        }
+      }
+    },
+    {
+      "iteration": 43,
+      "timestamp": 1772778726.0950966,
+      "parameters": {
+        "min_granularity_ns": 100000,
+        "latency_ns": 100000,
+        "cstate_max": {
+          "value": "POLL",
+          "cores": "0-9"
+        },
+        "napi_busy_poll": {
+          "value": 30,
+          "cores": "0-9"
+        },
+        "wakeup_granularity_ns": 100000,
+        "migration_cost_ns": 100000,
+        "max_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        },
+        "min_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        }
+      },
+      "metrics": {
+        "throughput": 2722.0,
+        "goodput": 2722.0,
+        "latency_avg": 0.3382527553269654,
+        "latency_p95": 0.597,
+        "request_count": 10888.0,
+        "intervals_aggregated": 4,
+        "app_name": "silo",
+        "latency_p50": 0.268,
+        "latency_p99": 1.163,
+        "latency_max": 7.713,
+        "msec_cpu_clock": 30025.47,
+        "cpus_utilized": 10.0,
+        "context_switches": 26064.0,
+        "context_switches_per_sec": 868.063,
+        "cpu_migrations": 241.0,
+        "cpu_migrations_per_sec": 8.027,
+        "page_faults": 19556.0,
+        "page_faults_per_sec": 651.314,
+        "cycles": 75063362997.0,
+        "ghz": 2.5,
+        "instructions": 4075524083.0,
+        "instructions_per_cycle": 0.05,
+        "branches": 1170804898.0,
+        "branches_per_sec": 38.994,
+        "branch_misses": 8593385.0,
+        "branch_miss_rate_pct": 0.73,
+        "time_elapsed_seconds": 3.002523937
+      },
+      "reward": 1.163,
+      "tuner_timing": {},
+      "post_tuning_phase": true,
+      "system_metrics": {
+        "window_start_time": 1772778721.0849416,
+        "window_end_time": 1772778726.0910213,
+        "perf_start_time": 1772778722.0852792,
+        "perf_end_time": 1772778725.0852792,
+        "system_metrics_start_time": 1772778722.0862932,
+        "system_metrics_end_time": 1772778725.0850096,
+        "power_socket0_watts": 51.84552933333333,
+        "power_ram_watts": 7.685924666666668,
+        "cstate_poll_pct": 100.0,
+        "cstate_c1_pct": 0.0,
+        "cstate_c1e_pct": 0.0,
+        "cstate_c6_pct": 0.0,
+        "cpu_load_cores_pct": 10.316401961809515,
+        "cpu_load_socket0_pct": 5.158200980904757,
+        "perf_metrics": {
+          "msec_cpu_clock": 30025.47,
+          "cpus_utilized": 10.0,
+          "context_switches": 26064.0,
+          "context_switches_per_sec": 868.063,
+          "cpu_migrations": 241.0,
+          "cpu_migrations_per_sec": 8.027,
+          "page_faults": 19556.0,
+          "page_faults_per_sec": 651.314,
+          "cycles": 75063362997.0,
+          "ghz": 2.5,
+          "instructions": 4075524083.0,
+          "instructions_per_cycle": 0.05,
+          "branches": 1170804898.0,
+          "branches_per_sec": 38.994,
+          "branch_misses": 8593385.0,
+          "branch_miss_rate_pct": 0.73,
+          "time_elapsed_seconds": 3.002523937
+        }
+      }
+    },
+    {
+      "iteration": 44,
+      "timestamp": 1772778731.1057744,
+      "parameters": {
+        "min_granularity_ns": 100000,
+        "latency_ns": 100000,
+        "cstate_max": {
+          "value": "POLL",
+          "cores": "0-9"
+        },
+        "napi_busy_poll": {
+          "value": 30,
+          "cores": "0-9"
+        },
+        "wakeup_granularity_ns": 100000,
+        "migration_cost_ns": 100000,
+        "max_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        },
+        "min_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        }
+      },
+      "metrics": {
+        "throughput": 2741.25,
+        "goodput": 2741.25,
+        "latency_avg": 0.34552594619243043,
+        "latency_p95": 0.654,
+        "request_count": 10965.0,
+        "intervals_aggregated": 4,
+        "app_name": "silo",
+        "latency_p50": 0.268,
+        "latency_p99": 1.519,
+        "latency_max": 7.749,
+        "msec_cpu_clock": 30035.04,
+        "cpus_utilized": 10.0,
+        "context_switches": 26652.0,
+        "context_switches_per_sec": 887.364,
+        "cpu_migrations": 214.0,
+        "cpu_migrations_per_sec": 7.125,
+        "page_faults": 19513.0,
+        "page_faults_per_sec": 649.675,
+        "cycles": 75087253370.0,
+        "ghz": 2.5,
+        "instructions": 4049393035.0,
+        "instructions_per_cycle": 0.05,
+        "branches": 1163520920.0,
+        "branches_per_sec": 38.739,
+        "branch_misses": 8469653.0,
+        "branch_miss_rate_pct": 0.73,
+        "time_elapsed_seconds": 3.003438025
+      },
+      "reward": 1.519,
+      "tuner_timing": {},
+      "post_tuning_phase": true,
+      "system_metrics": {
+        "window_start_time": 1772778726.0952098,
+        "window_end_time": 1772778731.1011682,
+        "perf_start_time": 1772778727.0955043,
+        "perf_end_time": 1772778730.0955043,
+        "system_metrics_start_time": 1772778727.0965457,
+        "system_metrics_end_time": 1772778730.0952566,
+        "power_socket0_watts": 51.87130666666667,
+        "power_ram_watts": 7.710429666666667,
+        "cstate_poll_pct": 100.0,
+        "cstate_c1_pct": 0.0,
+        "cstate_c1e_pct": 0.0,
+        "cstate_c6_pct": 0.0,
+        "cpu_load_cores_pct": 10.409381442267529,
+        "cpu_load_socket0_pct": 5.2046907211337645,
+        "perf_metrics": {
+          "msec_cpu_clock": 30035.04,
+          "cpus_utilized": 10.0,
+          "context_switches": 26652.0,
+          "context_switches_per_sec": 887.364,
+          "cpu_migrations": 214.0,
+          "cpu_migrations_per_sec": 7.125,
+          "page_faults": 19513.0,
+          "page_faults_per_sec": 649.675,
+          "cycles": 75087253370.0,
+          "ghz": 2.5,
+          "instructions": 4049393035.0,
+          "instructions_per_cycle": 0.05,
+          "branches": 1163520920.0,
+          "branches_per_sec": 38.739,
+          "branch_misses": 8469653.0,
+          "branch_miss_rate_pct": 0.73,
+          "time_elapsed_seconds": 3.003438025
+        }
+      }
+    },
+    {
+      "iteration": 45,
+      "timestamp": 1772778736.116147,
+      "parameters": {
+        "min_granularity_ns": 100000,
+        "latency_ns": 100000,
+        "cstate_max": {
+          "value": "POLL",
+          "cores": "0-9"
+        },
+        "napi_busy_poll": {
+          "value": 30,
+          "cores": "0-9"
+        },
+        "wakeup_granularity_ns": 100000,
+        "migration_cost_ns": 100000,
+        "max_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        },
+        "min_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        }
+      },
+      "metrics": {
+        "throughput": 2723.5,
+        "goodput": 2723.5,
+        "latency_avg": 0.34681696346612817,
+        "latency_p95": 0.645,
+        "request_count": 10894.0,
+        "intervals_aggregated": 4,
+        "app_name": "silo",
+        "latency_p50": 0.267,
+        "latency_p99": 1.492,
+        "latency_max": 8.399,
+        "msec_cpu_clock": 30030.55,
+        "cpus_utilized": 10.0,
+        "context_switches": 26363.0,
+        "context_switches_per_sec": 877.873,
+        "cpu_migrations": 234.0,
+        "cpu_migrations_per_sec": 7.792,
+        "page_faults": 19095.0,
+        "page_faults_per_sec": 635.853,
+        "cycles": 75076057606.0,
+        "ghz": 2.5,
+        "instructions": 4080683512.0,
+        "instructions_per_cycle": 0.05,
+        "branches": 1171081029.0,
+        "branches_per_sec": 38.996,
+        "branch_misses": 8676623.0,
+        "branch_miss_rate_pct": 0.74,
+        "time_elapsed_seconds": 3.003078876
+      },
+      "reward": 1.492,
+      "tuner_timing": {},
+      "post_tuning_phase": true,
+      "system_metrics": {
+        "window_start_time": 1772778731.1058686,
+        "window_end_time": 1772778736.1118526,
+        "perf_start_time": 1772778732.1061604,
+        "perf_end_time": 1772778735.1061604,
+        "system_metrics_start_time": 1772778732.10664,
+        "system_metrics_end_time": 1772778735.105915,
+        "power_socket0_watts": 51.86504033333333,
+        "power_ram_watts": 7.701821,
+        "cstate_poll_pct": 100.0,
+        "cstate_c1_pct": 0.0,
+        "cstate_c1e_pct": 0.0,
+        "cstate_c6_pct": 0.0,
+        "cpu_load_cores_pct": 10.461740742384366,
+        "cpu_load_socket0_pct": 5.230870371192183,
+        "perf_metrics": {
+          "msec_cpu_clock": 30030.55,
+          "cpus_utilized": 10.0,
+          "context_switches": 26363.0,
+          "context_switches_per_sec": 877.873,
+          "cpu_migrations": 234.0,
+          "cpu_migrations_per_sec": 7.792,
+          "page_faults": 19095.0,
+          "page_faults_per_sec": 635.853,
+          "cycles": 75076057606.0,
+          "ghz": 2.5,
+          "instructions": 4080683512.0,
+          "instructions_per_cycle": 0.05,
+          "branches": 1171081029.0,
+          "branches_per_sec": 38.996,
+          "branch_misses": 8676623.0,
+          "branch_miss_rate_pct": 0.74,
+          "time_elapsed_seconds": 3.003078876
+        }
+      }
+    },
+    {
+      "iteration": 46,
+      "timestamp": 1772778741.1262615,
+      "parameters": {
+        "min_granularity_ns": 100000,
+        "latency_ns": 100000,
+        "cstate_max": {
+          "value": "POLL",
+          "cores": "0-9"
+        },
+        "napi_busy_poll": {
+          "value": 30,
+          "cores": "0-9"
+        },
+        "wakeup_granularity_ns": 100000,
+        "migration_cost_ns": 100000,
+        "max_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        },
+        "min_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        }
+      },
+      "metrics": {
+        "throughput": 2687.5,
+        "goodput": 2687.5,
+        "latency_avg": 0.33574948837209306,
+        "latency_p95": 0.59,
+        "request_count": 10750.0,
+        "intervals_aggregated": 4,
+        "app_name": "silo",
+        "latency_p50": 0.268,
+        "latency_p99": 1.189,
+        "latency_max": 5.843,
+        "msec_cpu_clock": 30025.75,
+        "cpus_utilized": 10.0,
+        "context_switches": 25974.0,
+        "context_switches_per_sec": 865.057,
+        "cpu_migrations": 207.0,
+        "cpu_migrations_per_sec": 6.894,
+        "page_faults": 17496.0,
+        "page_faults_per_sec": 582.7,
+        "cycles": 75064065252.0,
+        "ghz": 2.5,
+        "instructions": 4051267868.0,
+        "instructions_per_cycle": 0.05,
+        "branches": 1165708337.0,
+        "branches_per_sec": 38.824,
+        "branch_misses": 8525787.0,
+        "branch_miss_rate_pct": 0.73,
+        "time_elapsed_seconds": 3.002510574
+      },
+      "reward": 1.189,
+      "tuner_timing": {},
+      "post_tuning_phase": true,
+      "system_metrics": {
+        "window_start_time": 1772778736.1162405,
+        "window_end_time": 1772778741.122227,
+        "perf_start_time": 1772778737.11653,
+        "perf_end_time": 1772778740.11653,
+        "system_metrics_start_time": 1772778737.1175733,
+        "system_metrics_end_time": 1772778740.116286,
+        "power_socket0_watts": 51.85496933333334,
+        "power_ram_watts": 7.675362333333333,
+        "cstate_poll_pct": 100.0,
+        "cstate_c1_pct": 0.0,
+        "cstate_c1e_pct": 0.0,
+        "cstate_c6_pct": 0.0,
+        "cpu_load_cores_pct": 9.897873659639124,
+        "cpu_load_socket0_pct": 4.948936829819562,
+        "perf_metrics": {
+          "msec_cpu_clock": 30025.75,
+          "cpus_utilized": 10.0,
+          "context_switches": 25974.0,
+          "context_switches_per_sec": 865.057,
+          "cpu_migrations": 207.0,
+          "cpu_migrations_per_sec": 6.894,
+          "page_faults": 17496.0,
+          "page_faults_per_sec": 582.7,
+          "cycles": 75064065252.0,
+          "ghz": 2.5,
+          "instructions": 4051267868.0,
+          "instructions_per_cycle": 0.05,
+          "branches": 1165708337.0,
+          "branches_per_sec": 38.824,
+          "branch_misses": 8525787.0,
+          "branch_miss_rate_pct": 0.73,
+          "time_elapsed_seconds": 3.002510574
+        }
+      }
+    },
+    {
+      "iteration": 47,
+      "timestamp": 1772778746.1369438,
+      "parameters": {
+        "min_granularity_ns": 100000,
+        "latency_ns": 100000,
+        "cstate_max": {
+          "value": "POLL",
+          "cores": "0-9"
+        },
+        "napi_busy_poll": {
+          "value": 30,
+          "cores": "0-9"
+        },
+        "wakeup_granularity_ns": 100000,
+        "migration_cost_ns": 100000,
+        "max_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        },
+        "min_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        }
+      },
+      "metrics": {
+        "throughput": 2769.0,
+        "goodput": 2769.0,
+        "latency_avg": 0.34174548573492236,
+        "latency_p95": 0.634,
+        "request_count": 11076.0,
+        "intervals_aggregated": 4,
+        "app_name": "silo",
+        "latency_p50": 0.268,
+        "latency_p99": 1.139,
+        "latency_max": 4.974,
+        "msec_cpu_clock": 30007.74,
+        "cpus_utilized": 10.0,
+        "context_switches": 26993.0,
+        "context_switches_per_sec": 899.535,
+        "cpu_migrations": 172.0,
+        "cpu_migrations_per_sec": 5.732,
+        "page_faults": 20866.0,
+        "page_faults_per_sec": 695.354,
+        "cycles": 75019011706.0,
+        "ghz": 2.5,
+        "instructions": 4099401260.0,
+        "instructions_per_cycle": 0.05,
+        "branches": 1174435039.0,
+        "branches_per_sec": 39.138,
+        "branch_misses": 8728531.0,
+        "branch_miss_rate_pct": 0.74,
+        "time_elapsed_seconds": 3.000779904
+      },
+      "reward": 1.139,
+      "tuner_timing": {},
+      "post_tuning_phase": true,
+      "system_metrics": {
+        "window_start_time": 1772778741.1263554,
+        "window_end_time": 1772778746.1323373,
+        "perf_start_time": 1772778742.1266818,
+        "perf_end_time": 1772778745.1266818,
+        "system_metrics_start_time": 1772778742.127717,
+        "system_metrics_end_time": 1772778745.1264005,
+        "power_socket0_watts": 51.937265333333336,
+        "power_ram_watts": 7.722930000000001,
+        "cstate_poll_pct": 100.0,
+        "cstate_c1_pct": 0.0,
+        "cstate_c1e_pct": 0.0,
+        "cstate_c6_pct": 0.0,
+        "cpu_load_cores_pct": 10.453372453926471,
+        "cpu_load_socket0_pct": 5.226686226963236,
+        "perf_metrics": {
+          "msec_cpu_clock": 30007.74,
+          "cpus_utilized": 10.0,
+          "context_switches": 26993.0,
+          "context_switches_per_sec": 899.535,
+          "cpu_migrations": 172.0,
+          "cpu_migrations_per_sec": 5.732,
+          "page_faults": 20866.0,
+          "page_faults_per_sec": 695.354,
+          "cycles": 75019011706.0,
+          "ghz": 2.5,
+          "instructions": 4099401260.0,
+          "instructions_per_cycle": 0.05,
+          "branches": 1174435039.0,
+          "branches_per_sec": 39.138,
+          "branch_misses": 8728531.0,
+          "branch_miss_rate_pct": 0.74,
+          "time_elapsed_seconds": 3.000779904
+        }
+      }
+    },
+    {
+      "iteration": 48,
+      "timestamp": 1772778751.1472595,
+      "parameters": {
+        "min_granularity_ns": 100000,
+        "latency_ns": 100000,
+        "cstate_max": {
+          "value": "POLL",
+          "cores": "0-9"
+        },
+        "napi_busy_poll": {
+          "value": 30,
+          "cores": "0-9"
+        },
+        "wakeup_granularity_ns": 100000,
+        "migration_cost_ns": 100000,
+        "max_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        },
+        "min_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        }
+      },
+      "metrics": {
+        "throughput": 2734.75,
+        "goodput": 2734.75,
+        "latency_avg": 0.3410111527561935,
+        "latency_p95": 0.602,
+        "request_count": 10939.0,
+        "intervals_aggregated": 4,
+        "app_name": "silo",
+        "latency_p50": 0.269,
+        "latency_p99": 1.178,
+        "latency_max": 7.537,
+        "msec_cpu_clock": 30023.06,
+        "cpus_utilized": 10.0,
+        "context_switches": 26538.0,
+        "context_switches_per_sec": 883.92,
+        "cpu_migrations": 223.0,
+        "cpu_migrations_per_sec": 7.428,
+        "page_faults": 24048.0,
+        "page_faults_per_sec": 800.984,
+        "cycles": 75057336146.0,
+        "ghz": 2.5,
+        "instructions": 4079224331.0,
+        "instructions_per_cycle": 0.05,
+        "branches": 1169855785.0,
+        "branches_per_sec": 38.965,
+        "branch_misses": 8697621.0,
+        "branch_miss_rate_pct": 0.74,
+        "time_elapsed_seconds": 3.002298949
+      },
+      "reward": 1.178,
+      "tuner_timing": {},
+      "post_tuning_phase": true,
+      "system_metrics": {
+        "window_start_time": 1772778746.137039,
+        "window_end_time": 1772778751.143001,
+        "perf_start_time": 1772778747.1373343,
+        "perf_end_time": 1772778750.1373343,
+        "system_metrics_start_time": 1772778747.1383774,
+        "system_metrics_end_time": 1772778750.137085,
+        "power_socket0_watts": 51.985625000000006,
+        "power_ram_watts": 7.725735333333334,
+        "cstate_poll_pct": 100.0,
+        "cstate_c1_pct": 0.0,
+        "cstate_c1e_pct": 0.0,
+        "cstate_c6_pct": 0.0,
+        "cpu_load_cores_pct": 10.368842657052825,
+        "cpu_load_socket0_pct": 5.184421328526413,
+        "perf_metrics": {
+          "msec_cpu_clock": 30023.06,
+          "cpus_utilized": 10.0,
+          "context_switches": 26538.0,
+          "context_switches_per_sec": 883.92,
+          "cpu_migrations": 223.0,
+          "cpu_migrations_per_sec": 7.428,
+          "page_faults": 24048.0,
+          "page_faults_per_sec": 800.984,
+          "cycles": 75057336146.0,
+          "ghz": 2.5,
+          "instructions": 4079224331.0,
+          "instructions_per_cycle": 0.05,
+          "branches": 1169855785.0,
+          "branches_per_sec": 38.965,
+          "branch_misses": 8697621.0,
+          "branch_miss_rate_pct": 0.74,
+          "time_elapsed_seconds": 3.002298949
+        }
+      }
+    },
+    {
+      "iteration": 49,
+      "timestamp": 1772778756.1574461,
+      "parameters": {
+        "min_granularity_ns": 100000,
+        "latency_ns": 100000,
+        "cstate_max": {
+          "value": "POLL",
+          "cores": "0-9"
+        },
+        "napi_busy_poll": {
+          "value": 30,
+          "cores": "0-9"
+        },
+        "wakeup_granularity_ns": 100000,
+        "migration_cost_ns": 100000,
+        "max_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        },
+        "min_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        }
+      },
+      "metrics": {
+        "throughput": 2730.0,
+        "goodput": 2730.0,
+        "latency_avg": 0.3422270146520146,
+        "latency_p95": 0.635,
+        "request_count": 10920.0,
+        "intervals_aggregated": 4,
+        "app_name": "silo",
+        "latency_p50": 0.267,
+        "latency_p99": 1.169,
+        "latency_max": 4.744,
+        "msec_cpu_clock": 30017.85,
+        "cpus_utilized": 10.0,
+        "context_switches": 26759.0,
+        "context_switches_per_sec": 891.436,
+        "cpu_migrations": 243.0,
+        "cpu_migrations_per_sec": 8.095,
+        "page_faults": 21694.0,
+        "page_faults_per_sec": 722.703,
+        "cycles": 75044300037.0,
+        "ghz": 2.5,
+        "instructions": 4071629448.0,
+        "instructions_per_cycle": 0.05,
+        "branches": 1168995880.0,
+        "branches_per_sec": 38.943,
+        "branch_misses": 8648832.0,
+        "branch_miss_rate_pct": 0.74,
+        "time_elapsed_seconds": 3.001878301
+      },
+      "reward": 1.169,
+      "tuner_timing": {},
+      "post_tuning_phase": true,
+      "system_metrics": {
+        "window_start_time": 1772778751.1473556,
+        "window_end_time": 1772778756.153327,
+        "perf_start_time": 1772778752.14765,
+        "perf_end_time": 1772778755.14765,
+        "system_metrics_start_time": 1772778752.1486914,
+        "system_metrics_end_time": 1772778755.1474028,
+        "power_socket0_watts": 52.06903966666667,
+        "power_ram_watts": 7.705345333333334,
+        "cstate_poll_pct": 100.0,
+        "cstate_c1_pct": 0.0,
+        "cstate_c1e_pct": 0.0,
+        "cstate_c6_pct": 0.0,
+        "cpu_load_cores_pct": 10.478456970929173,
+        "cpu_load_socket0_pct": 5.2392284854645865,
+        "perf_metrics": {
+          "msec_cpu_clock": 30017.85,
+          "cpus_utilized": 10.0,
+          "context_switches": 26759.0,
+          "context_switches_per_sec": 891.436,
+          "cpu_migrations": 243.0,
+          "cpu_migrations_per_sec": 8.095,
+          "page_faults": 21694.0,
+          "page_faults_per_sec": 722.703,
+          "cycles": 75044300037.0,
+          "ghz": 2.5,
+          "instructions": 4071629448.0,
+          "instructions_per_cycle": 0.05,
+          "branches": 1168995880.0,
+          "branches_per_sec": 38.943,
+          "branch_misses": 8648832.0,
+          "branch_miss_rate_pct": 0.74,
+          "time_elapsed_seconds": 3.001878301
+        }
+      }
+    },
+    {
+      "iteration": 50,
+      "timestamp": 1772778761.1681836,
+      "parameters": {
+        "min_granularity_ns": 100000,
+        "latency_ns": 100000,
+        "cstate_max": {
+          "value": "POLL",
+          "cores": "0-9"
+        },
+        "napi_busy_poll": {
+          "value": 30,
+          "cores": "0-9"
+        },
+        "wakeup_granularity_ns": 100000,
+        "migration_cost_ns": 100000,
+        "max_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        },
+        "min_perf_pct": {
+          "value": 100,
+          "cores": "0-9"
+        }
+      },
+      "metrics": {
+        "throughput": 2730.75,
+        "goodput": 2730.75,
+        "latency_avg": 0.34433141078458296,
+        "latency_p95": 0.675,
+        "request_count": 10923.0,
+        "intervals_aggregated": 4,
+        "app_name": "silo",
+        "latency_p50": 0.27,
+        "latency_p99": 1.237,
+        "latency_max": 5.565,
+        "msec_cpu_clock": 30011.74,
+        "cpus_utilized": 10.0,
+        "context_switches": 26844.0,
+        "context_switches_per_sec": 894.45,
+        "cpu_migrations": 218.0,
+        "cpu_migrations_per_sec": 7.264,
+        "page_faults": 28309.0,
+        "page_faults_per_sec": 943.264,
+        "cycles": 75029022155.0,
+        "ghz": 2.5,
+        "instructions": 4101195049.0,
+        "instructions_per_cycle": 0.05,
+        "branches": 1174191286.0,
+        "branches_per_sec": 39.124,
+        "branch_misses": 8752640.0,
+        "branch_miss_rate_pct": 0.75,
+        "time_elapsed_seconds": 3.001156268
+      },
+      "reward": 1.237,
+      "tuner_timing": {},
+      "post_tuning_phase": true,
+      "system_metrics": {
+        "window_start_time": 1772778756.157541,
+        "window_end_time": 1772778761.1635275,
+        "perf_start_time": 1772778757.1578326,
+        "perf_end_time": 1772778760.1578326,
+        "system_metrics_start_time": 1772778757.1588633,
+        "system_metrics_end_time": 1772778760.157587,
+        "power_socket0_watts": 52.098864999999996,
+        "power_ram_watts": 7.710771333333334,
+        "cstate_poll_pct": 100.0,
+        "cstate_c1_pct": 0.0,
+        "cstate_c1e_pct": 0.0,
+        "cstate_c6_pct": 0.0,
+        "cpu_load_cores_pct": 10.099000352004998,
+        "cpu_load_socket0_pct": 5.049500176002499,
+        "perf_metrics": {
+          "msec_cpu_clock": 30011.74,
+          "cpus_utilized": 10.0,
+          "context_switches": 26844.0,
+          "context_switches_per_sec": 894.45,
+          "cpu_migrations": 218.0,
+          "cpu_migrations_per_sec": 7.264,
+          "page_faults": 28309.0,
+          "page_faults_per_sec": 943.264,
+          "cycles": 75029022155.0,
+          "ghz": 2.5,
+          "instructions": 4101195049.0,
+          "instructions_per_cycle": 0.05,
+          "branches": 1174191286.0,
+          "branches_per_sec": 39.124,
+          "branch_misses": 8752640.0,
+          "branch_miss_rate_pct": 0.75,
+          "time_elapsed_seconds": 3.001156268
+        }
+      }
+    }
+  ],
+  "reason": "completed",
+  "mode": "actor-speculator",
+  "optimizer_gist": "**Analysis of Optimization History:**\n\nThe optimization history reveals a strong bimodal distribution in rewards, primarily dictated by the `cstate_max` parameter. When `cstate_max` is set to `C1`, rewards are consistently high (ranging from 10.151 to 14.463). Conversely, when `cstate_max` is set to `POLL`, rewards are very low (typically between 1.1 and 2.3), indicating a severe performance degradation, regardless of other parameter adjustments. The tuning process spent a significant portion of its iterations (e.g., Iter 4-8, 11-50) exploring `cstate_max=POLL` configurations, which proved largely unproductive.\n\n**Parameters with Biggest Impact:**\n\n1.  **`cstate_max`**: This is the single most impactful parameter. `C1` is critical for achieving high rewards, while `POLL` drastically reduces performance.\n2.  **`napi_busy_poll`**: This parameter shows some influence within the high-reward `cstate_max=C1` configurations, with values like 0, 50, and 200 all appearing in top-performing iterations. Its optimal range needs further focused exploration.\n3.  **`min_granularity_ns`, `latency_ns`, `wakeup_granularity_ns`, `migration_cost_ns`**: These parameters contribute, but their impact is secondary to `cstate_max`. High rewards were observed with both their lowest values (100000) and higher values (e.g., 500000, 2000000, 300000), suggesting a broader optimal region or less sensitivity.\n4.  **`max_perf_pct`**: This parameter was consistently 100% in all high-reward configurations, suggesting it should be fixed.\n5.  **`min_perf_pct`**: It varied between 0 and 100 in high-reward configurations, indicating it's less critical or context-dependent.\n\n**Optimal Configuration:**\n\nThe optimal configuration, yielding the highest reward of **14.463**, was achieved at **Iter 2**:\n`min_granularity_ns=500000`, `latency_ns=2000000`, `cstate_max=C1`, `napi_busy_poll=200`, `wakeup_granularity_ns=500000`, `migration_cost_ns=300000`, `max_perf_pct=100`, `min_perf_pct=100`.\n\n**Concise Takeaway for Future Runs:**\n\nFuture runs should fix `cstate_max` to `C1` and `max_perf_pct` to `100`, as these are crucial for high performance. Focus the remaining search on `napi_busy_poll` (e.g., within 0-200) and fine-tune the granularity, latency, and migration cost parameters around the values observed in the top configurations (e.g., 100000 to 2000000 range). This targeted approach will avoid unproductive exploration of poor `cstate_max` settings and significantly improve tuning efficiency.",
+  "optimizer_gist_raw": {
+    "text": "**Analysis of Optimization History:**\n\nThe optimization history reveals a strong bimodal distribution in rewards, primarily dictated by the `cstate_max` parameter. When `cstate_max` is set to `C1`, rewards are consistently high (ranging from 10.151 to 14.463). Conversely, when `cstate_max` is set to `POLL`, rewards are very low (typically between 1.1 and 2.3), indicating a severe performance degradation, regardless of other parameter adjustments. The tuning process spent a significant portion of its iterations (e.g., Iter 4-8, 11-50) exploring `cstate_max=POLL` configurations, which proved largely unproductive.\n\n**Parameters with Biggest Impact:**\n\n1.  **`cstate_max`**: This is the single most impactful parameter. `C1` is critical for achieving high rewards, while `POLL` drastically reduces performance.\n2.  **`napi_busy_poll`**: This parameter shows some influence within the high-reward `cstate_max=C1` configurations, with values like 0, 50, and 200 all appearing in top-performing iterations. Its optimal range needs further focused exploration.\n3.  **`min_granularity_ns`, `latency_ns`, `wakeup_granularity_ns`, `migration_cost_ns`**: These parameters contribute, but their impact is secondary to `cstate_max`. High rewards were observed with both their lowest values (100000) and higher values (e.g., 500000, 2000000, 300000), suggesting a broader optimal region or less sensitivity.\n4.  **`max_perf_pct`**: This parameter was consistently 100% in all high-reward configurations, suggesting it should be fixed.\n5.  **`min_perf_pct`**: It varied between 0 and 100 in high-reward configurations, indicating it's less critical or context-dependent.\n\n**Optimal Configuration:**\n\nThe optimal configuration, yielding the highest reward of **14.463**, was achieved at **Iter 2**:\n`min_granularity_ns=500000`, `latency_ns=2000000`, `cstate_max=C1`, `napi_busy_poll=200`, `wakeup_granularity_ns=500000`, `migration_cost_ns=300000`, `max_perf_pct=100`, `min_perf_pct=100`.\n\n**Concise Takeaway for Future Runs:**\n\nFuture runs should fix `cstate_max` to `C1` and `max_perf_pct` to `100`, as these are crucial for high performance. Focus the remaining search on `napi_busy_poll` (e.g., within 0-200) and fine-tune the granularity, latency, and migration cost parameters around the values observed in the top configurations (e.g., 100000 to 2000000 range). This targeted approach will avoid unproductive exploration of poor `cstate_max` settings and significantly improve tuning efficiency.",
+    "usage_metadata": {
+      "prompt_token_count": 5406,
+      "candidates_token_count": 727,
+      "total_token_count": 9902
+    }
+  }
+}

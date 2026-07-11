@@ -80,6 +80,15 @@ class BenchBaseBenchmark(BenchmarkInterface):
     def pre_execute(self) -> bool:
         if self.database_setup_done:
             return True
+
+        # A short multi-method Functional suite may prepare one identical
+        # dataset once, then launch each optimizer in a separate process. This
+        # environment-only switch is intentionally opt-in; ordinary paper
+        # configs retain their create/load isolation.
+        if os.environ.get("SEMATUNE_BENCHBASE_REUSE_LOADED_DB") == "1":
+            logger.info("Reusing the BenchBase database prepared by the first suite method")
+            self.database_setup_done = True
+            return True
         
         logger.info("Running BenchBase pre-execution setup (create + load)...")
         
@@ -118,6 +127,30 @@ class BenchBaseBenchmark(BenchmarkInterface):
         """
         tree = ET.parse(self.config_file)
         root = tree.getroot()
+
+        # Site-specific database credentials are supplied only through the
+        # caller's environment. They are written to the short-lived per-window
+        # XML and never serialized in an optimizer history or command line.
+        db_host = os.environ.get("SEMATUNE_BENCHBASE_HOST") or os.environ.get("SEMATUNE_SYSBENCH_HOST")
+        db_port = os.environ.get("SEMATUNE_BENCHBASE_PORT") or os.environ.get("SEMATUNE_SYSBENCH_PORT")
+        db_name = os.environ.get("SEMATUNE_BENCHBASE_DB") or os.environ.get("SEMATUNE_SYSBENCH_DB")
+        db_user = os.environ.get("SEMATUNE_BENCHBASE_USER") or os.environ.get("SEMATUNE_SYSBENCH_USER")
+        db_password = os.environ.get("SEMATUNE_BENCHBASE_PASSWORD") or os.environ.get("SEMATUNE_SYSBENCH_PASSWORD")
+        if db_host and db_port and db_name:
+            url_elem = root.find(".//url")
+            if url_elem is not None:
+                url_elem.text = (
+                    f"jdbc:postgresql://{db_host}:{db_port}/{db_name}"
+                    "?sslmode=disable&ApplicationName=tpcc&reWriteBatchedInserts=true"
+                )
+        if db_user:
+            user_elem = root.find(".//username")
+            if user_elem is not None:
+                user_elem.text = db_user
+        if db_password:
+            password_elem = root.find(".//password")
+            if password_elem is not None:
+                password_elem.text = db_password
         
         # Update the time element to use window duration
         time_elem = root.find('.//work/time')
@@ -212,7 +245,7 @@ class BenchBaseBenchmark(BenchmarkInterface):
             for attempt in range(1, max_timeout_retries + 2):
                 if attempt > 1:
                     logger.warning(
-                        "Retrying BenchBase window %s after timeout (%s/%s)",
+                        "Retrying BenchBase window %s after a transient process failure (%s/%s)",
                         window_number,
                         attempt,
                         max_timeout_retries + 1,
@@ -318,8 +351,18 @@ class BenchBaseBenchmark(BenchmarkInterface):
                 if process.returncode == 0:
                     break
 
-                # Retry only when the failure was a timeout
-                if timed_out and attempt <= max_timeout_retries:
+                # A fresh BenchBase JVM can also fail transiently while
+                # PostgreSQL invalidates catalog entries after a preceding
+                # create/load. Retry any non-zero process exit within the same
+                # strict budget; persistent configuration errors still fail on
+                # the next attempt.
+                if attempt <= max_timeout_retries:
+                    logger.warning(
+                        "BenchBase window %s exited %s%s; retrying",
+                        window_number,
+                        process.returncode,
+                        " after timeout" if timed_out else "",
+                    )
                     continue
 
                 raise RuntimeError(

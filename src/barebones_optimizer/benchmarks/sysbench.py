@@ -42,11 +42,29 @@ class SysbenchBenchmark(BenchmarkInterface):
         self.default_options = self.benchmark_info.default_options.copy()
         
         # OLTP-specific settings (only used if requires_setup is True)
-        self.host = getattr(config, 'sysbench_host', '127.0.0.1')
-        self.port = getattr(config, 'sysbench_port', 5432)
-        self.user = getattr(config, 'sysbench_user', 'admin')
-        self.password = getattr(config, 'sysbench_password', '')
-        self.db = getattr(config, 'sysbench_db', 'benchdb')
+        # Site-specific database settings may be supplied at runtime. In
+        # particular, keeping the password out of config prevents it from being
+        # copied into optimization histories saved for artifact evaluation.
+        self.host = os.getenv(
+            "SEMATUNE_SYSBENCH_HOST",
+            str(getattr(config, 'sysbench_host', '127.0.0.1')),
+        )
+        self.port = int(os.getenv(
+            "SEMATUNE_SYSBENCH_PORT",
+            str(getattr(config, 'sysbench_port', 5432)),
+        ))
+        self.user = os.getenv(
+            "SEMATUNE_SYSBENCH_USER",
+            str(getattr(config, 'sysbench_user', 'admin')),
+        )
+        self.password = os.getenv(
+            "SEMATUNE_SYSBENCH_PASSWORD",
+            str(getattr(config, 'sysbench_password', '')),
+        )
+        self.db = os.getenv(
+            "SEMATUNE_SYSBENCH_DB",
+            str(getattr(config, 'sysbench_db', 'benchdb')),
+        )
         self.tables = getattr(config, 'sysbench_tables', 4)
         self.table_size = getattr(config, 'sysbench_table_size', 100000)
         
@@ -115,7 +133,6 @@ class SysbenchBenchmark(BenchmarkInterface):
                 f"--pgsql-host={self.host}",
                 f"--pgsql-port={self.port}",
                 f"--pgsql-user={self.user}",
-                f"--pgsql-password={self.password}",
                 f"--pgsql-db={self.db}",
                 f"--tables={self.tables}",
                 f"--table-size={self.table_size}",
@@ -129,7 +146,6 @@ class SysbenchBenchmark(BenchmarkInterface):
             f"--pgsql-host={self.host}",
             f"--pgsql-port={self.port}",
             f"--pgsql-user={self.user}",
-            f"--pgsql-password={self.password}",
             f"--pgsql-db={self.db}",
             f"--tables={self.tables}",
             f"--table-size={self.table_size}",
@@ -165,7 +181,6 @@ class SysbenchBenchmark(BenchmarkInterface):
                 f"--pgsql-host={self.host}",
                 f"--pgsql-port={self.port}",
                 f"--pgsql-user={self.user}",
-                f"--pgsql-password={self.password}",
                 f"--pgsql-db={self.db}",
                 f"--tables={self.tables}",
                 f"--table-size={self.table_size}",
@@ -200,7 +215,6 @@ class SysbenchBenchmark(BenchmarkInterface):
                 f"--pgsql-host={self.host}",
                 f"--pgsql-port={self.port}",
                 f"--pgsql-user={self.user}",
-                f"--pgsql-password={self.password}",
                 f"--pgsql-db={self.db}",
                 f"--tables={self.tables}",
                 f"--table-size={self.table_size}",
@@ -302,7 +316,11 @@ class SysbenchBenchmark(BenchmarkInterface):
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             text=True,
-            start_new_session=True,
+            env=env,
+            # The Functional wrapper owns one killable process group and must
+            # be able to terminate the benchmark before restoring host state.
+            # Normal standalone runs retain the legacy isolated-child behavior.
+            start_new_session=os.getenv("SEMATUNE_FUNCTIONAL_PROCESS_GROUP") != "1",
         )
         
         print(f"Running sysbench command: {' '.join(final_cmd)}")
@@ -519,26 +537,28 @@ class SysbenchBenchmark(BenchmarkInterface):
         """
         lines = log_content.split('\n')
         
-        # Find the summary section based on benchmark type
-        # For CPU-only benchmarks (sysbench_cpu*): look for "CPU speed:" section
-        # For OLTP (requires_setup): look for "SQL statistics:" (has transactions/queries)
-        # For others: look for "General statistics:"
+        # Find the summary section based on benchmark type. Keep these branches
+        # separate: OLTP must start at "SQL statistics" so transaction/query
+        # rates above "General statistics" are not discarded.
         summary_start_idx = -1
         is_cpu_benchmark = (
             self.benchmark_info.name == "sysbench_cpu"
             or self.benchmark_info.name.startswith("sysbench_cpu_")
         )
-        if is_cpu_benchmark:
+        if self.requires_setup:
+            for i in range(len(lines) - 1, -1, -1):
+                if "SQL statistics:" in lines[i]:
+                    summary_start_idx = i
+                    break
+        elif is_cpu_benchmark:
             # For CPU benchmarks, find "CPU speed:" section
             for i in range(len(lines) - 1, -1, -1):
                 if "CPU speed:" in lines[i]:
                     summary_start_idx = i
                     break
         else:
-            # For OLTP and other benchmarks, look for SQL statistics or General statistics
             for i in range(len(lines) - 1, -1, -1):
-                line = lines[i]
-                if "SQL statistics:" in line or ("General statistics:" in line and "SQL statistics:" not in log_content[:i]):
+                if "General statistics:" in lines[i]:
                     summary_start_idx = i
                     break
         
@@ -752,4 +772,3 @@ class SysbenchContinuousBenchmark(SysbenchBenchmark):
                 self.continuous_process.wait()
             self.continuous_process = None
             logger.info("Continuous sysbench stopped")
-

@@ -460,7 +460,10 @@ def parse_custom_columns(spec: str) -> List[Tuple[str, str]]:
 
 def resolve_tuner_dir(workload_dir: Path, dir_spec: str) -> Optional[Path]:
     for candidate in [chunk.strip() for chunk in dir_spec.split("|") if chunk.strip()]:
-        names = [candidate] if candidate.endswith(" copy") else [f"{candidate} copy", candidate]
+        # Prefer the explicitly requested result directory. Directories ending
+        # in " copy" are historical backups and can contain misplaced runs;
+        # consult them only when the canonical directory is absent.
+        names = [candidate] if candidate.endswith(" copy") else [candidate, f"{candidate} copy"]
         for name in names:
             path = workload_dir / name
             if path.is_dir():

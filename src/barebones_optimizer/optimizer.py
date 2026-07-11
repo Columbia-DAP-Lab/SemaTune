@@ -23,12 +23,12 @@ from .benchmark import BenchmarkMetrics
 from .parameter_manager import (
     ParameterManager,
     is_per_core_parameter,
-    get_default_parameters,
+    get_selected_default_parameters,
     get_new_parameter_names,
-    reset_all_parameters_to_defaults,
+    reset_selected_parameters_to_defaults,
     reset_new_parameters_to_system_defaults,
 )
-from .tuners import TunerResponse
+from .tuners.base import TunerResponse
 
 logger = logging.getLogger(__name__)
 
@@ -92,6 +92,78 @@ class SimpleOptimizer:
         # Track request timestamps for aggregation interval calculation
         self.last_tuner_request_time = None
         self.current_window_start_time = None
+
+    def _requires_final_llm_freeze_before_stable(self) -> bool:
+        """Whether a single-loop LLM must choose one final stable config."""
+        return bool(
+            getattr(self.config, "tuner_type", None) == "llm"
+            and getattr(self.config, "llm_force_final_freeze_before_stable", False)
+            and getattr(self.config, "post_tuning_windows", 0) > 0
+        )
+
+    def _attach_final_freeze_timing_to_history(self, timing: Optional[Dict[str, Any]]) -> None:
+        if timing is None or not self.history:
+            return
+        timing_block = self.history[-1].setdefault("tuner_timing", {})
+        if not isinstance(timing_block, dict):
+            timing_block = {}
+            self.history[-1]["tuner_timing"] = timing_block
+        timing_block["final_freeze_before_stable"] = timing
+
+    def _get_metrics_from_history(self, entry: Dict[str, Any]) -> BenchmarkMetrics:
+        values = entry.get("metrics", {})
+        metrics = BenchmarkMetrics(
+            throughput=values.get("throughput", 0.0),
+            goodput=values.get("goodput", 0.0),
+            latency_avg=values.get("latency_avg", 0.0),
+            latency_p95=values.get("latency_p95", 0.0),
+        )
+        metrics.extra_metrics.update({
+            key: value for key, value in values.items()
+            if key not in {"throughput", "goodput", "latency_avg", "latency_p95"}
+        })
+        if "system_metrics" in entry:
+            metrics.extra_metrics["system_metrics"] = entry["system_metrics"]
+        return metrics
+
+    def _run_refreshed_final_freeze_before_stable(self, iteration: int) -> Dict[str, Any]:
+        """Ask the single LLM for one final config after the last tuning result."""
+        self._clear_pending_tuner_response()
+        if not self.history:
+            raise RuntimeError("Cannot issue final single-loop freeze without tuning history")
+
+        history_snapshot = [entry.copy() for entry in self.history]
+        last_entry = history_snapshot[-1]
+        call_iteration = last_entry.get("iteration", 0)
+        current_time = time.time()
+        aggregation_interval_s = (
+            current_time - self.last_tuner_request_time
+            if self.last_tuner_request_time is not None
+            else float(self.config.window_duration)
+        )
+        phase_override = (
+            "PHASE POLICY: this is the final single-agent refresh after the completed last tuning window. "
+            "Use the full tuning history including the latest measurement to choose the one configuration "
+            "to freeze for the stable phase. Do not explore; prefer the best safe incumbent or a very "
+            "nearby refinement.\n"
+        )
+        logger.info("Dispatching final single-loop freeze request before stable phase...")
+        self.last_tuner_request_time = current_time
+        response = self.tuner.suggest_parameters(
+            metrics=self._get_metrics_from_history(last_entry),
+            current_params=self._get_tunable_parameters(last_entry.get("parameters", self.current_parameters)),
+            iteration=call_iteration,
+            best_reward=self.best_reward,
+            history=history_snapshot,
+            baseline_index=0,
+            aggregation_interval_s=aggregation_interval_s,
+            phase_instruction_override=phase_override,
+            final_freeze_request=True,
+        )
+        timing = self._apply_tuner_parameters(response, call_iteration, duration_s=time.time() - current_time) or {}
+        timing["stage"] = "final_freeze_before_stable"
+        timing["stable_gate_iteration"] = iteration
+        return timing
     
     def _get_active_tuner(self, iteration: int):
         """Return the active tuner for the given iteration.
@@ -129,13 +201,26 @@ class SimpleOptimizer:
                 if not self.benchmark.pre_execute():
                     raise RuntimeError("Benchmark pre-execute failed")
             
-            # For new parameters, always reset to live system defaults at run start.
-            logger.info("Resetting new parameters to system defaults at run start...")
-            reset_new_parameters_to_system_defaults(self.param_manager, refresh_snapshot=True)
+            experiment_params = (
+                set(self.config.parameter_ranges.keys())
+                | set(self.config.fixed_parameters.keys())
+            )
+
+            # For new parameters, reset only those selected by this experiment.
+            new_params_to_reset = experiment_params & get_new_parameter_names()
+            if new_params_to_reset:
+                logger.info(
+                    "Resetting selected new parameters to system defaults at run start: %s",
+                    sorted(new_params_to_reset),
+                )
+                reset_new_parameters_to_system_defaults(
+                    self.param_manager,
+                    parameters_to_reset=new_params_to_reset,
+                    refresh_snapshot=True,
+                )
             
-            # Apply initial parameters - use default values for all parameters
-            default_params = get_default_parameters()
-            initial_params = default_params.copy()
+            # Apply defaults only for parameters selected by this experiment.
+            initial_params = get_selected_default_parameters(experiment_params)
             # Merge with fixed_parameters (fixed_parameters override defaults)
             initial_params.update(self.config.fixed_parameters)
             logger.info(f"Starting with default parameters: {initial_params}")
@@ -187,11 +272,16 @@ class SimpleOptimizer:
             in_post_tuning_phase = not tuning_active
 
             if iteration == post_phase_start and self.config.post_tuning_windows > 0:
+                if self._requires_final_llm_freeze_before_stable():
+                    logger.info("Preparing stable phase: waiting for final single-loop freeze response")
+                    timing = self._run_refreshed_final_freeze_before_stable(iteration)
+                    self._attach_final_freeze_timing_to_history(timing)
+                else:
+                    self._clear_pending_tuner_response()
                 logger.info(
                     "Entering post-tuning measurement phase: "
                     f"{self.config.post_tuning_windows} windows with frozen parameters"
                 )
-                self._clear_pending_tuner_response()
             
             # Check if there's a pending tuner response from previous iteration
             # and apply it if still valid (hasn't moved on to next iteration)
@@ -384,11 +474,16 @@ class SimpleOptimizer:
                 in_post_tuning_phase = not tuning_active
 
                 if iteration == post_phase_start and self.config.post_tuning_windows > 0:
+                    if self._requires_final_llm_freeze_before_stable():
+                        logger.info("Preparing stable phase: waiting for final single-loop freeze response")
+                        timing = self._run_refreshed_final_freeze_before_stable(iteration)
+                        self._attach_final_freeze_timing_to_history(timing)
+                    else:
+                        self._clear_pending_tuner_response()
                     logger.info(
                         "Entering post-tuning measurement phase: "
                         f"{self.config.post_tuning_windows} windows with frozen parameters"
                     )
-                    self._clear_pending_tuner_response()
                 
                 # Execute window (synchronously, no tuner checks during execution)
                 if self.benchmark and hasattr(self.benchmark, 'update_workload'):
@@ -763,7 +858,10 @@ class SimpleOptimizer:
                 for param_name, param_value in tuner_response.parameters.items():
                     # Check if this is a per-core parameter
                     from .parameter_manager import is_per_core_parameter
-                    if is_per_core_parameter(param_name) and self.config.pin_to_cores:
+                    bind_cores = is_per_core_parameter(param_name) and self.config.pin_to_cores
+                    if param_name in {"busy_poll", "napi_busy_poll", "busy_read", "netdev_budget", "netdev_budget_usecs"}:
+                        bind_cores = bind_cores and getattr(self.config, "bind_network_irqs", True)
+                    if bind_cores:
                         # Merge with pin_to_cores
                         new_params[param_name] = {
                             "value": param_value,
@@ -788,6 +886,7 @@ class SimpleOptimizer:
                             "tuner_duration": duration,
                             "tuner_response_time_ms": duration * 1000,
                             "parameters_applied": True,
+                            "proposed_parameters": tuner_response.parameters,
                             "target_iteration": effective_iteration,
                             "applied_to_iteration": current_iteration,
                             "justification": tuner_response.justification,
@@ -809,6 +908,7 @@ class SimpleOptimizer:
                             "tuner_duration": duration,
                             "tuner_response_time_ms": duration * 1000,
                             "parameters_applied": False,
+                            "proposed_parameters": tuner_response.parameters,
                             "apply_failed": True,
                             "target_iteration": effective_iteration,
                             "applied_to_iteration": current_iteration,
@@ -825,6 +925,7 @@ class SimpleOptimizer:
                     "tuner_duration": duration,
                     "tuner_response_time_ms": duration * 1000,
                     "parameters_applied": False,
+                    "proposed_parameters": tuner_response.parameters if tuner_response else {},
                     "target_iteration": effective_iteration,
                     "applied_to_iteration": current_iteration,
                     "justification": tuner_response.justification if tuner_response else None,
@@ -996,6 +1097,7 @@ class SimpleOptimizer:
             # Still return timing info even when no parameters changed
             timing_info = {
                 "parameters_applied": False,
+                "proposed_parameters": tuner_response.parameters if tuner_response else {},
                 "target_iteration": iteration + 1,
                 "justification": tuner_response.justification if tuner_response else None,
                 "converged": tuner_response.converged if tuner_response else None,
@@ -1066,6 +1168,7 @@ class SimpleOptimizer:
         # Return timing info (now including command results)
         timing_info = {
             "parameters_applied": bool(tuner_response.parameters), # True if params were formatted
+            "proposed_parameters": tuner_response.parameters,
             "target_iteration": iteration + 1,
             "justification": tuner_response.justification if tuner_response else None,
             "converged": tuner_response.converged if tuner_response else None,
@@ -1081,7 +1184,10 @@ class SimpleOptimizer:
         for param_name, param_value in tuner_response.parameters.items():
             # Check if this is a per-core parameter
             from .parameter_manager import is_per_core_parameter
-            if is_per_core_parameter(param_name) and self.config.pin_to_cores:
+            bind_cores = is_per_core_parameter(param_name) and self.config.pin_to_cores
+            if param_name in {"busy_poll", "napi_busy_poll", "busy_read", "netdev_budget", "netdev_budget_usecs"}:
+                bind_cores = bind_cores and getattr(self.config, "bind_network_irqs", True)
+            if bind_cores:
                 # Merge with pin_to_cores
                 tunable_params_to_apply[param_name] = {
                     "value": param_value,
@@ -1124,6 +1230,8 @@ class SimpleOptimizer:
                 # Return timing information
                 timing_info = {
                     "parameters_applied": True,
+                    "parameters_applied_timestamp": time.time(),
+                    "proposed_parameters": tuner_response.parameters,
                     "target_iteration": iteration + 1,
                     "justification": tuner_response.justification,
                     "converged": tuner_response.converged,
@@ -1139,6 +1247,7 @@ class SimpleOptimizer:
                 return {
                     "parameters_applied": False,
                     "apply_failed": True,
+                    "proposed_parameters": tuner_response.parameters,
                     "target_iteration": iteration + 1,
                     "justification": tuner_response.justification,
                     "converged": tuner_response.converged,
@@ -1217,12 +1326,22 @@ class SimpleOptimizer:
         
         # Reset parameters to defaults (this can be interrupted)
         try:
-            logger.info("Resetting base parameters to defaults...")
-            reset_all_parameters_to_defaults(self.param_manager, include_new_parameters=False)
+            experiment_params = (
+                set(self.config.parameter_ranges.keys())
+                | set(self.config.fixed_parameters.keys())
+            )
+            base_params_to_reset = experiment_params - get_new_parameter_names()
+            logger.info(
+                "Resetting selected base parameters to defaults: %s",
+                sorted(base_params_to_reset),
+            )
+            reset_selected_parameters_to_defaults(
+                self.param_manager,
+                base_params_to_reset,
+            )
             
             # For new parameters, reset only those that were part of this experiment.
             new_param_names = get_new_parameter_names()
-            experiment_params = set(self.config.parameter_ranges.keys()) | set(self.config.fixed_parameters.keys())
             new_params_to_reset = experiment_params & new_param_names
             if new_params_to_reset:
                 logger.info(

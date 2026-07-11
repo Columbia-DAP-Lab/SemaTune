@@ -1867,7 +1867,10 @@ Valid parameter ranges:
         request_timestamp = time.time()
         
         if self.replay_history_file:
-            return self._replay_response(iteration)
+            return self._replay_response(
+                iteration,
+                final_freeze_request=final_freeze_request,
+            )
 
         # Record the just-finished trial for history summarization (only for legacy single loop)
         # In dual loop, history is passed explicitly
@@ -2515,30 +2518,68 @@ Valid parameter ranges:
         
         return value
     
-    def _replay_response(self, iteration: int) -> TunerResponse:
-        """Simulate response from replay history."""
+    def _replay_response(
+        self, iteration: int, *, final_freeze_request: bool = False
+    ) -> TunerResponse:
+        """Return a deterministic role-aware response from a replay fixture.
+
+        New fixtures use ``responses.quick``, ``responses.reasoning``, and an
+        optional ``responses.reasoning_final`` object.  Legacy histories using
+        ``quick_parameters``/``parameters`` remain supported.
+        """
         entry = self.replay_by_iteration.get(iteration)
         if not entry:
             logger.warning(f"Replay: No history entry for iteration {iteration}")
-            return TunerResponse(parameters={}, confidence=0.0, justification=None)
-        
-        if self.agent_type == "quick":
-            params = entry.get('quick_parameters', {})
+            return TunerResponse(
+                parameters={}, confidence=0.0,
+                justification=f"Replay has no {self.agent_type} response for iteration {iteration}",
+                converged=False,
+            )
+
+        responses = entry.get("responses") or {}
+        role = "quick" if self.agent_type == "quick" else "reasoning"
+        if final_freeze_request and role == "reasoning":
+            response = responses.get("reasoning_final") or responses.get("reasoning") or {}
         else:
-            params = entry.get('parameters', {})
-        
+            response = responses.get(role) or {}
+
+        if response:
+            params = response.get("parameters") or {}
+            justification = response.get("justification")
+            confidence = response.get("confidence", 1.0)
+            converged = response.get("converged")
+            duration = response.get("response_time_seconds", 0)
+            token_metrics = response.get("token_metrics")
+        else:
+            # Compatibility with paper-era optimization histories.
+            params = (
+                entry.get("quick_parameters", {})
+                if role == "quick"
+                else entry.get("parameters", {})
+            )
+            justification = entry.get(f"{role}_justification") or entry.get("justification")
+            confidence = 1.0
+            converged = entry.get(f"{role}_converged", entry.get("converged"))
+            timing = entry.get("timing_info", {})
+            duration = timing.get(
+                "quick_response_duration" if role == "quick" else "reasoning_response_duration",
+                0,
+            )
+            token_metrics = None
+
         tunable_params = {k: v for k, v in params.items() if k in self.parameter_ranges}
-        
-        timing = entry.get('timing_info', {})
-        if self.agent_type == "quick":
-            duration = timing.get('quick_response_duration', 0)
-        else:
-            duration = timing.get('reasoning_response_duration', 0)
-        
+
         if duration and duration > 0:
             time.sleep(float(duration))
-        
-        return TunerResponse(parameters=tunable_params, confidence=1.0, justification=None)
+
+        return TunerResponse(
+            parameters=tunable_params,
+            confidence=float(confidence),
+            justification=justification,
+            converged=converged,
+            response_time=float(duration or 0),
+            token_metrics=token_metrics,
+        )
     
     def clear_history(self) -> None:
         """Clear conversation history."""

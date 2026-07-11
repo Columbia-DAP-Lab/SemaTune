@@ -11,7 +11,7 @@ import numpy as np
 from typing import Dict, Any
 
 from ..benchmark import BenchmarkMetrics
-from .base import TunerInterface, TunerResponse
+from .base import TunerInterface, TunerResponse, unwrap_parameter_value
 
 logger = logging.getLogger(__name__)
 
@@ -138,7 +138,7 @@ class QLearningTuner(TunerInterface):
             param_values = self.discretized_ranges[param_name]
             # Get value from parameters, or use first value from range as default
             if param_name in parameters:
-                value = parameters[param_name]
+                value = unwrap_parameter_value(parameters[param_name])
             else:
                 value = param_values[0] if param_values else 0
             
@@ -220,4 +220,3 @@ class QLearningTuner(TunerInterface):
             confidence=1.0 - self.epsilon,  # Confidence increases as epsilon decreases
             justification=f"Q-Learning (epsilon={self.epsilon:.3f})"
         )
-

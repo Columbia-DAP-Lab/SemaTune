@@ -13,6 +13,19 @@ from typing import Dict, Optional, Any, List
 from ..benchmark import BenchmarkMetrics
 
 
+def unwrap_parameter_value(value: Any) -> Any:
+    """Return the scalar value from a parameter-manager scoped value.
+
+    The optimizer represents controls that have a CPU scope as
+    ``{"value": <scalar>, "cores": <scope>}``.  Classical tuners operate on
+    scalar search-space values, so their state encoders must discard only the
+    scope metadata before comparing or normalizing a value.
+    """
+    if isinstance(value, dict) and "value" in value:
+        return value["value"]
+    return value
+
+
 @dataclass
 class TunerResponse:
     """Response from a tuner indicating parameter changes."""
@@ -49,4 +62,3 @@ class TunerInterface(ABC):
             TunerResponse with suggested parameters
         """
         pass
-

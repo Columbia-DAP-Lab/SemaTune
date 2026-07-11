@@ -21,17 +21,6 @@ if _src_dir not in sys.path:
     sys.path.insert(0, _src_dir)
 
 from barebones_optimizer.config import SimpleConfig
-from barebones_optimizer.benchmarks.sysbench import SysbenchBenchmark
-from barebones_optimizer.benchmarks.sysbench import SysbenchContinuousBenchmark
-from barebones_optimizer.benchmarks.benchbase import BenchBaseBenchmark
-from barebones_optimizer.benchmarks.mutilate_benchmark import MutilateBenchmark
-from barebones_optimizer.benchmarks.tailbench import TailbenchBenchmark
-from barebones_optimizer.benchmarks.dcperf import DCPerfSparkBenchmark, DCPerfMediawikiBenchmark, DCPerfDjangoBenchmark
-from barebones_optimizer.tuners import (
-    FixedTuner, LLMTuner, HumanTuner, QLearningTuner,
-    BayesianOptimizerTuner, DQNTuner, MLOSTuner, SimpleSMACTuner,
-    LLMCommandTuner
-)
 from barebones_optimizer.optimizer import SimpleOptimizer
 from barebones_optimizer.benchmarks.benchmark_registry import BenchmarkType
 
@@ -137,21 +126,29 @@ def create_benchmark(config: SimpleConfig):
     # Create appropriate benchmark instance
     if benchmark_name == "sysbench_oltp_continuous":
         # Special case for continuous OLTP
+        from barebones_optimizer.benchmarks.sysbench import SysbenchContinuousBenchmark
         return SysbenchContinuousBenchmark(config)
     elif benchmark_name in ("tpcc", "ycsb", "sibench", "wikipedia", "twitter", "auctionmark", "otmetrics"):
+        from barebones_optimizer.benchmarks.benchbase import BenchBaseBenchmark
         return BenchBaseBenchmark(config)
     elif benchmark_name == "mutilate":
+        from barebones_optimizer.benchmarks.mutilate_benchmark import MutilateBenchmark
         return MutilateBenchmark(config)
     elif benchmark_name == "tailbench":
+        from barebones_optimizer.benchmarks.tailbench import TailbenchBenchmark
         return TailbenchBenchmark(config)
     elif benchmark_name == "dcperf_spark":
+        from barebones_optimizer.benchmarks.dcperf import DCPerfSparkBenchmark
         return DCPerfSparkBenchmark(config)
     elif benchmark_name == "dcperf_mediawiki":
+        from barebones_optimizer.benchmarks.dcperf import DCPerfMediawikiBenchmark
         return DCPerfMediawikiBenchmark(config)
     elif benchmark_name == "dcperf_django":
+        from barebones_optimizer.benchmarks.dcperf import DCPerfDjangoBenchmark
         return DCPerfDjangoBenchmark(config)
     elif benchmark_name.startswith("sysbench"):
         # All other sysbench benchmarks use unified implementation
+        from barebones_optimizer.benchmarks.sysbench import SysbenchBenchmark
         return SysbenchBenchmark(config)
     else:
         raise ValueError(f"Unknown benchmark: {benchmark_name}")
@@ -182,7 +179,7 @@ def create_trimming_tuner(config: SimpleConfig):
     if not config.trimming_enabled:
         return None
     
-    from barebones_optimizer.tuners import LLMTrimmingTuner
+    from barebones_optimizer.tuners.llm_trimming import LLMTrimmingTuner
     import copy
     
     # Create a config copy with the trimming model if specified
@@ -330,6 +327,16 @@ Available benchmarks:
         _global_optimizer = optimizer
         
         result = optimizer.run()
+
+        # optimizer.run() always calls _finish() before returning. Disarm the
+        # process-exit hook now so normal completion does not clean up twice or,
+        # for LLM runs, make a second paid gist request.
+        _global_optimizer = None
+        _global_benchmark = None
+        try:
+            atexit.unregister(cleanup_handler)
+        except Exception:
+            pass
 
         if result.get("terminated_reason") == "error":
             print("\n" + "="*80)
