@@ -65,8 +65,8 @@ def completed_history(directory: Path) -> tuple[Path, dict[str, Any]]:
 
 
 def validate_configs() -> int:
-    from barebones_optimizer.config import SimpleConfig
-    from barebones_optimizer.parameter_manager import get_selected_default_parameters
+    from optimizer.config import SimpleConfig
+    from optimizer.parameter_manager import get_selected_default_parameters
 
     errors: list[str] = []
     methods = manifest()["methods"]

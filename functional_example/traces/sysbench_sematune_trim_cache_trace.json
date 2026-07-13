@@ -1,0 +1,144 @@
+{
+  "benchmark": "sysbench_oltp_rw",
+  "description": "Recorded Gemini 2.5 Flash-Lite Functional responses; no provider request is made.",
+  "history": [
+    {
+      "iteration": 1,
+      "responses": {
+        "reasoning": {
+          "confidence": 1.0,
+          "converged": false,
+          "eliminated_params": [],
+          "justification": "To maximize cache misses, we aim for high activity and low sleep states. Setting min_perf_pct to 100 and max_perf_pct to 100, along with napi_busy_poll to its maximum, should increase CPU utilization. We also set cstate_max to POLL to prevent CPUs from entering deeper sleep states. Latency and granularity parameters are set to their minimums to encourage more frequent scheduling events, potentially leading to more cache churn. Ranges are narrowed to explore higher activity values.",
+          "parameters": {
+            "cstate_max": "POLL",
+            "latency_ns": 100000,
+            "max_perf_pct": 100,
+            "migration_cost_ns": 100000,
+            "min_granularity_ns": 100000,
+            "min_perf_pct": 100,
+            "napi_busy_poll": 1000,
+            "wakeup_granularity_ns": 100000
+          },
+          "suggested_ranges": {
+            "latency_ns": {
+              "max": 50000000,
+              "min": 100000
+            },
+            "migration_cost_ns": {
+              "max": 50000000,
+              "min": 100000
+            },
+            "min_granularity_ns": {
+              "max": 50000000,
+              "min": 100000
+            },
+            "wakeup_granularity_ns": {
+              "max": 50000000,
+              "min": 100000
+            }
+          },
+          "token_metrics": {
+            "api_total_tokens": 2495,
+            "billable_output_tokens": 412,
+            "billable_total_tokens": 2495,
+            "cached_content_token_count": 0,
+            "input_tokens": 2083,
+            "output_tokens": 412,
+            "thinking_tokens": 0,
+            "thinking_tokens_inferred_from_api_total": 0
+          }
+        }
+      }
+    },
+    {
+      "iteration": 2,
+      "responses": {
+        "reasoning": {
+          "confidence": 1.0,
+          "converged": false,
+          "eliminated_params": [],
+          "justification": "The previous iterations showed no improvement in cache misses, suggesting that the current parameters are not effectively increasing cache misses. We will explore lower values for latency and migration cost, and narrower ranges for granularity to see if finer control impacts cache misses.",
+          "parameters": {
+            "cstate_max": "POLL",
+            "latency_ns": 100000,
+            "max_perf_pct": 100,
+            "migration_cost_ns": 100000,
+            "min_granularity_ns": 100000,
+            "min_perf_pct": 100,
+            "napi_busy_poll": 1000,
+            "wakeup_granularity_ns": 100000
+          },
+          "suggested_ranges": {
+            "latency_ns": {
+              "max": 10000000,
+              "min": 100000
+            },
+            "migration_cost_ns": {
+              "max": 10000000,
+              "min": 100000
+            },
+            "min_granularity_ns": {
+              "max": 10000000,
+              "min": 100000
+            },
+            "wakeup_granularity_ns": {
+              "max": 10000000,
+              "min": 100000
+            }
+          },
+          "token_metrics": {
+            "api_total_tokens": 2990,
+            "billable_output_tokens": 245,
+            "billable_total_tokens": 2990,
+            "cached_content_token_count": 0,
+            "input_tokens": 2745,
+            "output_tokens": 245,
+            "thinking_tokens": 0,
+            "thinking_tokens_inferred_from_api_total": 0
+          }
+        }
+      }
+    },
+    {
+      "iteration": 3,
+      "responses": {
+        "reasoning": {
+          "confidence": 1.0,
+          "converged": false,
+          "eliminated_params": [],
+          "justification": "The current performance is consistently zero for cache misses. To explore potential improvements, we will slightly widen the ranges for latency, migration cost, minimum granularity, and wakeup granularity to see if there's a sweet spot that can increase cache misses, while keeping other parameters at their current successful values.",
+          "parameters": {
+            "cstate_max": "POLL",
+            "latency_ns": 100000,
+            "max_perf_pct": 100,
+            "migration_cost_ns": 100000,
+            "min_granularity_ns": 100000,
+            "min_perf_pct": 100,
+            "napi_busy_poll": 1000,
+            "wakeup_granularity_ns": 100000
+          },
+          "suggested_ranges": {},
+          "token_metrics": {
+            "api_total_tokens": 3443,
+            "billable_output_tokens": 256,
+            "billable_total_tokens": 3443,
+            "cached_content_token_count": 0,
+            "input_tokens": 3187,
+            "output_tokens": 256,
+            "thinking_tokens": 0,
+            "thinking_tokens_inferred_from_api_total": 0
+          }
+        }
+      }
+    }
+  ],
+  "method": "sematune_trim_cache",
+  "provider_requests": 0,
+  "replay_normalizations": [
+    "iteration 3: the recorded Flash-Lite response adjusted ranges but omitted a complete candidate; replay carries forward the recorded configuration",
+    "iteration 4: the recorded Flash-Lite response adjusted ranges but omitted a complete candidate; replay carries forward the recorded configuration"
+  ],
+  "schema_version": 1,
+  "source_history": "optimization_history_sysbench_oltp_20260712_023424.json"
+}

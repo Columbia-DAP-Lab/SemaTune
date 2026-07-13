@@ -11,6 +11,10 @@ Git histories. Their upstream licenses remain authoritative.
 | `DCPerf` | <https://github.com/facebookresearch/DCPerf> | `5d8d16d63cf28311ee85a2f63ce7506ade67dbef` | MIT plus component licenses | Used through the SemaTune DCPerf adapter. |
 | `mutilate` | <https://github.com/leverich/mutilate> | `d65c6ef7c2f78ae05a9db3e37d7f6ddff1c0af64` | BSD-3-Clause | Used as an external Memcached load generator. |
 
-The Functional quick installer does not build these unrelated workloads.
-Their acquisition/build requirements and exact versions are retained for the
-archived paper experiments in the root README and machine-readable provenance.
+`scripts/setup.sh --base` prepares Sysbench, PostgreSQL, and BenchBase for the
+Functional workflow. `scripts/setup.sh --full` additionally materializes all
+four pinned source trees, installs the retained native dependency closure,
+builds Mutilate plus the four retained TailBench workloads and their inputs,
+and installs the verified Spark runtime, dataset, storage layout, and populated
+warehouse. The distributed Mutilate deployment remains an explicit two-node
+step; see the root README and machine-readable provenance.

@@ -18,7 +18,7 @@ from typing import Dict, Any
 # Add src to path
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'src'))
 
-from barebones_optimizer.parameter_manager import (
+from optimizer.parameter_manager import (
     ParameterManager,
     get_default_parameters,
     get_new_parameter_names,

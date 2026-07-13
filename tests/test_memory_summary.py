@@ -8,9 +8,9 @@ from unittest.mock import patch
 sys.path.append(os.getcwd())
 sys.path.append(os.path.join(os.getcwd(), "src"))
 
-from barebones_optimizer.memory.common import GEMINI_SUMMARY_MODEL
-from barebones_optimizer.memory.redaction import redact_history_data
-from barebones_optimizer.memory.summary import (
+from optimizer.memory.common import GEMINI_SUMMARY_MODEL
+from optimizer.memory.redaction import redact_history_data
+from optimizer.memory.summary import (
     GoogleGenAISummaryBackend,
     SUMMARY_RESPONSE_SCHEMA,
     build_summary_prompt,

@@ -18,6 +18,7 @@ import numpy as np  # noqa: E402
 from matplotlib.patches import Patch  # noqa: E402
 
 
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--summary", type=Path, required=True)
@@ -26,8 +27,10 @@ def main() -> int:
     try:
         summary = json.loads(args.summary.read_text(encoding="utf-8"))
         methods = list(summary["methods"].values())
-        if len(methods) != 8:
-            raise ValueError(f"expected 8 methods, found {len(methods)}")
+        tuning_windows = int(summary["tuning_windows"])
+        stable_windows = int(summary["stable_windows"])
+        if not methods:
+            raise ValueError("summary contains no methods")
         output = args.output_dir.resolve()
         output.mkdir(parents=True, exist_ok=True)
         rows = []
@@ -50,7 +53,7 @@ def main() -> int:
 
         x = np.arange(len(methods), dtype=float)
         width = 0.34
-        fig, ax = plt.subplots(figsize=(10.2, 4.8))
+        fig, ax = plt.subplots(figsize=(14.5, 5.4))
         for index, method in enumerate(methods):
             color = method["color"]
             ax.bar(
@@ -72,8 +75,8 @@ def main() -> int:
         ax.spines["right"].set_visible(False)
         ax.legend(
             handles=[
-                Patch(facecolor="white", edgecolor="#333333", label="Tuning (10 windows)"),
-                Patch(facecolor="white", edgecolor="#333333", hatch="////", label="Stable (5 windows)"),
+                Patch(facecolor="white", edgecolor="#333333", label=f"Tuning ({tuning_windows} windows)"),
+                Patch(facecolor="white", edgecolor="#333333", hatch="////", label=f"Stable ({stable_windows} windows)"),
             ],
             loc="upper center", bbox_to_anchor=(0.5, -0.26), ncol=2, frameon=True,
         )
@@ -86,10 +89,11 @@ def main() -> int:
             "status": "PASS",
             "checks": {
                 "methods": len(methods),
-                "tuning_windows_per_method": 10,
-                "stable_windows_per_method": 5,
+                "tuning_windows_per_method": tuning_windows,
+                "stable_windows_per_method": stable_windows,
                 "positive_finite_metrics": True,
                 "improvement_required": False,
+                "performance_result_validation": False,
             },
         }
         (output / "validation.json").write_text(json.dumps(report, indent=2, sort_keys=True) + "\n", encoding="utf-8")

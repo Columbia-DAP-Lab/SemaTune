@@ -15,19 +15,19 @@ sys.path.append(os.path.join(os.getcwd(), 'src'))
 
 # Now import
 try:
-    from barebones_optimizer.tuners.llm import LLMTuner
+    from optimizer.tuners.llm import LLMTuner
 except ImportError:
     # If import fails (e.g. deps missing), we relied on mocks above
-    # But we need to ensure barebones_optimizer structure is importable
+    # But we need to ensure optimizer structure is importable
     # Ideally should work if PYTHONPATH is correct
     pass
 
 # ... (imports remain)
 
 try:
-    from barebones_optimizer.tuners.llm import LLMTuner
-    from barebones_optimizer.config import SimpleConfig
-    from barebones_optimizer.benchmark import BenchmarkMetrics
+    from optimizer.tuners.llm import LLMTuner
+    from optimizer.config import SimpleConfig
+    from optimizer.benchmark import BenchmarkMetrics
 except ImportError:
     pass
 

@@ -13,7 +13,7 @@ while [[ $# -gt 0 ]]; do
     *) echo "Usage: $0 [--real-dir DIR] [--output-dir DIR]" >&2; exit 2 ;;
   esac
 done
-[[ -f "$SCRIPT_DIR/site.env" ]] || { echo 'Run functional_example/install.sh first.' >&2; exit 1; }
+[[ -f "$SCRIPT_DIR/site.env" ]] || { echo 'Run scripts/setup.sh --base first.' >&2; exit 1; }
 # shellcheck disable=SC1091
 source "$SCRIPT_DIR/site.env"
 export PYTHONPATH="$REPO_ROOT/src:$SCRIPT_DIR" OS_PARAM_TUNING_ROOT="$REPO_ROOT"
@@ -64,7 +64,7 @@ for method in "${METHODS[@]}"; do
   echo "RUNNING_REPLAY: $method (recorded actions and response delays; zero provider calls)"
   pgid_file="$OUTPUT_DIR/.${method}.pgid"
   "${ROOT[@]}" setsid --wait sh -c 'printf "%s\n" "$$" > "$1"; shift; exec timeout --foreground --signal=TERM --kill-after=20s "$@"' \
-    sh "$pgid_file" 1800s "$PYTHON" "$REPO_ROOT/src/barebones_optimizer/main.py" --config "$OUTPUT_DIR/configs/$method.json" \
+    sh "$pgid_file" 1800s "$PYTHON" -m optimizer.main --config "$OUTPUT_DIR/configs/$method.json" \
     >"$OUTPUT_DIR/logs/$method.log" 2>&1 & pid=$!
   for _ in {1..40}; do [[ -s "$pgid_file" ]] && break; sleep 0.05; done
   [[ -s "$pgid_file" ]] || { echo "Could not establish $method replay process group" >&2; exit 1; }

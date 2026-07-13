@@ -1,13 +1,13 @@
 import json
 from pathlib import Path
 
-from src.barebones_optimizer.config import SimpleConfig
-from src.barebones_optimizer.memory.common import (
+from src.optimizer.config import SimpleConfig
+from src.optimizer.memory.common import (
     GEMINI_EMBEDDING_DIMENSION,
     GEMINI_EMBEDDING_MODEL,
     GEMINI_SUMMARY_MODEL,
 )
-from src.barebones_optimizer.model_versions import (
+from src.optimizer.model_versions import (
     DEFAULT_LLM_TEMPERATURE,
     GEMINI_31_ACTOR_MODEL,
     GEMINI_COMPARISON_ACTOR_MODEL,

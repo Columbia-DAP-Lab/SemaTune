@@ -25,7 +25,6 @@ if str(SRC) not in sys.path:
     sys.path.insert(0, str(SRC))
 
 SUITE_PATH = HERE / "sysbench_suite.json"
-TRACE_PATH = HERE / "sysbench_trace_replay.json"
 KNOBS = (
     "min_granularity_ns", "latency_ns", "cstate_max", "napi_busy_poll",
     "wakeup_granularity_ns", "migration_cost_ns", "max_perf_pct", "min_perf_pct",
@@ -62,16 +61,31 @@ def range_ok(ranges: dict[str, Any], name: str, value: Any) -> bool:
 
 
 def validate(runtime: bool = False) -> int:
-    from barebones_optimizer.config import SimpleConfig
+    from optimizer.config import SimpleConfig
 
     errors: list[str] = []
     loaded: list[tuple[str, Any]] = []
+    manifest = suite()
+    tuning_windows = int(manifest["tuning_windows"])
+    stable_windows = int(manifest["stable_windows"])
+    window_seconds = int(manifest["window_duration_seconds"])
     for method, path in config_paths():
         try:
             payload = load(path)
             structural = copy.deepcopy(payload)
             if structural.get("tuner_type") == "llm" or structural.get("trimming_enabled"):
-                structural["llm_replay_file"] = str(TRACE_PATH)
+                trace_name = method.get("trace")
+                if not trace_name:
+                    raise ValueError("LLM method lacks a recorded trace")
+                trace_path = HERE / trace_name
+                trace = load(trace_path)
+                if trace.get("method") != method["id"] or trace.get("provider_requests") != 0:
+                    raise ValueError(f"{trace_path.name}: invalid method or provider-request metadata")
+                if not trace.get("history"):
+                    raise ValueError(f"{trace_path.name}: contains no recorded responses")
+                if any(marker in json.dumps(trace) for marker in ("AIza", "sk-or-", "GEMINI_API_KEY")):
+                    raise ValueError(f"{trace_path.name}: contains credential-like material")
+                structural["llm_replay_file"] = str(trace_path)
             config = SimpleConfig.from_dict(structural)
             config.validate()
             loaded.append((method["id"], config))
@@ -82,52 +96,33 @@ def validate(runtime: bool = False) -> int:
             errors.append(f"{path.name}: benchmark must be sysbench_oltp")
         if tuple(payload.get("parameters_to_tune") or ()) != KNOBS:
             errors.append(f"{path.name}: expected the canonical ordered eight knobs")
-        if (payload.get("max_iterations"), payload.get("post_tuning_windows"), payload.get("window_duration")) != (10, 5, 10):
-            errors.append(f"{path.name}: expected 10 tuning + 5 stable windows at 10 seconds")
+        if (payload.get("max_iterations"), payload.get("post_tuning_windows"), payload.get("window_duration")) != (tuning_windows, stable_windows, window_seconds):
+            errors.append(
+                f"{path.name}: expected {tuning_windows} tuning + {stable_windows} "
+                f"stable windows at {window_seconds} seconds"
+            )
+        is_dual = bool(payload.get("llm_actor_model") and payload.get("llm_speculator_model"))
+        if is_dual and (
+            payload.get("llm_actor_model") != "gemini-2.5-flash-lite"
+            or payload.get("llm_speculator_model") != "gemini-2.5-flash-lite"
+        ):
+            errors.append(f"{path.name}: Functional Actor and Speculator must both use Gemini 2.5 Flash-Lite")
+        if (payload.get("tuner_type") == "llm" or payload.get("trimming_enabled")) and payload.get("llm_model_name") != "gemini-2.5-flash-lite":
+            errors.append(f"{path.name}: Functional LLM calls must use Gemini 2.5 Flash-Lite")
         serialized = json.dumps(payload)
         if "AIza" in serialized or "sk-or-" in serialized:
             errors.append(f"{path.name}: contains a credential-like value")
         if payload.get("experiment_profile"):
             errors.append(f"{path.name}: experiment_profile would override the reduced budget")
 
-    try:
-        replay = load(TRACE_PATH)
-        entries = {int(row["iteration"]): row for row in replay["history"]}
-        ranges = load(HERE / "sysbench_sematune_dual.json")["parameter_ranges"]
-        for iteration in range(10):
-            for role in ("quick", "reasoning"):
-                response = (entries.get(iteration, {}).get("responses") or {}).get(role)
-                if not response:
-                    errors.append(f"trace: missing {role} response at iteration {iteration}")
-                    continue
-                params = response.get("parameters") or {}
-                if set(params) != set(KNOBS) or len(params) != len(KNOBS):
-                    errors.append(f"trace: {iteration}/{role} does not contain all eight knobs")
-                for name, value in params.items():
-                    if name not in ranges or not range_ok(ranges, name, value):
-                        errors.append(f"trace: invalid {iteration}/{role} {name}={value!r}")
-                if not str(response.get("justification") or "").strip():
-                    errors.append(f"trace: missing justification for {iteration}/{role}")
-        final = ((entries.get(10, {}).get("responses") or {}).get("reasoning_final") or {})
-        final_params = final.get("parameters") or {}
-        if final.get("converged") is not True or set(final_params) != set(KNOBS) or len(final_params) != len(KNOBS):
-            errors.append("trace: missing converged final Actor response")
-        for iteration in range(5):
-            response = (entries[iteration]["responses"]["reasoning"])
-            if "suggested_ranges" not in response or "eliminated_params" not in response:
-                errors.append(f"trace: trimming action fields missing at iteration {iteration}")
-    except Exception as exc:
-        errors.append(f"trace: {exc}")
-
     if runtime and not errors:
-        from barebones_optimizer.main_helpers import create_tuner_from_config
-        from barebones_optimizer.tuners.llm import LLMTuner
-        from barebones_optimizer.tuners.llm_trimming import LLMTrimmingTuner
+        from optimizer.main_helpers import create_tuner_from_config
+        from optimizer.tuners.llm import LLMTuner
+        from optimizer.tuners.llm_trimming import LLMTrimmingTuner
 
         for method_id, config in loaded:
             tuner = None
             try:
-                config.llm_replay_file = str(TRACE_PATH)
                 if getattr(config, "_explicit_dual_loop", False):
                     LLMTuner(config, agent_type="quick")
                     tuner = LLMTuner(config, agent_type="reasoning")
@@ -148,7 +143,11 @@ def validate(runtime: bool = False) -> int:
             print(f"  - {error}", file=sys.stderr)
         return 1
     qualifier = " + runtime tuner imports" if runtime else ""
-    print(f"SYSBENCH_CONFIG_VALIDATION: PASS (8 methods, canonical knobs, role-complete trace{qualifier})")
+    print(
+        f"SYSBENCH_CONFIG_VALIDATION: PASS ({len(manifest['methods'])} methods, "
+        f"{tuning_windows}+{stable_windows}, canonical knobs, Flash-Lite Functional models, "
+        f"method-specific recorded traces{qualifier})"
+    )
     return 0
 
 
@@ -156,7 +155,7 @@ def preflight(live: bool, real_llm: bool) -> int:
     errors: list[str] = []
     for command in ("sysbench", "psql", "pg_isready", "perf", "taskset", "timeout", "setsid"):
         if shutil.which(command) is None:
-            errors.append(f"missing command: {command} (run functional_example/install.sh)")
+            errors.append(f"missing command: {command} (run scripts/setup.sh --base)")
     affinity = os.sched_getaffinity(0) if hasattr(os, "sched_getaffinity") else set(range(os.cpu_count() or 0))
     missing = sorted(set(range(20)) - affinity)
     if missing:
@@ -203,8 +202,11 @@ def find_history(directory: Path) -> tuple[Path, dict[str, Any]]:
 
 def phase_values(payload: dict[str, Any]) -> tuple[list[float], list[float]]:
     config = payload.get("config") or {}
-    if int(config.get("max_iterations", 0)) != 10 or int(config.get("post_tuning_windows", 0)) != 5:
-        raise ValueError("history does not use the reduced 10+5 schedule")
+    manifest = suite()
+    tuning_windows = int(manifest["tuning_windows"])
+    stable_windows = int(manifest["stable_windows"])
+    if int(config.get("max_iterations", 0)) != tuning_windows or int(config.get("post_tuning_windows", 0)) != stable_windows:
+        raise ValueError(f"history does not use the reduced {tuning_windows}+{stable_windows} schedule")
     tuning: list[float] = []
     stable: list[float] = []
     for position, row in enumerate(payload.get("history") or [], start=1):
@@ -221,11 +223,11 @@ def phase_values(payload: dict[str, Any]) -> tuple[list[float], list[float]]:
             value /= 1000.0
         if not math.isfinite(value) or value <= 0:
             raise ValueError(f"iteration {iteration} has invalid p99 latency {raw!r}")
-        if row.get("post_tuning_phase") or iteration > 10:
+        if row.get("post_tuning_phase") or iteration > tuning_windows:
             stable.append(value)
         else:
             tuning.append(value)
-    if len(tuning) != 10 or len(stable) != 5:
+    if len(tuning) != tuning_windows or len(stable) != stable_windows:
         raise ValueError(f"history contains {len(tuning)} tuning and {len(stable)} stable values")
     return tuning, stable
 
@@ -244,14 +246,24 @@ def validate_llm_trace(payload: dict[str, Any], ranges: dict[str, Any]) -> list[
         for item in timings:
             if not isinstance(item, dict):
                 continue
+            has_recorded_proposal = "proposed_parameters" in item
             proposed = item.get("proposed_parameters")
+            recorded_required = item.get("required_parameters")
             # The single-loop trimming history used to record the applied
             # parameters on the row, while its timing object retained the LLM
             # justification/token usage but omitted proposed_parameters. This
             # is still an inspectable provider response for a trimming-phase
             # row. New histories store proposed_parameters directly.
-            if not proposed and row.get("trimming_phase") and item.get("token_metrics"):
+            if not has_recorded_proposal and row.get("trimming_phase") and item.get("token_metrics"):
                 proposed = row.get("parameters")
+            elif has_recorded_proposal and row.get("trimming_phase") and not proposed:
+                if recorded_required == []:
+                    checked += 1
+                    if not str(item.get("justification") or row.get("llm_justification") or "").strip():
+                        errors.append("LLM response lacks a justification")
+                    continue
+                errors.append("trimming response did not provide the required parameter configuration")
+                continue
             if not proposed:
                 continue
             checked += 1
@@ -260,13 +272,22 @@ def validate_llm_trace(payload: dict[str, Any], ranges: dict[str, Any]) -> list[
             for name, value in proposed.items():
                 if name in ranges and not range_ok(ranges, name, value):
                     errors.append(f"LLM response proposed out-of-range {name}={value!r}")
-    if checked == 0:
+            if row.get("trimming_phase"):
+                expected = set(recorded_required) if isinstance(recorded_required, list) else set(ranges)
+                missing = sorted(expected - set(proposed))
+                if missing:
+                    errors.append(
+                        f"trimming response omitted required parameters: {', '.join(missing)}"
+                    )
+    if checked == 0 and not errors:
         errors.append("history contains no inspectable LLM responses")
     return errors
 
 
 def summarize(results_dir: Path) -> int:
     manifest = suite()
+    tuning_windows = int(manifest["tuning_windows"])
+    stable_windows = int(manifest["stable_windows"])
     methods: dict[str, Any] = {}
     errors: list[str] = []
     for method in manifest["methods"]:
@@ -296,8 +317,8 @@ def summarize(results_dir: Path) -> int:
         "benchmark": "sysbench_oltp_rw",
         "metric": "latency_p99_ms",
         "goal": "minimize",
-        "tuning_windows": 10,
-        "stable_windows": 5,
+        "tuning_windows": tuning_windows,
+        "stable_windows": stable_windows,
         "methods": methods,
     }
     dump(results_dir / "sysbench_summary.json", output)
@@ -314,17 +335,23 @@ def summarize(results_dir: Path) -> int:
                     "windows": len(row[f"{phase}_values"]),
                     "history_file": row["history_file"],
                 })
-    print("SYSBENCH_SUMMARY: PASS (8 methods, 10 tuning + 5 stable values each)")
+    print(
+        f"SYSBENCH_SUMMARY: PASS ({len(manifest['methods'])} methods, "
+        f"{tuning_windows} tuning + {stable_windows} stable values each)"
+    )
     return 0
 
 
 def completed_methods(results_dir: Path) -> int:
-    """Print suite method IDs with complete, structurally valid 10+5 histories."""
-    for method in suite()["methods"]:
+    """Print suite method IDs with complete, structurally valid reduced histories."""
+    manifest = suite()
+    tuning_windows = int(manifest["tuning_windows"])
+    stable_windows = int(manifest["stable_windows"])
+    for method in manifest["methods"]:
         try:
             _, payload = find_history(results_dir / "raw" / method["results_subdir"])
             tuning, stable = phase_values(payload)
-            if len(tuning) == 10 and len(stable) == 5:
+            if len(tuning) == tuning_windows and len(stable) == stable_windows:
                 print(method["id"])
         except (OSError, ValueError, KeyError, json.JSONDecodeError):
             continue
@@ -332,15 +359,20 @@ def completed_methods(results_dir: Path) -> int:
 
 
 def write_manifest(output: Path, mode: str) -> int:
+    manifest = suite()
     payload = {
         "schema_version": 1,
         "started_at_utc": dt.datetime.now(dt.timezone.utc).isoformat(),
         "benchmark": "sysbench_oltp_rw",
         "mode": mode,
-        "methods": [method["id"] for method in suite()["methods"]],
-        "schedule": {"tuning_windows": 10, "stable_windows": 5, "seconds_per_window": 10},
+        "methods": [method["id"] for method in manifest["methods"]],
+        "schedule": {
+            "tuning_windows": manifest["tuning_windows"],
+            "stable_windows": manifest["stable_windows"],
+            "seconds_per_window": manifest["window_duration_seconds"],
+        },
         "cpu_allocation": {"controls_and_perf": "0-9", "sysbench": "10-19"},
-        "provider_requests_expected": 0 if mode == "trace-replay" else "Single, Dual, and trimming model calls",
+        "provider_requests_expected": 0 if mode == "trace-replay" else "Single, App/System/IPC Dual, and App/IPC/Cache trimming model calls",
         "credential_source": None if mode == "trace-replay" else "GEMINI_API_KEY environment variable",
     }
     dump(output, payload)
@@ -351,9 +383,9 @@ def real_llm_smoke() -> int:
     """Issue one real provider request and validate, but never print its content."""
     if not os.environ.get("GEMINI_API_KEY"):
         raise ValueError("GEMINI_API_KEY is not exported")
-    from barebones_optimizer.benchmark import BenchmarkMetrics
-    from barebones_optimizer.config import SimpleConfig
-    from barebones_optimizer.tuners.llm import LLMTuner
+    from optimizer.benchmark import BenchmarkMetrics
+    from optimizer.config import SimpleConfig
+    from optimizer.tuners.llm import LLMTuner
 
     payload = load(HERE / "sysbench_sematune_single.json")
     payload["llm_replay_file"] = None

@@ -1,0 +1,315 @@
+{
+  "benchmark": "sysbench_oltp_rw",
+  "description": "Recorded Gemini 2.5 Flash-Lite Functional responses; no provider request is made.",
+  "history": [
+    {
+      "iteration": 0,
+      "responses": {
+        "quick": {
+          "confidence": 1.0,
+          "converged": false,
+          "justification": "Initiating exploration by reducing latency and wakeup granularity to potentially improve responsiveness. Increasing minimum performance and busy poll for more consistent thread execution, while slightly reducing maximum performance to explore a different operating point. Disabling deeper C-states to favor immediate wakeups.",
+          "parameters": {
+            "cstate_max": "POLL",
+            "latency_ns": 100000,
+            "max_perf_pct": 90,
+            "migration_cost_ns": 100000,
+            "min_granularity_ns": 100000,
+            "min_perf_pct": 10,
+            "napi_busy_poll": 100,
+            "wakeup_granularity_ns": 100000
+          },
+          "token_metrics": {
+            "api_total_tokens": 1301,
+            "billable_output_tokens": 183,
+            "billable_total_tokens": 1301,
+            "cached_content_token_count": 0,
+            "input_tokens": 1118,
+            "output_tokens": 181,
+            "thinking_tokens": 2,
+            "thinking_tokens_inferred_from_api_total": 0
+          }
+        },
+        "reasoning": {
+          "confidence": 1.0,
+          "converged": false,
+          "justification": "Exploring a more aggressive C-state (C1) to potentially reduce power consumption without significantly impacting performance. Reducing latency and granularity, while slightly lowering max performance and introducing min performance and busy polling, aims to find a balance between responsiveness and efficiency.",
+          "parameters": {
+            "cstate_max": "C1",
+            "latency_ns": 10000000,
+            "max_perf_pct": 90,
+            "migration_cost_ns": 100000,
+            "min_granularity_ns": 1000000,
+            "min_perf_pct": 10,
+            "napi_busy_poll": 50,
+            "wakeup_granularity_ns": 2000000
+          },
+          "token_metrics": {
+            "api_total_tokens": 1323,
+            "billable_output_tokens": 183,
+            "billable_total_tokens": 1323,
+            "cached_content_token_count": 0,
+            "input_tokens": 1140,
+            "output_tokens": 183,
+            "thinking_tokens": 0,
+            "thinking_tokens_inferred_from_api_total": 0
+          }
+        }
+      }
+    },
+    {
+      "iteration": 1,
+      "responses": {
+        "quick": {
+          "confidence": 1.0,
+          "converged": false,
+          "justification": "Continuing exploration by slightly increasing latency and wakeup granularity while reducing max performance and min granularity to see if finer control improves IPC. C1 state is explored as a balance between power saving and responsiveness.",
+          "parameters": {
+            "cstate_max": "C1",
+            "latency_ns": 20000000,
+            "max_perf_pct": 95,
+            "migration_cost_ns": 200000,
+            "min_granularity_ns": 500000,
+            "min_perf_pct": 5,
+            "napi_busy_poll": 50,
+            "wakeup_granularity_ns": 500000
+          },
+          "token_metrics": {
+            "api_total_tokens": 1539,
+            "billable_output_tokens": 171,
+            "billable_total_tokens": 1539,
+            "cached_content_token_count": 622,
+            "input_tokens": 1368,
+            "output_tokens": 169,
+            "thinking_tokens": 2,
+            "thinking_tokens_inferred_from_api_total": 0
+          }
+        },
+        "reasoning": {
+          "confidence": 1.0,
+          "converged": false,
+          "justification": "The previous iteration pushed parameters to their minimums, which did not yield improvement. We will explore slightly relaxed values, particularly increasing wakeup_granularity_ns and latency_ns to potentially improve cache utilization and reduce context switching overhead, while slightly adjusting performance percentages and migration cost to maintain responsiveness.",
+          "parameters": {
+            "cstate_max": "C1",
+            "latency_ns": 1000000,
+            "max_perf_pct": 95,
+            "migration_cost_ns": 200000,
+            "min_granularity_ns": 200000,
+            "min_perf_pct": 5,
+            "napi_busy_poll": 50,
+            "wakeup_granularity_ns": 2000000
+          },
+          "token_metrics": {
+            "api_total_tokens": 1579,
+            "billable_output_tokens": 189,
+            "billable_total_tokens": 1579,
+            "cached_content_token_count": 0,
+            "input_tokens": 1390,
+            "output_tokens": 189,
+            "thinking_tokens": 0,
+            "thinking_tokens_inferred_from_api_total": 0
+          }
+        }
+      }
+    },
+    {
+      "iteration": 2,
+      "responses": {
+        "quick": {
+          "confidence": 1.0,
+          "converged": false,
+          "justification": "Continuing exploration by slightly reducing max_perf_pct and increasing min_perf_pct, while also exploring lower latency and wakeup granularity, and a more aggressive C-state (POLL) to potentially improve IPC given the noisy zero results so far.",
+          "parameters": {
+            "cstate_max": "POLL",
+            "latency_ns": 500000,
+            "max_perf_pct": 85,
+            "migration_cost_ns": 150000,
+            "min_granularity_ns": 200000,
+            "min_perf_pct": 15,
+            "napi_busy_poll": 75,
+            "wakeup_granularity_ns": 200000
+          },
+          "token_metrics": {
+            "api_total_tokens": 1769,
+            "billable_output_tokens": 182,
+            "billable_total_tokens": 1769,
+            "cached_content_token_count": 0,
+            "input_tokens": 1587,
+            "output_tokens": 180,
+            "thinking_tokens": 2,
+            "thinking_tokens_inferred_from_api_total": 0
+          }
+        },
+        "reasoning": {
+          "confidence": 1.0,
+          "converged": false,
+          "justification": "The previous iterations explored a wide range of parameters. Given the lack of significant improvement and the noisy nature of the measurements, we will re-explore the configuration from iteration 1, which had the lowest latency and wakeup granularity, to see if it yields more consistent results when given more time to stabilize.",
+          "parameters": {
+            "cstate_max": "POLL",
+            "latency_ns": 100000,
+            "max_perf_pct": 90,
+            "migration_cost_ns": 100000,
+            "min_granularity_ns": 100000,
+            "min_perf_pct": 10,
+            "napi_busy_poll": 100,
+            "wakeup_granularity_ns": 100000
+          },
+          "token_metrics": {
+            "api_total_tokens": 1800,
+            "billable_output_tokens": 191,
+            "billable_total_tokens": 1800,
+            "cached_content_token_count": 0,
+            "input_tokens": 1609,
+            "output_tokens": 191,
+            "thinking_tokens": 0,
+            "thinking_tokens_inferred_from_api_total": 0
+          }
+        }
+      }
+    },
+    {
+      "iteration": 3,
+      "responses": {
+        "quick": {
+          "confidence": 1.0,
+          "converged": false,
+          "justification": "Continuing exploration by revisiting parameters from Iteration 1, which showed a trend towards lower latency and higher performance, while slightly adjusting max_perf_pct to explore a more aggressive performance setting.",
+          "parameters": {
+            "cstate_max": "POLL",
+            "latency_ns": 100000,
+            "max_perf_pct": 90,
+            "migration_cost_ns": 100000,
+            "min_granularity_ns": 100000,
+            "min_perf_pct": 10,
+            "napi_busy_poll": 100,
+            "wakeup_granularity_ns": 100000
+          },
+          "token_metrics": {
+            "api_total_tokens": 1866,
+            "billable_output_tokens": 169,
+            "billable_total_tokens": 1866,
+            "cached_content_token_count": 673,
+            "input_tokens": 1697,
+            "output_tokens": 169,
+            "thinking_tokens": 0,
+            "thinking_tokens_inferred_from_api_total": 0
+          }
+        },
+        "reasoning": {
+          "confidence": 1.0,
+          "converged": false,
+          "justification": "The previous iterations have explored a wide range of parameters. Given the consistent zero IPC and noisy measurements, it's prudent to re-explore the most promising configuration from iteration 1, which had the lowest latency and wakeup granularity, while slightly increasing max_perf_pct to 90 and keeping other parameters from that iteration to see if these low values yield any improvement.",
+          "parameters": {
+            "cstate_max": "POLL",
+            "latency_ns": 100000,
+            "max_perf_pct": 90,
+            "migration_cost_ns": 100000,
+            "min_granularity_ns": 100000,
+            "min_perf_pct": 10,
+            "napi_busy_poll": 100,
+            "wakeup_granularity_ns": 100000
+          },
+          "token_metrics": {
+            "api_total_tokens": 1925,
+            "billable_output_tokens": 206,
+            "billable_total_tokens": 1925,
+            "cached_content_token_count": 0,
+            "input_tokens": 1719,
+            "output_tokens": 206,
+            "thinking_tokens": 0,
+            "thinking_tokens_inferred_from_api_total": 0
+          }
+        }
+      }
+    },
+    {
+      "iteration": 4,
+      "responses": {
+        "quick": {
+          "confidence": 1.0,
+          "converged": false,
+          "justification": "Continuing to explore configurations similar to Iteration 1 and 4, which used the lowest latency and wakeup granularity, along with a high max_perf_pct and low min_perf_pct, as these settings aim to reduce overhead and prioritize responsiveness for potentially higher IPC.",
+          "parameters": {
+            "cstate_max": "POLL",
+            "latency_ns": 100000,
+            "max_perf_pct": 90,
+            "migration_cost_ns": 100000,
+            "min_granularity_ns": 100000,
+            "min_perf_pct": 10,
+            "napi_busy_poll": 100,
+            "wakeup_granularity_ns": 100000
+          },
+          "token_metrics": {
+            "api_total_tokens": 2001,
+            "billable_output_tokens": 186,
+            "billable_total_tokens": 2001,
+            "cached_content_token_count": 688,
+            "input_tokens": 1815,
+            "output_tokens": 186,
+            "thinking_tokens": 0,
+            "thinking_tokens_inferred_from_api_total": 0
+          }
+        },
+        "reasoning": {
+          "confidence": 1.0,
+          "converged": false,
+          "justification": "The previous configurations have not yielded any measurable improvement in instructions_per_cycle, suggesting that the current range of exploration might not be optimal or that the noise level is too high. We will continue exploring with parameters similar to Iteration 1 and 4, which used very low latency and granularity, while keeping performance percentages and busy polling relatively high, as these settings have been consistently tested without degrading performance.",
+          "parameters": {
+            "cstate_max": "POLL",
+            "latency_ns": 100000,
+            "max_perf_pct": 90,
+            "migration_cost_ns": 100000,
+            "min_granularity_ns": 100000,
+            "min_perf_pct": 10,
+            "napi_busy_poll": 100,
+            "wakeup_granularity_ns": 100000
+          },
+          "token_metrics": {
+            "api_total_tokens": 2049,
+            "billable_output_tokens": 212,
+            "billable_total_tokens": 2049,
+            "cached_content_token_count": 0,
+            "input_tokens": 1837,
+            "output_tokens": 212,
+            "thinking_tokens": 0,
+            "thinking_tokens_inferred_from_api_total": 0
+          }
+        }
+      }
+    },
+    {
+      "iteration": 5,
+      "responses": {
+        "reasoning_final": {
+          "confidence": 1.0,
+          "converged": false,
+          "justification": "Given the persistent zero instructions_per_cycle across all tested configurations, and the lack of any discernible improvement, we will freeze the configuration from iteration 1 as it represents a significant deviation from the OS defaults towards lower latency and more aggressive performance settings, which is a reasonable starting point for further investigation if actual performance metrics were available.",
+          "parameters": {
+            "cstate_max": "POLL",
+            "latency_ns": 100000,
+            "max_perf_pct": 90,
+            "migration_cost_ns": 100000,
+            "min_granularity_ns": 100000,
+            "min_perf_pct": 10,
+            "napi_busy_poll": 100,
+            "wakeup_granularity_ns": 100000
+          },
+          "token_metrics": {
+            "api_total_tokens": 2144,
+            "billable_output_tokens": 199,
+            "billable_total_tokens": 2144,
+            "cached_content_token_count": 704,
+            "input_tokens": 1945,
+            "output_tokens": 197,
+            "thinking_tokens": 2,
+            "thinking_tokens_inferred_from_api_total": 0
+          }
+        }
+      }
+    }
+  ],
+  "method": "sematune_ipc",
+  "provider_requests": 0,
+  "schema_version": 1,
+  "source_history": "dual_loop_actor_speculator_sysbench_oltp_20260712_022701.json"
+}

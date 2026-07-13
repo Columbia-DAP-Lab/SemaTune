@@ -5,6 +5,9 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 PYTHON="$REPO_ROOT/.venv-functional/bin/python"
 [[ -x "$PYTHON" ]] || PYTHON=python3
+if [[ "$PYTHON" != python3 ]]; then
+  export PATH="$(dirname "$PYTHON"):$PATH"
+fi
 
 RESULTS_DIR=''
 OUTPUT_DIR=''
@@ -29,6 +32,8 @@ export PYTHONPATH="$REPO_ROOT/src:$SCRIPT_DIR"
 "$PYTHON" "$SCRIPT_DIR/tpcc_tool.py" summarize --results-dir "$RESULTS_DIR"
 "$PYTHON" "$SCRIPT_DIR/plot_tpcc_suite.py" \
   --summary "$RESULTS_DIR/sysbench_summary.json" --output-dir "$OUTPUT_DIR"
+"$PYTHON" "$SCRIPT_DIR/plot_paper_style_equivalents.py" \
+  --results-dir "$RESULTS_DIR" --output-dir "$OUTPUT_DIR"
 
 archive_work="$OUTPUT_DIR/.archived_headline_work"
 rm -rf "$archive_work"

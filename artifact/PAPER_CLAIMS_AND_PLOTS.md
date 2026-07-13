@@ -13,17 +13,20 @@ and model access described in the artifact README.
 From the repository root:
 
 ```bash
-reproduction/reproduce_all.sh --dry-run
-reproduction/reproduce_all.sh --archived-only --output-dir results/reproduced_archived
-reproduction/reproduce_all.sh --run --output-dir results/reproduced_one_run
+reproduction/reproduce_claims.sh --dry-run
+reproduction/reproduce_claims.sh --archived-only --output-dir results/reproduced_core
+reproduction/reproduce_claims.sh --run --output-dir results/reproduced_core
 ```
 
-`reproduction/experiment_manifest.json` maps every plot to the complete configs
-that generate it. The live command performs one rerun of each unique config and
-reuses shared results across plots; the archived-only command regenerates the
-same presentations from the checksummed five-rerun evidence. See
+`reproduction/claim_manifest.json` maps the scoped C1–C4 evaluation to 21 unique
+configs. The live command performs one fresh repetition on three workloads and
+reuses shared results; the archived phase regenerates the corresponding paper
+presentations from the checksummed five-repeat evidence. See
 `reproduction/README.md` for counts, runtimes, resume behavior, and validation
 profiles.
+
+The unscoped `reproduction/reproduce_all.sh` workflow remains available for all
+seven paper plots, but can take several days.
 
 Each `generate_plot_N.sh` can also be run separately and accepts an output
 directory as its first argument. `SEMATUNE_RESULTS_ROOT` can point at a different
@@ -48,10 +51,11 @@ table reuses its submitted CSV.**
 | C1 | SemaTune improves stable-phase performance by 72.49% over Default Parameters over 13 workloads. | Stable aggregate factor 1.7249. | Plot 1 |
 | C2 | SemaTune improves performance by 153.3% over MLOS. | Stable factors: `(1.7249 / 0.6809 - 1) * 100 = 153.33%`. This is improvement relative to MLOS, not percentage points over Default Parameters. | Plot 1 |
 | C3 | With only system metrics, SemaTune still outperforms MLOS with app metrics by 93.7% in the submitted plot. | Submitted factors: `(1.3189 / 0.6809 - 1) * 100 = 93.70%`. The measured regeneration gives a 1.3631 System factor and preserves the conclusion. | Plots 1 and 2 |
-| C4 | The dual loop provides the best cost/quality tradeoff at about $0.20 per 30-window session. | Non-catastrophic stable improvement 87.2% at $0.20, versus Single-Reasoning 89.7% at $0.42 and Single-Instant 25.4% at $0.12. | Plot 3 |
-| C5 | SemaTune explores more safely than MLOS and SemaTune-Trim. | Lower bad-window rates and variability during windows 1--30. | Plot 4 |
-| C6 | SemaTune remains effective as the action space grows to 41 knobs. | Stable improvement stays positive from 1 to 41 knobs and is 155.9% at 41. | Plot 5 and latency table |
-| C7 | Top-3 cross-run memory improves unseen-workload tuning and reduces spread. | App Top-3: 155.55%/202.89% tuning/stable. Recomputing No Memory from the regular App-only Sysbench run gives 87.62%/145.39% rather than the paper's 86.30%/144.67%. | Plot 6 |
+| C4 | SemaTune remains effective as the action space grows to 41 knobs. | Stable improvement stays positive from 1 to 41 knobs and is 155.9% at 41. | Plot 5 and latency table |
+
+The dual-versus-single cost, tuning robustness, and cross-run memory analyses
+remain documented below and are reproducible through the complete workflow;
+they are outside the time-bounded C1–C4 badge request.
 
 ## Plot 1 — end-to-end performance and catastrophic-region avoidance
 

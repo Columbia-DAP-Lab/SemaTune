@@ -67,8 +67,8 @@ def verify_config(path: Path) -> dict[str, Any]:
             mismatches.append(key)
     if mismatches:
         raise ValueError(f"config differs from canonical/archive for: {', '.join(mismatches)}")
-    from barebones_optimizer.config import SimpleConfig
-    from barebones_optimizer.parameter_manager import get_selected_default_parameters
+    from optimizer.config import SimpleConfig
+    from optimizer.parameter_manager import get_selected_default_parameters
 
     parsed = SimpleConfig.load(str(path))
     actual_defaults = get_selected_default_parameters(set(parsed.parameters_to_tune or ()))

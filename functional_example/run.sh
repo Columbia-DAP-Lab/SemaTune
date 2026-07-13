@@ -15,8 +15,8 @@ usage() {
     '  functional_example/run.sh --quick --trace-replay --resume [--output-dir DIR]' \
     '  functional_example/run.sh --quick --trace-replay --resume --method ID [--output-dir DIR]' \
     '' \
-    'The live suite runs Fixed, MLOS, Bayesian, DQN, Q-learning, SemaTune Single,' \
-    'SemaTune Dual, and SemaTune-Trim on Sysbench OLTP-RW (10 tuning + 5 stable windows).'
+    'The live suite runs 14 selected tuner/signal variants on Sysbench OLTP-RW' \
+    '(5 tuning + 5 stable windows, eight OS parameters).'
 }
 
 DRY_RUN=0
@@ -46,7 +46,7 @@ else
 fi
 if [[ -n "$SELECT_METHOD" ]]; then
   case "$SELECT_METHOD" in
-    fixed|mlos|bayesian|dqn|qlearning|sematune_single|sematune_dual|sematune_trim) ;;
+    fixed|mlos|mlos_ipc|mlos_cache|bayesian|dqn|qlearning|sematune_single|sematune_dual|sematune_system|sematune_ipc|sematune_trim|sematune_trim_ipc|sematune_trim_cache) ;;
     *) echo "Unknown method ID: $SELECT_METHOD" >&2; exit 2 ;;
   esac
 fi
@@ -59,17 +59,20 @@ if [[ "$DRY_RUN" -eq 1 ]]; then
   printf '%s\n' \
     'DRY_RUN: PASS (read-only; no root, database, provider, benchmark, output, or kernel writes)' \
     '  Workload: Sysbench OLTP read/write, 4 × 100,000-row tables, 40 threads' \
-    '  Methods: Fixed, MLOS, Bayesian, DQN, Q-learning, SemaTune Single, SemaTune Dual, SemaTune-Trim' \
-    '  Schedule: 10 tuning + 5 stable windows per method, 10 s/window' \
+    '  Methods: Fixed; MLOS App/IPC/Cache; Bayesian; DQN; Q-learning; SemaTune Single;' \
+    '           SemaTune App/System/IPC; SemaTune-Trim App/IPC/Cache' \
+    '  Schedule: 5 tuning + 5 stable windows per method, 10 s/window' \
+    '  Search space: the eight OS parameters used in paper Figures 6, 7, and 8' \
+    '  Functional model: Gemini 2.5 Flash-Lite for every LLM role (cost-limited operational check)' \
     '  CPUs: controls/perf 0-9; Sysbench 10-19' \
-    '  Expected wall time: approximately 25-40 minutes; hard timeout: 60 minutes'
+    '  Expected wall time: approximately 30-50 minutes; hard timeout: 60 minutes'
   exit 0
 fi
 
 echo 'WARNING: this Sysbench suite changes scheduler, busy-poll, P-state, and C-state controls.'
 echo 'Use only a dedicated/disposable bare-metal machine. Captured controls are restored and byte-verified.'
 
-[[ -f "$SCRIPT_DIR/site.env" ]] || { echo "Missing $SCRIPT_DIR/site.env; run functional_example/install.sh." >&2; exit 1; }
+[[ -f "$SCRIPT_DIR/site.env" ]] || { echo "Missing $SCRIPT_DIR/site.env; run scripts/setup.sh --base." >&2; exit 1; }
 # shellcheck disable=SC1091
 source "$SCRIPT_DIR/site.env"
 
@@ -85,10 +88,8 @@ if ! flock -n 9; then
   exit 1
 fi
 MODE='trace-replay'
-REPLAY="$SCRIPT_DIR/sysbench_trace_replay.json"
 if [[ "$REAL" -eq 1 ]]; then
   MODE='real-llm'
-  REPLAY=''
   [[ -n "${GEMINI_API_KEY:-}" ]] || { echo 'Real mode requires the caller’s exported GEMINI_API_KEY.' >&2; exit 1; }
 fi
 
@@ -122,7 +123,7 @@ export OS_PARAM_TUNING_ROOT="$REPO_ROOT"
 "$PYTHON" "$SCRIPT_DIR/functional_tool.py" machine --output "$OUTPUT_DIR/machine.json"
 "$PYTHON" "$SCRIPT_DIR/tpcc_tool.py" manifest --output "$OUTPUT_DIR/run_manifest.json" --mode "$MODE"
 
-mapfile -t METHODS < <("$PYTHON" -c 'import json,sys; from pathlib import Path; d=json.loads(Path(sys.argv[1]).read_text()); [print(m["id"], m["config"], m["results_subdir"]) for m in d["methods"]]' "$SCRIPT_DIR/sysbench_suite.json")
+mapfile -t METHODS < <("$PYTHON" -c 'import json,sys; from pathlib import Path; d=json.loads(Path(sys.argv[1]).read_text()); [print(m["id"], m["config"], m["results_subdir"], m.get("trace", "-")) for m in d["methods"]]' "$SCRIPT_DIR/sysbench_suite.json")
 declare -A COMPLETED=()
 if [[ "$RESUME" -eq 1 ]]; then
   while IFS= read -r method; do COMPLETED["$method"]=1; done < <(
@@ -131,9 +132,12 @@ if [[ "$RESUME" -eq 1 ]]; then
   echo "RESUME: preserving ${#COMPLETED[@]} completed method(s)"
 fi
 for row in "${METHODS[@]}"; do
-  read -r method source_name result_subdir <<< "$row"
+  read -r method source_name result_subdir trace_name <<< "$row"
   materialize=(materialize --source "$SCRIPT_DIR/$source_name" --output "$OUTPUT_DIR/configs/$source_name" --results-dir "$OUTPUT_DIR/raw/$result_subdir")
-  [[ -n "$REPLAY" ]] && materialize+=(--replay "$REPLAY")
+  if [[ "$TRACE" -eq 1 && "$trace_name" != '-' ]]; then
+    [[ -f "$SCRIPT_DIR/$trace_name" ]] || { echo "Missing recorded trace: $SCRIPT_DIR/$trace_name" >&2; exit 1; }
+    materialize+=(--replay "$SCRIPT_DIR/$trace_name")
+  fi
   "$PYTHON" "$SCRIPT_DIR/tpcc_tool.py" "${materialize[@]}"
 done
 
@@ -191,7 +195,7 @@ run_method() {
   local pgid_file="$OUTPUT_DIR/.${method}.pgid"
   "${ROOT[@]}" setsid --wait sh -c \
     'pgid_file="$1"; shift; printf "%s\n" "$$" > "$pgid_file"; exec timeout --foreground --signal=TERM --kill-after=20s "$@"' \
-    sh "$pgid_file" "${remaining}s" "$PYTHON" "$REPO_ROOT/src/barebones_optimizer/main.py" --config "$config" \
+    sh "$pgid_file" "${remaining}s" "$PYTHON" -m optimizer.main --config "$config" \
     >"$log" 2>&1 &
   ACTIVE_PID=$!
   for _ in {1..40}; do [[ -s "$pgid_file" ]] && break; sleep 0.05; done
@@ -217,7 +221,7 @@ for row in "${METHODS[@]}"; do
   read -r method source_name _ <<< "$row"
   [[ -z "$SELECT_METHOD" || "$method" == "$SELECT_METHOD" ]] || continue
   if [[ -n "${COMPLETED[$method]:-}" && -z "$SELECT_METHOD" ]]; then
-    echo "SKIPPING: $method (completed 10+5 history already present)"
+    echo "SKIPPING: $method (completed 5+5 history already present)"
     continue
   fi
   run_method "$method" "$OUTPUT_DIR/configs/$source_name" "$OUTPUT_DIR/logs/$method.log"
@@ -226,10 +230,11 @@ done
 restore_host
 "${ROOT[@]}" chown -R "$(id -u):$(id -g)" "$OUTPUT_DIR" 2>/dev/null || true
 mapfile -t FINISHED < <("$PYTHON" "$SCRIPT_DIR/tpcc_tool.py" completed-methods --results-dir "$OUTPUT_DIR")
-if [[ "${#FINISHED[@]}" -eq 8 ]]; then
+EXPECTED_METHODS="$(jq '.methods | length' "$SCRIPT_DIR/sysbench_suite.json")"
+if [[ "${#FINISHED[@]}" -eq "$EXPECTED_METHODS" ]]; then
   "$PYTHON" "$SCRIPT_DIR/tpcc_tool.py" summarize --results-dir "$OUTPUT_DIR"
   "$SCRIPT_DIR/plot.sh" --results-dir "$OUTPUT_DIR" --output-dir "$OUTPUT_DIR/plots"
   echo "FUNCTIONAL_SYSBENCH_RUN: PASS ($OUTPUT_DIR)"
 else
-  echo "FUNCTIONAL_SYSBENCH_METHOD: PASS (${SELECT_METHOD:-selected methods}; ${#FINISHED[@]}/8 complete; rerun with --resume)"
+  echo "FUNCTIONAL_SYSBENCH_METHOD: PASS (${SELECT_METHOD:-selected methods}; ${#FINISHED[@]}/$EXPECTED_METHODS complete; rerun with --resume)"
 fi

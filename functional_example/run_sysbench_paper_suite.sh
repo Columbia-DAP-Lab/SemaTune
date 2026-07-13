@@ -19,7 +19,7 @@ while [[ $# -gt 0 ]]; do
 done
 
 [[ -n "${GEMINI_API_KEY:-}" ]] || { echo 'Export GEMINI_API_KEY before running.' >&2; exit 1; }
-[[ -f "$SCRIPT_DIR/site.env" ]] || { echo 'Run functional_example/install.sh first.' >&2; exit 1; }
+[[ -f "$SCRIPT_DIR/site.env" ]] || { echo 'Run scripts/setup.sh --base first.' >&2; exit 1; }
 # shellcheck disable=SC1091
 source "$SCRIPT_DIR/site.env"
 export PYTHONPATH="$REPO_ROOT/src:$SCRIPT_DIR"
@@ -100,7 +100,7 @@ for row in "${METHODS[@]}"; do
   "${ROOT[@]}" setsid --wait sh -c \
     'printf "%s\n" "$$" > "$1"; shift; exec timeout --foreground --signal=TERM --kill-after=20s "$@"' \
     sh "$PGID_FILE" "${SEMATUNE_PAPER_METHOD_TIMEOUT_SECONDS:-1800}s" "$PYTHON" \
-    "$REPO_ROOT/src/barebones_optimizer/main.py" --config "$OUTPUT_DIR/configs/$config_name" \
+    -m optimizer.main --config "$OUTPUT_DIR/configs/$config_name" \
     >"$OUTPUT_DIR/logs/$method.log" 2>&1 &
   RUN_PID=$!
   for _ in {1..40}; do [[ -s "$PGID_FILE" ]] && break; sleep 0.05; done

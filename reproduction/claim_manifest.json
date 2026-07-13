@@ -1,0 +1,189 @@
+{
+  "schema_version": 1,
+  "workflow": "scoped-results-reproduced",
+  "selection_label": "claim",
+  "base_manifest": "experiment_manifest.json",
+  "reruns_per_configuration": 1,
+  "workloads": [
+    "silo_hi_p99",
+    "tpcc_hi_p99",
+    "sysbench_oltp_rw_hi_p99"
+  ],
+  "knob_counts": [2, 8, 16, 41],
+  "plots": {
+    "1": {
+      "claim": "SemaTune improves stable-phase performance over Default Parameters.",
+      "paper_plot": 1,
+      "jobs": [
+        "common:silo_hi_p99:fixed",
+        "common:silo_hi_p99:sematune_app",
+        "common:tpcc_hi_p99:fixed",
+        "common:tpcc_hi_p99:sematune_app",
+        "common:sysbench_oltp_rw_hi_p99:fixed",
+        "common:sysbench_oltp_rw_hi_p99:sematune_app"
+      ]
+    },
+    "2": {
+      "claim": "SemaTune outperforms MLOS.",
+      "paper_plot": 1,
+      "jobs": [
+        "common:silo_hi_p99:fixed",
+        "common:silo_hi_p99:mlos_app",
+        "common:silo_hi_p99:sematune_app",
+        "common:tpcc_hi_p99:fixed",
+        "common:tpcc_hi_p99:mlos_app",
+        "common:tpcc_hi_p99:sematune_app",
+        "common:sysbench_oltp_rw_hi_p99:fixed",
+        "common:sysbench_oltp_rw_hi_p99:mlos_app",
+        "common:sysbench_oltp_rw_hi_p99:sematune_app"
+      ]
+    },
+    "3": {
+      "claim": "SemaTune using only system metrics outperforms MLOS using application metrics.",
+      "paper_plot": 2,
+      "jobs": [
+        "common:silo_hi_p99:fixed",
+        "common:silo_hi_p99:mlos_app",
+        "common:silo_hi_p99:sematune_system",
+        "common:tpcc_hi_p99:fixed",
+        "common:tpcc_hi_p99:mlos_app",
+        "common:tpcc_hi_p99:sematune_system",
+        "common:sysbench_oltp_rw_hi_p99:fixed",
+        "common:sysbench_oltp_rw_hi_p99:mlos_app",
+        "common:sysbench_oltp_rw_hi_p99:sematune_system"
+      ]
+    },
+    "4": {
+      "claim": "SemaTune remains effective as the action space grows to 41 knobs.",
+      "paper_plot": 5,
+      "jobs": [
+        "common:silo_hi_p99:fixed",
+        "common:silo_hi_p99:sematune_app",
+        "common:tpcc_hi_p99:fixed",
+        "common:tpcc_hi_p99:sematune_app",
+        "common:sysbench_oltp_rw_hi_p99:fixed",
+        "common:sysbench_oltp_rw_hi_p99:sematune_app",
+        "parameter:silo_hi_p99_final:2_param:silo_hi_p99:llm_dual_app_metrics_final_actor",
+        "parameter:silo_hi_p99_final:16_param:silo_hi_p99:llm_dual_app_metrics_final_actor",
+        "parameter:silo_hi_p99_final:41_param:silo_hi_p99:llm_dual_app_metrics_final_actor",
+        "parameter:tpcc_p99_final:2_param:tpcc_hi_p99:llm_dual_app_metrics_final_actor",
+        "parameter:tpcc_p99_final:16_param:tpcc_hi_p99:llm_dual_app_metrics_final_actor",
+        "parameter:tpcc_p99_final:41_param:tpcc_hi_p99:llm_dual_app_metrics_final_actor",
+        "parameter:sysbench_oltp_rw_final:2_param:sysbench_oltp_rw_hi_p99:llm_dual_app_metrics_final_actor",
+        "parameter:sysbench_oltp_rw_final:16_param:sysbench_oltp_rw_hi_p99:llm_dual_app_metrics_final_actor",
+        "parameter:sysbench_oltp_rw_final:41_param:sysbench_oltp_rw_hi_p99:llm_dual_app_metrics_final_actor"
+      ]
+    }
+  },
+  "jobs": [
+    {
+      "id": "common:silo_hi_p99:fixed",
+      "plots": [1, 2, 3, 4],
+      "runtime_overrides": {"max_iterations": 30, "post_tuning_windows": 20},
+      "completion": {"measurement_windows": 50, "tuning_windows": 30, "post_tuning_windows": 20, "optimization_metric": "latency_p99", "allow_iteration_zero": true}
+    },
+    {
+      "id": "common:silo_hi_p99:mlos_app",
+      "plots": [2, 3],
+      "completion": {"measurement_windows": 50, "tuning_windows": 50, "post_tuning_windows": 0, "optimization_metric": "latency_p99", "allow_iteration_zero": true}
+    },
+    {
+      "id": "common:silo_hi_p99:sematune_app",
+      "plots": [1, 2, 4],
+      "completion": {"measurement_windows": 50, "tuning_windows": 30, "post_tuning_windows": 20, "optimization_metric": "latency_p99", "allow_iteration_zero": true, "required_mode": "actor-speculator", "require_optimizer_gist": true}
+    },
+    {
+      "id": "common:silo_hi_p99:sematune_system",
+      "plots": [3],
+      "completion": {"measurement_windows": 50, "tuning_windows": 30, "post_tuning_windows": 20, "optimization_metric": "latency_p99", "allow_iteration_zero": true, "required_mode": "actor-speculator", "require_optimizer_gist": true}
+    },
+    {
+      "id": "common:tpcc_hi_p99:fixed",
+      "plots": [1, 2, 3, 4],
+      "runtime_overrides": {"max_iterations": 30, "post_tuning_windows": 20},
+      "completion": {"measurement_windows": 50, "tuning_windows": 30, "post_tuning_windows": 20, "optimization_metric": "latency_p99", "allow_iteration_zero": true}
+    },
+    {
+      "id": "common:tpcc_hi_p99:mlos_app",
+      "plots": [2, 3],
+      "completion": {"measurement_windows": 50, "tuning_windows": 50, "post_tuning_windows": 0, "optimization_metric": "latency_p99", "allow_iteration_zero": true}
+    },
+    {
+      "id": "common:tpcc_hi_p99:sematune_app",
+      "plots": [1, 2, 4],
+      "completion": {"measurement_windows": 50, "tuning_windows": 30, "post_tuning_windows": 20, "optimization_metric": "latency_p99", "allow_iteration_zero": true, "required_mode": "actor-speculator", "require_optimizer_gist": true}
+    },
+    {
+      "id": "common:tpcc_hi_p99:sematune_system",
+      "plots": [3],
+      "completion": {"measurement_windows": 50, "tuning_windows": 30, "post_tuning_windows": 20, "optimization_metric": "latency_p99", "allow_iteration_zero": true, "required_mode": "actor-speculator", "require_optimizer_gist": true}
+    },
+    {
+      "id": "common:sysbench_oltp_rw_hi_p99:fixed",
+      "plots": [1, 2, 3, 4],
+      "runtime_overrides": {"max_iterations": 30, "post_tuning_windows": 20},
+      "completion": {"measurement_windows": 50, "tuning_windows": 30, "post_tuning_windows": 20, "optimization_metric": "latency_p99", "allow_iteration_zero": true}
+    },
+    {
+      "id": "common:sysbench_oltp_rw_hi_p99:mlos_app",
+      "plots": [2, 3],
+      "completion": {"measurement_windows": 50, "tuning_windows": 50, "post_tuning_windows": 0, "optimization_metric": "latency_p99", "allow_iteration_zero": true}
+    },
+    {
+      "id": "common:sysbench_oltp_rw_hi_p99:sematune_app",
+      "plots": [1, 2, 4],
+      "completion": {"measurement_windows": 50, "tuning_windows": 30, "post_tuning_windows": 20, "optimization_metric": "latency_p99", "allow_iteration_zero": true, "required_mode": "actor-speculator", "require_optimizer_gist": true}
+    },
+    {
+      "id": "common:sysbench_oltp_rw_hi_p99:sematune_system",
+      "plots": [3],
+      "completion": {"measurement_windows": 50, "tuning_windows": 30, "post_tuning_windows": 20, "optimization_metric": "latency_p99", "allow_iteration_zero": true, "required_mode": "actor-speculator", "require_optimizer_gist": true}
+    },
+    {
+      "id": "parameter:silo_hi_p99_final:2_param:silo_hi_p99:llm_dual_app_metrics_final_actor",
+      "plots": [4],
+      "completion": {"measurement_windows": 50, "tuning_windows": 30, "post_tuning_windows": 20, "optimization_metric": "latency_p99", "allow_iteration_zero": true, "required_mode": "actor-speculator", "require_optimizer_gist": true}
+    },
+    {
+      "id": "parameter:silo_hi_p99_final:16_param:silo_hi_p99:llm_dual_app_metrics_final_actor",
+      "plots": [4],
+      "completion": {"measurement_windows": 50, "tuning_windows": 30, "post_tuning_windows": 20, "optimization_metric": "latency_p99", "allow_iteration_zero": true, "required_mode": "actor-speculator", "require_optimizer_gist": true}
+    },
+    {
+      "id": "parameter:silo_hi_p99_final:41_param:silo_hi_p99:llm_dual_app_metrics_final_actor",
+      "plots": [4],
+      "completion": {"measurement_windows": 50, "tuning_windows": 30, "post_tuning_windows": 20, "optimization_metric": "latency_p99", "allow_iteration_zero": true, "required_mode": "actor-speculator", "require_optimizer_gist": true}
+    },
+    {
+      "id": "parameter:tpcc_p99_final:2_param:tpcc_hi_p99:llm_dual_app_metrics_final_actor",
+      "plots": [4],
+      "completion": {"measurement_windows": 50, "tuning_windows": 30, "post_tuning_windows": 20, "optimization_metric": "latency_p99", "allow_iteration_zero": true, "required_mode": "actor-speculator", "require_optimizer_gist": true}
+    },
+    {
+      "id": "parameter:tpcc_p99_final:16_param:tpcc_hi_p99:llm_dual_app_metrics_final_actor",
+      "plots": [4],
+      "completion": {"measurement_windows": 50, "tuning_windows": 30, "post_tuning_windows": 20, "optimization_metric": "latency_p99", "allow_iteration_zero": true, "required_mode": "actor-speculator", "require_optimizer_gist": true}
+    },
+    {
+      "id": "parameter:tpcc_p99_final:41_param:tpcc_hi_p99:llm_dual_app_metrics_final_actor",
+      "plots": [4],
+      "completion": {"measurement_windows": 50, "tuning_windows": 30, "post_tuning_windows": 20, "optimization_metric": "latency_p99", "allow_iteration_zero": true, "required_mode": "actor-speculator", "require_optimizer_gist": true}
+    },
+    {
+      "id": "parameter:sysbench_oltp_rw_final:2_param:sysbench_oltp_rw_hi_p99:llm_dual_app_metrics_final_actor",
+      "plots": [4],
+      "completion": {"measurement_windows": 50, "tuning_windows": 30, "post_tuning_windows": 20, "optimization_metric": "latency_p99", "allow_iteration_zero": true, "required_mode": "actor-speculator", "require_optimizer_gist": true}
+    },
+    {
+      "id": "parameter:sysbench_oltp_rw_final:16_param:sysbench_oltp_rw_hi_p99:llm_dual_app_metrics_final_actor",
+      "plots": [4],
+      "completion": {"measurement_windows": 50, "tuning_windows": 30, "post_tuning_windows": 20, "optimization_metric": "latency_p99", "allow_iteration_zero": true, "required_mode": "actor-speculator", "require_optimizer_gist": true}
+    },
+    {
+      "id": "parameter:sysbench_oltp_rw_final:41_param:sysbench_oltp_rw_hi_p99:llm_dual_app_metrics_final_actor",
+      "plots": [4],
+      "completion": {"measurement_windows": 50, "tuning_windows": 30, "post_tuning_windows": 20, "optimization_metric": "latency_p99", "allow_iteration_zero": true, "required_mode": "actor-speculator", "require_optimizer_gist": true}
+    }
+  ],
+  "aliases": []
+}

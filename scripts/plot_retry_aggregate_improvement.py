@@ -811,6 +811,7 @@ def plot_summary(
     x_group_y_shift_pts: float = 0.0,
     x_font_delta_map: Optional[Dict[str, float]] = None,
     right_trim_pts: float = RIGHT_TRIM_PTS,
+    footer_text: str = "",
 ) -> None:
     labels = [label for label, _ in columns]
     base_labels: List[str] = []
@@ -1034,6 +1035,17 @@ def plot_summary(
     ax.spines["right"].set_visible(False)
     ax.margins(x=0.04, y=0.16)
     bottom_rect = 0.08 if x_group_map else 0.0
+    if footer_text:
+        bottom_rect = max(bottom_rect, 0.16 if x_group_map else 0.10)
+        fig.text(
+            0.5,
+            0.012,
+            footer_text,
+            ha="center",
+            va="bottom",
+            fontsize=max(8, FS - 6),
+            fontstyle="italic",
+        )
     fig.tight_layout(pad=0.35, rect=(0.0, bottom_rect, 1.0, 0.88))
     output_path.parent.mkdir(parents=True, exist_ok=True)
     fig.canvas.draw()

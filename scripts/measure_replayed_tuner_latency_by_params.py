@@ -14,9 +14,9 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Dict, List, Sequence
 
-from barebones_optimizer.benchmark import BenchmarkMetrics
-from barebones_optimizer.config import SimpleConfig
-from barebones_optimizer.tuners.llm import LLMTuner
+from optimizer.benchmark import BenchmarkMetrics
+from optimizer.config import SimpleConfig
+from optimizer.tuners.llm import LLMTuner
 
 
 PARAM_COUNTS_DEFAULT = [1, 2, 4, 8, 16, 32, 41]

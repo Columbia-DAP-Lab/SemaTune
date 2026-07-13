@@ -15,7 +15,7 @@ if [[ "${1:-}" == "--output-dir" && -n "${2:-}" ]]; then
 fi
 [[ $# -eq 0 ]] || { echo "Usage: $0 [--output-dir DIR]" >&2; exit 2; }
 [[ -n "${GEMINI_API_KEY:-}" ]] || { echo 'Export GEMINI_API_KEY before running.' >&2; exit 1; }
-[[ -f "$SCRIPT_DIR/site.env" ]] || { echo 'Run functional_example/install.sh first.' >&2; exit 1; }
+[[ -f "$SCRIPT_DIR/site.env" ]] || { echo 'Run scripts/setup.sh --base first.' >&2; exit 1; }
 # shellcheck disable=SC1091
 source "$SCRIPT_DIR/site.env"
 export PYTHONPATH="$REPO_ROOT/src:$SCRIPT_DIR"
@@ -89,7 +89,7 @@ PGID_FILE="$OUTPUT_DIR/.run.pgid"
 "${ROOT[@]}" setsid --wait sh -c \
   'printf "%s\n" "$$" > "$1"; shift; exec timeout --foreground --signal=TERM --kill-after=20s "$@"' \
   sh "$PGID_FILE" "${TIMEOUT_SECONDS}s" "$PYTHON" \
-  "$REPO_ROOT/src/barebones_optimizer/main.py" --config "$CONFIG" \
+  -m optimizer.main --config "$CONFIG" \
   >"$OUTPUT_DIR/logs/sematune_dual.log" 2>&1 &
 RUN_PID=$!
 for _ in {1..40}; do [[ -s "$PGID_FILE" ]] && break; sleep 0.05; done

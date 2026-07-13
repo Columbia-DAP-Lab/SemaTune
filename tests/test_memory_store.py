@@ -11,9 +11,9 @@ sys.path.append(os.path.join(os.getcwd(), "src"))
 
 import chromadb
 
-from barebones_optimizer.memory.redaction import redact_history_data, redact_history_file
-from barebones_optimizer.memory.store import load_into_store, query_store
-from barebones_optimizer.memory.summary import summarize_redacted_history
+from optimizer.memory.redaction import redact_history_data, redact_history_file
+from optimizer.memory.store import load_into_store, query_store
+from optimizer.memory.summary import summarize_redacted_history
 from tests.memory_test_utils import (
     FakeEmbeddingProvider,
     FakeSummaryBackend,

@@ -6,6 +6,7 @@ from __future__ import annotations
 import argparse
 import fcntl
 import json
+import math
 import os
 import re
 import shutil
@@ -35,8 +36,22 @@ def _interrupt_on_term(signum: int, frame: Any) -> None:
     raise KeyboardInterrupt
 
 
-def load_manifest() -> dict[str, Any]:
-    value = json.loads(MANIFEST_PATH.read_text(encoding="utf-8"))
+def load_manifest(path: Path = MANIFEST_PATH) -> dict[str, Any]:
+    value = json.loads(path.read_text(encoding="utf-8"))
+    base_name = value.get("base_manifest")
+    if base_name:
+        base_path = (path.parent / str(base_name)).resolve()
+        base = json.loads(base_path.read_text(encoding="utf-8"))
+        base_jobs = {job["id"]: job for job in base["jobs"]}
+        expanded: list[dict[str, Any]] = []
+        for override in value.get("jobs", []):
+            job_id = override.get("id")
+            if job_id not in base_jobs:
+                raise ValueError(f"scoped manifest references unknown base job: {job_id!r}")
+            job = dict(base_jobs[job_id])
+            job.update(override)
+            expanded.append(job)
+        value["jobs"] = expanded
     if value.get("reruns_per_configuration") != 1:
         raise ValueError("the reproduction manifest must request exactly one rerun")
     return value
@@ -68,6 +83,17 @@ def config_path(job: dict[str, Any]) -> Path:
     return REPRO_ROOT / job["config"]
 
 
+def materialized_config(job: dict[str, Any]) -> dict[str, Any]:
+    """Load a checked-in config and apply declared, reviewable run overrides."""
+
+    payload = json.loads(config_path(job).read_text(encoding="utf-8"))
+    overrides = job.get("runtime_overrides", {})
+    if not isinstance(overrides, dict):
+        raise ValueError(f"{job.get('id')}: runtime_overrides must be an object")
+    payload.update(overrides)
+    return payload
+
+
 def history_files(directory: Path) -> list[Path]:
     files: list[Path] = []
     for pattern in HISTORY_PATTERNS:
@@ -75,12 +101,72 @@ def history_files(directory: Path) -> list[Path]:
     return sorted(set(files))
 
 
-def completed_result(directory: Path) -> Path | None:
+def result_satisfies_completion(data: dict[str, Any], completion: dict[str, Any]) -> bool:
+    """Return whether a history satisfies a scoped job's exact completion contract."""
+
+    marker = str(data.get("terminated_reason") or data.get("reason") or "").lower()
+    if marker not in {"complete", "completed", "max_iterations", "converged"}:
+        return False
+    history = data.get("history")
+    if not isinstance(history, list):
+        return False
+
+    baseline_rows = [row for row in history if isinstance(row, dict) and row.get("iteration") == 0]
+    if baseline_rows and not completion.get("allow_iteration_zero", False):
+        return False
+    if len(baseline_rows) > 1:
+        return False
+    rows = [row for row in history if isinstance(row, dict) and row.get("iteration") != 0]
+    expected = int(completion["measurement_windows"])
+    if len(rows) != expected:
+        return False
+    if [row.get("iteration") for row in rows] != list(range(1, expected + 1)):
+        return False
+
+    tuning = int(completion["tuning_windows"])
+    post = int(completion["post_tuning_windows"])
+    if tuning + post != expected:
+        return False
+    if any(bool(row.get("post_tuning_phase")) for row in rows[:tuning]):
+        return False
+    if any(not bool(row.get("post_tuning_phase")) for row in rows[tuning:]):
+        return False
+
+    metric = str(completion["optimization_metric"])
+    for row in rows:
+        parameters = row.get("parameters")
+        metrics = row.get("metrics")
+        if not isinstance(parameters, dict) or not parameters:
+            return False
+        if not isinstance(metrics, dict):
+            return False
+        try:
+            value = float(metrics[metric])
+            reward = float(row["reward"])
+        except (KeyError, TypeError, ValueError):
+            return False
+        if not math.isfinite(value) or not math.isfinite(reward):
+            return False
+
+    required_mode = completion.get("required_mode")
+    if required_mode and data.get("mode") != required_mode:
+        return False
+    if completion.get("require_optimizer_gist") and not str(data.get("optimizer_gist", "")).strip():
+        return False
+    return True
+
+
+def completed_result(directory: Path, job: dict[str, Any] | None = None) -> Path | None:
     candidates = history_files(directory)
     for path in reversed(candidates):
         try:
             data = json.loads(path.read_text(encoding="utf-8"))
         except (OSError, json.JSONDecodeError):
+            continue
+        completion = job.get("completion") if job else None
+        if completion is not None:
+            if isinstance(completion, dict) and result_satisfies_completion(data, completion):
+                return path
             continue
         history = data.get("history")
         if not isinstance(history, list) or not history:
@@ -114,11 +200,31 @@ def validate_manifest(manifest: dict[str, Any], *, verify_sources: bool) -> list
         except (OSError, json.JSONDecodeError) as exc:
             errors.append(f"{job_id}: invalid config: {exc}")
             continue
-        serialized = json.dumps(payload)
+        try:
+            effective_payload = materialized_config(job)
+        except (OSError, json.JSONDecodeError, ValueError) as exc:
+            errors.append(f"{job_id}: invalid runtime overrides: {exc}")
+            continue
+        serialized = json.dumps(effective_payload)
         if any(pattern.search(serialized) for pattern in SECRET_PATTERNS):
             errors.append(f"{job_id}: config contains a credential-like value")
         if payload.get("results_dir") != f"results/reproduced/raw/{target}":
             errors.append(f"{job_id}: unexpected checked-in results_dir")
+        completion = job.get("completion")
+        if completion is not None:
+            try:
+                expected_windows = int(completion["measurement_windows"])
+                configured_windows = int(effective_payload.get("max_iterations", 0)) + int(
+                    effective_payload.get("post_tuning_windows", 0)
+                )
+                if expected_windows != configured_windows:
+                    errors.append(
+                        f"{job_id}: completion expects {expected_windows} windows, config runs {configured_windows}"
+                    )
+                if str(completion["optimization_metric"]) != str(effective_payload.get("optimization_metric")):
+                    errors.append(f"{job_id}: completion metric does not match config")
+            except (KeyError, TypeError, ValueError) as exc:
+                errors.append(f"{job_id}: invalid completion contract: {exc}")
         if verify_sources:
             source = REPO_ROOT / job["source_history"]
             if not source.is_file():
@@ -143,18 +249,19 @@ def validate_manifest(manifest: dict[str, Any], *, verify_sources: bool) -> list
 
 def command_plan(args: argparse.Namespace, manifest: dict[str, Any]) -> int:
     plots = parse_plots(args.plots, manifest)
+    selection_label = str(manifest.get("selection_label", "plot"))
     jobs = select_jobs(manifest, plots)
     by_kind = Counter(job["kind"] for job in jobs)
     windows = 0
     llm_jobs = 0
     benchmarks: Counter[str] = Counter()
     for job in jobs:
-        cfg = json.loads(config_path(job).read_text(encoding="utf-8"))
+        cfg = materialized_config(job)
         windows += int(cfg.get("max_iterations", 0)) + int(cfg.get("post_tuning_windows", 0))
         benchmarks[str(cfg.get("benchmark", "unknown"))] += 1
         if str(cfg.get("tuner_type", "")).startswith("llm") or cfg.get("llm_actor_model"):
             llm_jobs += 1
-    print(f"plots: {','.join(str(x) for x in sorted(plots))}")
+    print(f"{selection_label}s: {','.join(str(x) for x in sorted(plots))}")
     print(f"unique one-rerun configurations: {len(jobs)}")
     print(f"LLM configurations: {llm_jobs}")
     print(f"total benchmark windows: {windows}")
@@ -163,7 +270,7 @@ def command_plan(args: argparse.Namespace, manifest: dict[str, Any]) -> int:
     for plot in sorted(plots):
         info = manifest["plots"][str(plot)]
         selected_count = sum(1 for job in jobs if plot in job["plots"])
-        print(f"plot {plot}: {selected_count} configs — {info['claim']}")
+        print(f"{selection_label} {plot}: {selected_count} configs — {info['claim']}")
     if args.verbose:
         for job in jobs:
             print(f"{job['id']}\t{job['config']}\t{job['target_results_dir']}")
@@ -222,7 +329,7 @@ def write_json_atomic(path: Path, payload: Any) -> None:
 
 def command_for(config: Path) -> list[str]:
     python = sys.executable
-    base = [python, "-m", "barebones_optimizer.main", "--config", str(config)]
+    base = [python, "-m", "optimizer.main", "--config", str(config)]
     if os.geteuid() == 0:
         return base
     return ["sudo", "-E", "env", f"PYTHONPATH={REPO_ROOT / 'src'}", f"OS_PARAM_TUNING_ROOT={REPO_ROOT}", *base]
@@ -266,6 +373,7 @@ def materialize_aliases(manifest: dict[str, Any], raw_root: Path, selected_jobs:
 
 
 def command_run(args: argparse.Namespace, manifest: dict[str, Any]) -> int:
+    suite_started = time.time()
     plots = parse_plots(args.plots, manifest)
     jobs = select_jobs(manifest, plots)
     if args.limit is not None:
@@ -310,14 +418,23 @@ def command_run(args: argparse.Namespace, manifest: dict[str, Any]) -> int:
     selected_ids = {job["id"] for job in jobs}
     for index, job in enumerate(jobs, start=1):
         target = raw_root / job["target_results_dir"]
-        existing = completed_result(target)
+        existing = completed_result(target, job)
         if existing is not None and not args.rerun_existing:
             print(f"[{index}/{len(jobs)}] RESUME {job['id']} -> {existing.name}")
-            status["jobs"][job["id"]] = {"status": "reused_existing", "history": str(existing)}
+            previous_job = status["jobs"].get(job["id"], {})
+            status["jobs"][job["id"]] = {
+                "status": "reused_existing",
+                "history": str(existing),
+                **(
+                    {"previous_duration_seconds": previous_job["duration_seconds"]}
+                    if "duration_seconds" in previous_job
+                    else {}
+                ),
+            }
             write_json_atomic(status_path, status)
             continue
 
-        cfg = json.loads(config_path(job).read_text(encoding="utf-8"))
+        cfg = materialized_config(job)
         cfg["results_dir"] = str(target)
         safe_name = re.sub(r"[^A-Za-z0-9_.-]+", "__", job["id"])
         runtime_config = run_configs / f"{safe_name}.json"
@@ -348,7 +465,7 @@ def command_run(args: argparse.Namespace, manifest: dict[str, Any]) -> int:
                 terminate_group(process)
             raise
         duration = time.time() - started
-        produced = completed_result(target)
+        produced = completed_result(target, job)
         if returncode == 0 and produced is not None:
             print(f"[{index}/{len(jobs)}] PASS {job['id']} ({duration:.0f}s)")
             status["jobs"][job["id"]] = {
@@ -374,6 +491,7 @@ def command_run(args: argparse.Namespace, manifest: dict[str, Any]) -> int:
     if failures == 0:
         materialize_aliases(manifest, raw_root, selected_ids)
     status["finished_at"] = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
+    status["elapsed_seconds_this_invocation"] = round(time.time() - suite_started, 3)
     status["failures"] = failures
     write_json_atomic(status_path, status)
     return 1 if failures else 0
@@ -381,6 +499,12 @@ def command_run(args: argparse.Namespace, manifest: dict[str, Any]) -> int:
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument(
+        "--manifest",
+        type=Path,
+        default=MANIFEST_PATH,
+        help="Manifest to validate or execute (default: the complete paper manifest).",
+    )
     subparsers = parser.add_subparsers(dest="command", required=True)
 
     validate = subparsers.add_parser("validate", help="Validate configs, mappings, and source checksums.")
@@ -408,7 +532,7 @@ def main() -> int:
     try:
         with LOCK_PATH.open("a+") as lock:
             fcntl.flock(lock.fileno(), fcntl.LOCK_SH)
-            manifest = load_manifest()
+            manifest = load_manifest(args.manifest.resolve())
             if args.command == "validate":
                 errors = validate_manifest(manifest, verify_sources=not args.skip_source_checksums)
                 for error in errors:

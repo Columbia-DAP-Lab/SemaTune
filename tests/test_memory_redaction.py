@@ -9,7 +9,7 @@ from pathlib import Path
 sys.path.append(os.getcwd())
 sys.path.append(os.path.join(os.getcwd(), "src"))
 
-from barebones_optimizer.memory.redaction import redact_history_data, redact_history_file
+from optimizer.memory.redaction import redact_history_data, redact_history_file
 from tests.memory_test_utils import MemoryFixtureMixin
 
 

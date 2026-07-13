@@ -22,6 +22,32 @@ EXACT_PATHS = (
     Path("/sys/kernel/debug/sched/wakeup_granularity_ns"),
     Path("/sys/kernel/debug/sched/migration_cost_ns"),
     Path("/proc/sys/net/core/busy_poll"),
+    Path("/proc/sys/net/core/busy_read"),
+    Path("/proc/sys/net/core/netdev_budget"),
+    Path("/proc/sys/net/core/netdev_budget_usecs"),
+    Path("/proc/sys/vm/swappiness"),
+    Path("/proc/sys/vm/dirty_ratio"),
+    Path("/proc/sys/vm/dirty_background_ratio"),
+    Path("/proc/sys/vm/dirty_expire_centisecs"),
+    Path("/proc/sys/vm/dirty_writeback_centisecs"),
+    Path("/proc/sys/vm/zone_reclaim_mode"),
+    Path("/proc/sys/kernel/numa_balancing"),
+    Path("/proc/sys/kernel/sched_autogroup_enabled"),
+    Path("/proc/sys/kernel/sched_cfs_bandwidth_slice_us"),
+    Path("/proc/sys/net/core/somaxconn"),
+    Path("/proc/sys/net/core/netdev_max_backlog"),
+    Path("/proc/sys/net/core/rmem_default"),
+    Path("/proc/sys/net/core/wmem_default"),
+    Path("/proc/sys/net/core/rmem_max"),
+    Path("/proc/sys/net/core/wmem_max"),
+    Path("/proc/sys/net/ipv4/tcp_fin_timeout"),
+    Path("/proc/sys/net/ipv4/tcp_tw_reuse"),
+    Path("/proc/sys/net/ipv4/tcp_mtu_probing"),
+    Path("/proc/sys/net/ipv4/tcp_timestamps"),
+    Path("/proc/sys/net/ipv4/tcp_sack"),
+    Path("/proc/sys/net/ipv4/tcp_window_scaling"),
+    Path("/proc/sys/net/ipv4/tcp_fastopen"),
+    Path("/proc/sys/net/ipv4/tcp_congestion_control"),
     Path("/sys/devices/system/cpu/intel_pstate/max_perf_pct"),
     Path("/sys/devices/system/cpu/intel_pstate/min_perf_pct"),
     Path("/sys/devices/system/cpu/intel_pstate/no_turbo"),
@@ -31,6 +57,9 @@ IRQ_RE = re.compile(r"^/proc/irq/[0-9]+/smp_affinity_list$")
 CPUFREQ_RE = re.compile(
     r"^/sys/devices/system/cpu/cpufreq/policy[0-9]+/"
     r"(scaling_governor|scaling_min_freq|scaling_max_freq|energy_performance_preference)$"
+)
+PMQOS_RE = re.compile(
+    r"^/sys/devices/system/cpu/cpu[0-9]+/power/pm_qos_resume_latency_us$"
 )
 
 
@@ -70,12 +99,19 @@ def cpufreq_paths() -> list[Path]:
 
 def allowed_paths() -> list[Path]:
     cpuidle = sorted(Path("/sys/devices/system/cpu").glob("cpu[0-9]*/cpuidle/state[0-9]*/disable"))
-    return [*EXACT_PATHS, *cpufreq_paths(), *cpuidle, *nic_irq_paths()]
+    pmqos = sorted(Path("/sys/devices/system/cpu").glob("cpu[0-9]*/power/pm_qos_resume_latency_us"))
+    return [*EXACT_PATHS, *cpufreq_paths(), *cpuidle, *pmqos, *nic_irq_paths()]
 
 
 def path_is_allowed(path: Path) -> bool:
     text = str(path)
-    return path in EXACT_PATHS or bool(CPUIDLE_RE.fullmatch(text)) or bool(IRQ_RE.fullmatch(text)) or bool(CPUFREQ_RE.fullmatch(text))
+    return (
+        path in EXACT_PATHS
+        or bool(CPUIDLE_RE.fullmatch(text))
+        or bool(PMQOS_RE.fullmatch(text))
+        or bool(IRQ_RE.fullmatch(text))
+        or bool(CPUFREQ_RE.fullmatch(text))
+    )
 
 
 def read_bytes(path: Path) -> bytes:
@@ -192,9 +228,11 @@ def restore_order(item: dict[str, str]) -> tuple[int, str]:
         return (0, path)
     if path.endswith("/min_perf_pct") or path.endswith("/scaling_min_freq"):
         return (1, path)
-    if path.endswith("/scaling_governor") or path.endswith("/energy_performance_preference"):
+    if path.endswith("/scaling_governor"):
         return (2, path)
-    return (3, path)
+    if path.endswith("/energy_performance_preference"):
+        return (3, path)
+    return (4, path)
 
 
 def write_report(report: Path | None, payload: dict[str, Any]) -> None:

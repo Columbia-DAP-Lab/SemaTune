@@ -1,0 +1,308 @@
+{
+  "benchmark": "sysbench_oltp_rw",
+  "description": "Recorded Gemini 2.5 Flash-Lite Functional responses; no provider request is made.",
+  "history": [
+    {
+      "iteration": 0,
+      "responses": {
+        "quick": {
+          "confidence": 1.0,
+          "converged": false,
+          "justification": "Exploring aggressive low latency settings by disabling C-states, minimizing scheduler latencies and granularities, and enabling busy polling to reduce wake-up overhead.",
+          "parameters": {
+            "cstate_max": "POLL",
+            "latency_ns": 100000,
+            "max_perf_pct": 100,
+            "migration_cost_ns": 100000,
+            "min_granularity_ns": 100000,
+            "min_perf_pct": 0,
+            "napi_busy_poll": 1000,
+            "wakeup_granularity_ns": 100000
+          },
+          "token_metrics": {
+            "api_total_tokens": 1449,
+            "billable_output_tokens": 162,
+            "billable_total_tokens": 1449,
+            "cached_content_token_count": 0,
+            "input_tokens": 1287,
+            "output_tokens": 162,
+            "thinking_tokens": 0,
+            "thinking_tokens_inferred_from_api_total": 0
+          }
+        },
+        "reasoning": {
+          "confidence": 1.0,
+          "converged": false,
+          "justification": "The initial configuration shows no improvement over the default. To explore a different performance/power tradeoff, we will test the most aggressive C-state setting (POLL) to minimize latency by keeping cores awake, while slightly reducing latency_ns to see if that further aids in reducing p99 latency without significantly impacting throughput.",
+          "parameters": {
+            "cstate_max": "POLL"
+          },
+          "token_metrics": {
+            "api_total_tokens": 1397,
+            "billable_output_tokens": 88,
+            "billable_total_tokens": 1397,
+            "cached_content_token_count": 0,
+            "input_tokens": 1309,
+            "output_tokens": 86,
+            "thinking_tokens": 2,
+            "thinking_tokens_inferred_from_api_total": 0
+          }
+        }
+      }
+    },
+    {
+      "iteration": 1,
+      "responses": {
+        "quick": {
+          "confidence": 1.0,
+          "converged": false,
+          "justification": "The previous iteration significantly reduced latency by lowering latency_ns and wakeup_granularity_ns, and enabling napi_busy_poll and C1 state. We will explore C1E to see if it offers further latency reduction while keeping other parameters from the best performing configuration.",
+          "parameters": {
+            "cstate_max": "C1E",
+            "latency_ns": 100000,
+            "max_perf_pct": 100,
+            "migration_cost_ns": 100000,
+            "min_granularity_ns": 100000,
+            "min_perf_pct": 0,
+            "napi_busy_poll": 1000,
+            "wakeup_granularity_ns": 100000
+          },
+          "token_metrics": {
+            "api_total_tokens": 1782,
+            "billable_output_tokens": 188,
+            "billable_total_tokens": 1782,
+            "cached_content_token_count": 658,
+            "input_tokens": 1594,
+            "output_tokens": 188,
+            "thinking_tokens": 0,
+            "thinking_tokens_inferred_from_api_total": 0
+          }
+        },
+        "reasoning": {
+          "confidence": 1.0,
+          "converged": false,
+          "justification": "The previous iteration significantly reduced latency_p99 by minimizing latency_ns, min_granularity_ns, migration_cost_ns, and wakeup_granularity_ns, while enabling napi_busy_poll and setting cstate_max to POLL. To continue exploration while staying in a promising region, we will maintain these aggressive low-latency settings and slightly increase latency_ns to probe for potential tradeoffs.",
+          "parameters": {
+            "cstate_max": "POLL",
+            "latency_ns": 100000,
+            "max_perf_pct": 100,
+            "migration_cost_ns": 100000,
+            "min_granularity_ns": 100000,
+            "min_perf_pct": 0,
+            "napi_busy_poll": 1000,
+            "wakeup_granularity_ns": 100000
+          },
+          "token_metrics": {
+            "api_total_tokens": 1832,
+            "billable_output_tokens": 216,
+            "billable_total_tokens": 1832,
+            "cached_content_token_count": 0,
+            "input_tokens": 1616,
+            "output_tokens": 216,
+            "thinking_tokens": 0,
+            "thinking_tokens_inferred_from_api_total": 0
+          }
+        }
+      }
+    },
+    {
+      "iteration": 2,
+      "responses": {
+        "quick": {
+          "confidence": 1.0,
+          "converged": false,
+          "justification": "Continuing exploration, we are testing C1 state to see if it offers further latency reduction compared to C1E, while keeping other low-latency parameters consistent.",
+          "parameters": {
+            "cstate_max": "C1",
+            "latency_ns": 100000,
+            "max_perf_pct": 100,
+            "migration_cost_ns": 100000,
+            "min_granularity_ns": 100000,
+            "min_perf_pct": 0,
+            "napi_busy_poll": 1000,
+            "wakeup_granularity_ns": 100000
+          },
+          "token_metrics": {
+            "api_total_tokens": 2038,
+            "billable_output_tokens": 164,
+            "billable_total_tokens": 2038,
+            "cached_content_token_count": 695,
+            "input_tokens": 1874,
+            "output_tokens": 164,
+            "thinking_tokens": 0,
+            "thinking_tokens_inferred_from_api_total": 0
+          }
+        },
+        "reasoning": {
+          "confidence": 1.0,
+          "converged": false,
+          "justification": "The configuration from iteration 2 is the current best, showing marginal improvement over iteration 1. To continue exploration in a safe direction, we will maintain the core settings of iteration 2 while slightly increasing the latency_ns to observe its impact on latency_p99.",
+          "parameters": {
+            "cstate_max": "C1E",
+            "latency_ns": 100000,
+            "max_perf_pct": 100,
+            "migration_cost_ns": 100000,
+            "min_granularity_ns": 100000,
+            "min_perf_pct": 0,
+            "napi_busy_poll": 1000,
+            "wakeup_granularity_ns": 100000
+          },
+          "token_metrics": {
+            "api_total_tokens": 2084,
+            "billable_output_tokens": 188,
+            "billable_total_tokens": 2084,
+            "cached_content_token_count": 698,
+            "input_tokens": 1896,
+            "output_tokens": 188,
+            "thinking_tokens": 0,
+            "thinking_tokens_inferred_from_api_total": 0
+          }
+        }
+      }
+    },
+    {
+      "iteration": 3,
+      "responses": {
+        "quick": {
+          "confidence": 1.0,
+          "converged": false,
+          "justification": "Continuing exploration by testing C6 state, which might offer better power efficiency without significantly impacting latency compared to C1E or POLL, given the consistently low latency_ns and high max_perf_pct.",
+          "parameters": {
+            "cstate_max": "C6",
+            "latency_ns": 100000,
+            "max_perf_pct": 100,
+            "migration_cost_ns": 100000,
+            "min_granularity_ns": 100000,
+            "min_perf_pct": 0,
+            "napi_busy_poll": 1000,
+            "wakeup_granularity_ns": 100000
+          },
+          "token_metrics": {
+            "api_total_tokens": 2219,
+            "billable_output_tokens": 173,
+            "billable_total_tokens": 2219,
+            "cached_content_token_count": 1430,
+            "input_tokens": 2046,
+            "output_tokens": 173,
+            "thinking_tokens": 0,
+            "thinking_tokens_inferred_from_api_total": 0
+          }
+        },
+        "reasoning": {
+          "confidence": 1.0,
+          "converged": false,
+          "justification": "The previous iterations show that very low latency_ns, min_granularity_ns, migration_cost_ns, and wakeup_granularity_ns, along with high max_perf_pct and napi_busy_poll, are beneficial. The best latency_p99 was achieved with cstate_max=C1E, so we will continue exploring this setting while keeping other parameters consistent with the best performing configurations.",
+          "parameters": {
+            "cstate_max": "C1E",
+            "latency_ns": 100000,
+            "max_perf_pct": 100,
+            "migration_cost_ns": 100000,
+            "min_granularity_ns": 100000,
+            "min_perf_pct": 0,
+            "napi_busy_poll": 1000,
+            "wakeup_granularity_ns": 100000
+          },
+          "token_metrics": {
+            "api_total_tokens": 2288,
+            "billable_output_tokens": 220,
+            "billable_total_tokens": 2288,
+            "cached_content_token_count": 0,
+            "input_tokens": 2068,
+            "output_tokens": 220,
+            "thinking_tokens": 0,
+            "thinking_tokens_inferred_from_api_total": 0
+          }
+        }
+      }
+    },
+    {
+      "iteration": 4,
+      "responses": {
+        "quick": {
+          "confidence": 1.0,
+          "converged": false,
+          "justification": "The previous iteration with C6 showed a slight increase in latency. Reverting to C1E, which yielded the best latency_p99 so far, while keeping other low-latency parameters consistent, offers a safe exploration step.",
+          "parameters": {
+            "cstate_max": "C1E",
+            "latency_ns": 100000,
+            "max_perf_pct": 100,
+            "migration_cost_ns": 100000,
+            "min_granularity_ns": 100000,
+            "min_perf_pct": 0,
+            "napi_busy_poll": 1000,
+            "wakeup_granularity_ns": 100000
+          },
+          "token_metrics": {
+            "api_total_tokens": 2400,
+            "billable_output_tokens": 180,
+            "billable_total_tokens": 2400,
+            "cached_content_token_count": 1464,
+            "input_tokens": 2220,
+            "output_tokens": 180,
+            "thinking_tokens": 0,
+            "thinking_tokens_inferred_from_api_total": 0
+          }
+        },
+        "reasoning": {
+          "confidence": 1.0,
+          "converged": false,
+          "justification": "The best latency_p99 was achieved with C1E, and while C6 showed a slight increase in latency, it's worth re-testing C1E to confirm its stability as the optimal C-state given the noisy nature of the measurements. Other parameters have been kept consistent with the best performing configurations.",
+          "parameters": {
+            "cstate_max": "C1E",
+            "latency_ns": 100000,
+            "max_perf_pct": 100,
+            "migration_cost_ns": 100000,
+            "min_granularity_ns": 100000,
+            "min_perf_pct": 0,
+            "napi_busy_poll": 1000,
+            "wakeup_granularity_ns": 100000
+          },
+          "token_metrics": {
+            "api_total_tokens": 2440,
+            "billable_output_tokens": 198,
+            "billable_total_tokens": 2440,
+            "cached_content_token_count": 0,
+            "input_tokens": 2242,
+            "output_tokens": 198,
+            "thinking_tokens": 0,
+            "thinking_tokens_inferred_from_api_total": 0
+          }
+        }
+      }
+    },
+    {
+      "iteration": 5,
+      "responses": {
+        "reasoning_final": {
+          "confidence": 1.0,
+          "converged": false,
+          "justification": "The configuration from Iteration 2 achieved the lowest latency_p99 of 9.73ns with consistent throughput, and subsequent tests with different cstate_max values (POLL and C6) did not yield significantly better latency, making C1E the best choice for stability.",
+          "parameters": {
+            "cstate_max": "C1E",
+            "latency_ns": 100000,
+            "max_perf_pct": 100,
+            "migration_cost_ns": 100000,
+            "min_granularity_ns": 100000,
+            "min_perf_pct": 0,
+            "napi_busy_poll": 1000,
+            "wakeup_granularity_ns": 100000
+          },
+          "token_metrics": {
+            "api_total_tokens": 2604,
+            "billable_output_tokens": 193,
+            "billable_total_tokens": 2604,
+            "cached_content_token_count": 0,
+            "input_tokens": 2411,
+            "output_tokens": 193,
+            "thinking_tokens": 0,
+            "thinking_tokens_inferred_from_api_total": 0
+          }
+        }
+      }
+    }
+  ],
+  "method": "sematune_dual",
+  "provider_requests": 0,
+  "schema_version": 1,
+  "source_history": "dual_loop_actor_speculator_sysbench_oltp_20260712_022017.json"
+}

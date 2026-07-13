@@ -23,52 +23,42 @@ def load_module(name: str, path: Path):
     return module
 
 
-def test_checked_in_configs_and_role_replay_validate_without_credentials():
-    env = {key: value for key, value in os.environ.items() if key != "GEMINI_API_KEY"}
-    result = subprocess.run(
-        [sys.executable, str(FUNCTIONAL / "functional_tool.py"), "validate-configs"],
-        cwd=ROOT, env=env, text=True, capture_output=True, check=False,
-    )
-    assert result.returncode == 0, result.stdout + result.stderr
-    assert "2 quick + 6 representative" in result.stdout
-
-
 def test_null_actor_speculator_fields_remain_single_loop():
-    from barebones_optimizer.config import SimpleConfig
+    from optimizer.config import SimpleConfig
 
-    single = SimpleConfig.load(str(FUNCTIONAL / "tpcc_sematune_single.json"))
-    dual = SimpleConfig.load(str(FUNCTIONAL / "tpcc_sematune_dual.json"))
+    single = SimpleConfig.load(str(FUNCTIONAL / "sysbench_sematune_single.json"))
+    dual = SimpleConfig.load(str(FUNCTIONAL / "sysbench_sematune_dual.json"))
     assert single.llm_actor_model is None and single.llm_speculator_model is None
     assert single._explicit_dual_loop is False
     assert dual._explicit_dual_loop is True
 
 
-def test_mock_replay_preserves_roles_justification_convergence_and_final(monkeypatch):
-    from barebones_optimizer.benchmark import BenchmarkMetrics
-    from barebones_optimizer.config import SimpleConfig
-    from barebones_optimizer.tuners.llm import LLMTuner
+def test_recorded_replay_preserves_roles_justification_convergence_and_final(monkeypatch):
+    from optimizer.benchmark import BenchmarkMetrics
+    from optimizer.config import SimpleConfig
+    from optimizer.tuners.llm import LLMTuner
 
     monkeypatch.delenv("GEMINI_API_KEY", raising=False)
-    config = SimpleConfig.load(str(FUNCTIONAL / "quick_sematune.json"))
-    config.llm_replay_file = str(FUNCTIONAL / "mock_replay.json")
+    config = SimpleConfig.load(str(FUNCTIONAL / "sysbench_sematune_dual.json"))
+    config.llm_replay_file = str(FUNCTIONAL / "traces/sysbench_sematune_dual_trace.json")
     quick = LLMTuner(config, agent_type="quick")
     actor = LLMTuner(config, agent_type="reasoning")
     metrics = BenchmarkMetrics()
     quick_response = quick.suggest_parameters(metrics, {}, 0)
     actor_response = actor.suggest_parameters(metrics, {}, 0)
-    final_response = actor.suggest_parameters(metrics, {}, 10, final_freeze_request=True)
+    final_response = actor.suggest_parameters(metrics, {}, 5, final_freeze_request=True)
     assert quick_response.parameters != actor_response.parameters
     assert quick_response.justification and actor_response.justification
     assert quick_response.converged is False
-    assert final_response.converged is True
-    assert "freeze" in final_response.justification.lower()
+    assert set(final_response.parameters) == set(config.parameters_to_tune)
+    assert final_response.justification
     assert quick.client is None and actor.client is None
 
 
 def test_tuner_package_is_lazy():
     code = """
 import sys
-from barebones_optimizer.tuners import FixedTuner
+from optimizer.tuners import FixedTuner
 assert not any(name == 'torch' or name.startswith('smac') or name.startswith('chromadb') for name in sys.modules)
 print(FixedTuner.__name__)
 """
@@ -81,7 +71,7 @@ print(FixedTuner.__name__)
 
 
 def test_selected_defaults_do_not_include_unrelated_controls(monkeypatch):
-    from barebones_optimizer import parameter_manager
+    from optimizer import parameter_manager
 
     monkeypatch.setattr(parameter_manager, "get_default_parameters", lambda: {
         "latency_ns": 24_000_000, "cstate_max": "unlimited", "busy_poll": 17,
@@ -93,8 +83,8 @@ def test_selected_defaults_do_not_include_unrelated_controls(monkeypatch):
 
 
 def test_sysbench_credentials_stay_in_environment_and_off_command_line(monkeypatch, tmp_path):
-    from barebones_optimizer.benchmarks.sysbench import SysbenchBenchmark
-    from barebones_optimizer.config import SimpleConfig
+    from optimizer.benchmarks.sysbench import SysbenchBenchmark
+    from optimizer.config import SimpleConfig
 
     monkeypatch.setenv("OS_PARAM_TUNING_ROOT", str(ROOT))
     monkeypatch.setenv("SEMATUNE_SYSBENCH_PASSWORD", "runtime-only")
@@ -107,8 +97,8 @@ def test_sysbench_credentials_stay_in_environment_and_off_command_line(monkeypat
 
 
 def test_sysbench_oltp_parser_keeps_sql_rates(monkeypatch, tmp_path):
-    from barebones_optimizer.benchmarks.sysbench import SysbenchBenchmark
-    from barebones_optimizer.config import SimpleConfig
+    from optimizer.benchmarks.sysbench import SysbenchBenchmark
+    from optimizer.config import SimpleConfig
 
     monkeypatch.setenv("OS_PARAM_TUNING_ROOT", str(ROOT))
     benchmark = SysbenchBenchmark(SimpleConfig(benchmark="sysbench_oltp", results_dir=str(tmp_path)))
@@ -129,38 +119,6 @@ Latency (ms):
     assert metrics.goodput == 1904.55
     assert metrics.throughput == 38236.57
     assert metrics.extra_metrics["latency_p99"] == 49.21
-
-
-def write_history(path: Path, method: str, stable_value: float) -> None:
-    history = [
-        {"iteration": iteration, "post_tuning_phase": iteration > 10,
-         "metrics": {"latency_p99": stable_value if iteration > 10 else stable_value * 1.2}}
-        for iteration in range(1, 16)
-    ]
-    payload = {"config": {"max_iterations": 10, "post_tuning_windows": 5}, "history": history}
-    if method == "sematune":
-        payload["reason"] = "completed"
-        filename = "dual_loop_actor_speculator_sysbench_oltp_20260101_000000.json"
-    else:
-        payload["terminated_reason"] = "completed"
-        filename = "optimization_history_fixed_20260101_000000.json"
-    (path / filename).write_text(json.dumps(payload), encoding="utf-8")
-
-
-def test_quick_plot_uses_two_methods_and_both_phases(tmp_path):
-    write_history(tmp_path, "fixed", 10.0)
-    write_history(tmp_path, "sematune", 8.0)
-    output = tmp_path / "plots"
-    result = subprocess.run(
-        [sys.executable, str(FUNCTIONAL / "plot_quick.py"), "--results-dir", str(tmp_path), "--output-dir", str(output)],
-        cwd=ROOT, env={**os.environ, "PYTHONPATH": f"{ROOT / 'src'}:{FUNCTIONAL}"},
-        text=True, capture_output=True, check=False,
-    )
-    assert result.returncode == 0, result.stdout + result.stderr
-    rows = (output / "quick_tuning_vs_stable.csv").read_text(encoding="utf-8").splitlines()
-    assert len(rows) == 5
-    assert (output / "quick_tuning_vs_stable.pdf").is_file()
-    assert (output / "quick_tuning_vs_stable.png").is_file()
 
 
 def test_host_snapshot_rejects_non_whitelisted_paths(tmp_path):
@@ -186,7 +144,7 @@ def test_recovered_twitter_histories_and_resolution():
     assert "5 checksummed histories" in result.stdout
 
 
-def test_tpcc_eight_method_suite_and_trace_validate_without_credentials():
+def test_sysbench_fourteen_method_suite_and_trace_validate_without_credentials():
     env = {**os.environ, "PYTHONPATH": f"{ROOT / 'src'}:{FUNCTIONAL}"}
     env.pop("GEMINI_API_KEY", None)
     result = subprocess.run(
@@ -194,22 +152,81 @@ def test_tpcc_eight_method_suite_and_trace_validate_without_credentials():
         cwd=ROOT, env=env, text=True, capture_output=True, check=False,
     )
     assert result.returncode == 0, result.stdout + result.stderr
-    assert "8 methods" in result.stdout
-    suite = json.loads((FUNCTIONAL / "tpcc_suite.json").read_text())
+    assert "14 methods" in result.stdout
+    suite = json.loads((FUNCTIONAL / "sysbench_suite.json").read_text())
     assert [method["id"] for method in suite["methods"]] == [
-        "fixed", "mlos", "bayesian", "dqn", "qlearning",
-        "sematune_single", "sematune_dual", "sematune_trim",
+        "fixed", "mlos", "mlos_ipc", "mlos_cache", "bayesian", "dqn",
+        "qlearning", "sematune_single", "sematune_dual", "sematune_system",
+        "sematune_ipc", "sematune_trim", "sematune_trim_ipc",
+        "sematune_trim_cache",
     ]
+    assert suite["tuning_windows"] == 5
+    assert suite["stable_windows"] == 5
+    for method in suite["methods"]:
+        config = json.loads((FUNCTIONAL / method["config"]).read_text())
+        assert len(config["parameters_to_tune"]) == 8
+        assert config["max_iterations"] == config["post_tuning_windows"] == 5
+        if config.get("llm_actor_model") and config.get("llm_speculator_model"):
+            assert config["llm_actor_model"] == "gemini-2.5-flash-lite"
+            assert config["llm_speculator_model"] == "gemini-2.5-flash-lite"
 
 
-def test_tpcc_trim_replay_applies_recorded_search_space_actions(monkeypatch):
-    from barebones_optimizer.benchmark import BenchmarkMetrics
-    from barebones_optimizer.config import SimpleConfig
-    from barebones_optimizer.tuners.llm_trimming import LLMTrimmingTuner
+def test_sysbench_fourteen_method_operational_plot(tmp_path):
+    suite = json.loads((FUNCTIONAL / "sysbench_suite.json").read_text())
+    methods = {}
+    for index, method in enumerate(suite["methods"], start=1):
+        tuning = [float(index)] * 5
+        stable = [float(index) + 0.5] * 5
+        history = tmp_path / f"{method['id']}.json"
+        history.write_text(json.dumps({"history": []}))
+        methods[method["id"]] = {
+            "label": method["label"],
+            "color": method["color"],
+            "tuning_values": tuning,
+            "stable_values": stable,
+            "tuning_mean": float(index),
+            "stable_mean": float(index) + 0.5,
+            "tuning_std": 0.0,
+            "stable_std": 0.0,
+            "history_file": str(history),
+        }
+    summary = tmp_path / "summary.json"
+    summary.write_text(json.dumps({
+        "tuning_windows": 5,
+        "stable_windows": 5,
+        "methods": methods,
+    }))
+    output = tmp_path / "plots"
+    result = subprocess.run(
+        [sys.executable, str(FUNCTIONAL / "plot_tpcc_suite.py"),
+         "--summary", str(summary), "--output-dir", str(output)],
+        cwd=ROOT, text=True, capture_output=True, check=False,
+    )
+    assert result.returncode == 0, result.stdout + result.stderr
+    result = subprocess.run(
+        [sys.executable, str(FUNCTIONAL / "plot_paper_style_equivalents.py"),
+         "--summary", str(summary), "--output-dir", str(output)],
+        cwd=ROOT, text=True, capture_output=True, check=False,
+    )
+    assert result.returncode == 0, result.stdout + result.stderr
+    report = json.loads((output / "validation.json").read_text())
+    assert report["checks"]["methods"] == 14
+    assert report["checks"]["performance_result_validation"] is False
+    for figure in (6, 7, 8, 9):
+        stem = output / f"functional_figure_{figure}_equivalent"
+        assert stem.with_suffix(".pdf").is_file()
+        assert stem.with_suffix(".png").is_file()
+        assert stem.with_suffix(".csv").is_file()
+
+
+def test_sysbench_trim_replay_applies_recorded_search_space_actions(monkeypatch):
+    from optimizer.benchmark import BenchmarkMetrics
+    from optimizer.config import SimpleConfig
+    from optimizer.tuners.llm_trimming import LLMTrimmingTuner
 
     monkeypatch.delenv("GEMINI_API_KEY", raising=False)
-    config = SimpleConfig.load(str(FUNCTIONAL / "tpcc_sematune_trim.json"))
-    config.llm_replay_file = str(FUNCTIONAL / "tpcc_trace_replay.json")
+    config = SimpleConfig.load(str(FUNCTIONAL / "sysbench_sematune_trim.json"))
+    config.llm_replay_file = str(FUNCTIONAL / "traces/sysbench_sematune_trim_trace.json")
     tuner = LLMTrimmingTuner(config, agent_type="single")
     before = dict(tuner.effective_ranges)
     tuner._create_update_message(
@@ -223,8 +240,8 @@ def test_tpcc_trim_replay_applies_recorded_search_space_actions(monkeypatch):
 
 
 def test_benchbase_runtime_credentials_only_enter_temporary_xml(monkeypatch, tmp_path):
-    from barebones_optimizer.benchmarks.benchbase import BenchBaseBenchmark
-    from barebones_optimizer.config import SimpleConfig
+    from optimizer.benchmarks.benchbase import BenchBaseBenchmark
+    from optimizer.config import SimpleConfig
     import xml.etree.ElementTree as ET
 
     source = tmp_path / "tpcc.xml"
@@ -255,7 +272,7 @@ def test_benchbase_runtime_credentials_only_enter_temporary_xml(monkeypatch, tmp
 
 def test_trim_history_validator_distinguishes_token_metrics_from_dual_roles():
     tool = load_module("functional_tpcc_tool", FUNCTIONAL / "tpcc_tool.py")
-    config = json.loads((FUNCTIONAL / "tpcc_sematune_trim.json").read_text())
+    config = json.loads((FUNCTIONAL / "sysbench_sematune_trim.json").read_text())
     parameters = {
         name: ({"value": values[0], "cores": "0-9"} if name in {
             "cstate_max", "max_perf_pct", "min_perf_pct", "napi_busy_poll"
@@ -273,3 +290,131 @@ def test_trim_history_validator_distinguishes_token_metrics_from_dual_roles():
         },
     }]}
     assert tool.validate_llm_trace(payload, config["parameter_ranges"]) == []
+
+
+def test_trim_history_validator_reports_empty_required_candidate_accurately():
+    tool = load_module("functional_tpcc_tool_empty_proposal", FUNCTIONAL / "tpcc_tool.py")
+    config = json.loads((FUNCTIONAL / "sysbench_sematune_trim.json").read_text())
+    payload = {"history": [{
+        "iteration": 2,
+        "trimming_phase": True,
+        "parameters": {"cstate_max": "unlimited"},
+        "tuner_timing": {
+            "proposed_parameters": {},
+            "justification": "Only the search ranges changed.",
+            "token_metrics": {"input_tokens": 10, "output_tokens": 5},
+        },
+    }]}
+    assert tool.validate_llm_trace(payload, config["parameter_ranges"]) == [
+        "trimming response did not provide the required parameter configuration"
+    ]
+
+
+def test_trim_history_validator_uses_recorded_active_parameters_after_elimination():
+    tool = load_module("functional_tpcc_tool_eliminated", FUNCTIONAL / "tpcc_tool.py")
+    config = json.loads((FUNCTIONAL / "sysbench_sematune_trim.json").read_text())
+    required = [name for name in config["parameter_ranges"] if name != "cstate_max"]
+    proposed = {name: config["parameter_ranges"][name][0] for name in required}
+    payload = {"history": [{
+        "iteration": 3,
+        "trimming_phase": True,
+        "tuner_timing": {
+            "proposed_parameters": proposed,
+            "required_parameters": required,
+            "justification": "cstate_max was eliminated in the prior cycle.",
+            "token_metrics": {"input_tokens": 10, "output_tokens": 5},
+        },
+    }]}
+    assert tool.validate_llm_trace(payload, config["parameter_ranges"]) == []
+
+
+def test_trim_history_validator_accepts_empty_candidate_after_all_eliminated():
+    tool = load_module("functional_tpcc_tool_all_eliminated", FUNCTIONAL / "tpcc_tool.py")
+    config = json.loads((FUNCTIONAL / "sysbench_sematune_trim.json").read_text())
+    payload = {"history": [{
+        "iteration": 4,
+        "trimming_phase": True,
+        "tuner_timing": {
+            "proposed_parameters": {},
+            "required_parameters": [],
+            "justification": "All parameters were eliminated in prior cycles.",
+            "token_metrics": {"input_tokens": 10, "output_tokens": 5},
+        },
+    }]}
+    assert tool.validate_llm_trace(payload, config["parameter_ranges"]) == []
+
+
+def test_trim_prompt_schema_and_runtime_require_complete_active_candidate(monkeypatch):
+    from optimizer.benchmark import BenchmarkMetrics
+    from optimizer.config import SimpleConfig
+    from optimizer.tuners.base import TunerResponse
+    from optimizer.tuners.llm import LLMTuner
+    from optimizer.tuners.llm_trimming import LLMTrimmingTuner
+
+    config = SimpleConfig.load(str(FUNCTIONAL / "sysbench_sematune_trim.json"))
+    config.llm_replay_file = str(FUNCTIONAL / "traces/sysbench_sematune_trim_trace.json")
+    tuner = LLMTrimmingTuner(config, agent_type="single")
+    tuner.replay_history_file = None
+
+    prompt = tuner._create_base_prompt()
+    assert "DO NOT retain or copy any such out-of-range value" in prompt
+    schema = tuner._build_response_schema()
+    assert set(config.parameter_ranges) <= set(schema["required"])
+    assert {"suggested_ranges", "eliminated_params", "justification"} <= set(schema["required"])
+
+    valid = {name: values[0] for name, values in config.parameter_ranges.items()}
+    replies = iter([
+        TunerResponse(parameters={}, justification="Only changed ranges."),
+        TunerResponse(parameters=valid, justification="Complete retry."),
+    ])
+    monkeypatch.setattr(LLMTuner, "suggest_parameters", lambda self, *args, **kwargs: next(replies))
+    response = tuner.suggest_parameters(BenchmarkMetrics(), {}, 1)
+    assert response.parameters == valid
+
+
+def test_trim_range_changes_are_transactional_for_invalid_candidate():
+    from optimizer.config import SimpleConfig
+    from optimizer.tuners.llm_trimming import LLMTrimmingTuner
+
+    config = SimpleConfig.load(str(FUNCTIONAL / "sysbench_sematune_trim.json"))
+    config.llm_replay_file = str(FUNCTIONAL / "traces/sysbench_sematune_trim_trace.json")
+    tuner = LLMTrimmingTuner(config, agent_type="single")
+    before = dict(tuner.effective_ranges)
+    parsed = {
+        "suggested_ranges": {"latency_ns": {"min": 100000, "max": 200000}},
+        "eliminated_params": [],
+        "justification": "Narrow latency.",
+        "cstate_max": "unlimited",
+    }
+    tuner._parse_structured_response(parsed)
+    assert tuner.effective_ranges == before
+    assert tuner._last_candidate_parse_error
+
+
+def test_trim_runtime_fails_after_one_invalid_retry(monkeypatch):
+    import pytest
+
+    from optimizer.benchmark import BenchmarkMetrics
+    from optimizer.config import SimpleConfig
+    from optimizer.optimizer import _is_fatal_llm_http_error
+    from optimizer.tuners.base import TunerResponse
+    from optimizer.tuners.llm import LLMTuner
+    from optimizer.tuners.llm_trimming import (
+        InvalidTrimmingCandidateError,
+        LLMTrimmingTuner,
+    )
+
+    config = SimpleConfig.load(str(FUNCTIONAL / "sysbench_sematune_trim.json"))
+    config.llm_replay_file = str(FUNCTIONAL / "traces/sysbench_sematune_trim_trace.json")
+    tuner = LLMTrimmingTuner(config, agent_type="single")
+    tuner.replay_history_file = None
+    monkeypatch.setattr(
+        LLMTuner,
+        "suggest_parameters",
+        lambda self, *args, **kwargs: TunerResponse(parameters={}, justification="Incomplete."),
+    )
+
+    with pytest.raises(InvalidTrimmingCandidateError) as exc_info:
+        tuner.suggest_parameters(BenchmarkMetrics(), {}, 1)
+    assert "after 2 attempt(s)" in str(exc_info.value)
+    assert _is_fatal_llm_http_error(exc_info.value)

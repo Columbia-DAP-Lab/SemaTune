@@ -1,15 +1,147 @@
-# One-rerun Results-Reproduced workflow
+# Results Reproduced workflow
 
-This directory maps every active empirical paper plot to exact SemaTune
-configurations and provides one end-to-end command. The suite performs **one
-fresh rerun per unique configuration**, not the five repetitions used for the
-paper. A run shared by multiple plots is executed once.
+## TL;DR: scoped C1–C4 evaluation
+
+The recommended evaluator workflow targets four headline claims within the
+available evaluation time. It regenerates the paper evidence from the archived
+five-repeat histories, then performs one fresh repetition on Silo, TPC-C, and
+Sysbench.
+
+```bash
+reproduction/reproduce_claims.sh --dry-run
+
+export GEMINI_API_KEY='<provided-key>'
+mkdir -p results
+RUN_DIR="$(mktemp -d -p "$PWD/results" reproduced_core_real_XXXXXXXX)"
+reproduction/reproduce_claims.sh --run --output-dir "$RUN_DIR"
+echo "Results: $RUN_DIR"
+```
+
+The API key is provided on the preconfigured CloudLab machine. The dry run is
+read-only and should report 21 unique configurations, 15 LLM configurations,
+and 1,050 benchmark windows. At five seconds per window, the nominal benchmark
+time is 1.46 hours; workload startup, database resets, and hosted-model calls
+add overhead. The workflow is designed for less than ten hours on the supplied
+host, but actual time remains host- and provider-dependent.
+
+### Claims
+
+| ID | Claim | Archived evidence | Fresh observation |
+|---|---|---|---|
+| C1 | SemaTune improves stable-phase performance over Default Parameters. | Submitted 72.49%; measured regeneration 73.01% over 13 workloads. | SemaTune App versus Fixed stable aggregate over the three-workload subset. |
+| C2 | SemaTune outperforms MLOS. | Submitted 153.3%; measured regeneration 154.09%. | SemaTune App versus MLOS aggregate ordering and ratio. |
+| C3 | SemaTune using only system metrics outperforms MLOS using application metrics. | Submitted 93.7%; measured regeneration 100.19%, preserving the conclusion. | System-metric SemaTune versus application-metric MLOS. |
+| C4 | SemaTune remains effective as the action space grows to 41 knobs. | Regenerates the complete parameter-scaling plot and validates the submitted latency CSV. | SemaTune at 2, 8, 16, and 41 knobs; the eight-knob runs are reused from C1/C2. |
+
+The paper values aggregate five repetitions over 13 workloads. The fresh run
+uses one repetition over three workloads. LLM decisions and host measurements
+are nondeterministic, so reviewers should validate whether the observation is
+preserved rather than require exact percentage equality.
+
+`claim_report.md` and `claim_report.json` report two independent fields:
+
+- `COMPLETE`: every required history and output passed structural validation.
+- `CONSISTENT` or `DIVERGENT`: the single fresh aggregate does or does not have
+  the direction stated by the claim.
+
+A divergent stochastic observation is disclosed for reviewer interpretation;
+it is never silently replaced with the paper value. Other paper experiments
+remain in the complete workflow but are outside this time-bounded claim set.
+
+### Optional full C1–C4 workflow
+
+To run the canonical full-workload dependencies for paper Plots 1, 2, and 5,
+use `--full` with another new output directory:
+
+```bash
+export GEMINI_API_KEY='<provided-key>'
+mkdir -p results
+FULL_DIR="$(mktemp -d -p "$PWD/results" reproduced_claims_full_real_XXXXXXXX)"
+reproduction/reproduce_claims.sh --run --full --output-dir "$FULL_DIR"
+echo "Results: $FULL_DIR"
+```
+
+Check the plan first with `reproduction/reproduce_claims.sh --dry-run --full`.
+It selects 232 unique configurations and 13,430 benchmark windows. The nominal
+window time alone is 18.65 hours, and the complete run can take one to several
+days. Fresh histories and plots are written under `FULL_DIR/full/`; archived
+comparison plots remain under `FULL_DIR/archived/plots/`. This canonical plot
+selection includes supporting methods required by Plots 1, 2, and 5, but does
+not select the dual-versus-single cost experiment.
+
+### Runs, phases, and resume
+
+[`claim_manifest.json`](claim_manifest.json) selects exactly 21 unique jobs:
+
+- Fixed, MLOS App, SemaTune App, and SemaTune System on each workload;
+- additional 2-, 16-, and 41-knob SemaTune App runs on each workload; and
+- the shared SemaTune App runs as the eight-knob C4 point.
+
+SemaTune runs 30 tuning and 20 stable windows. MLOS preserves its paper
+behavior and tunes for all 50 windows. Fixed holds one static configuration for
+50 observations. For a uniform comparison, every method is summarized over
+windows 1–30 and 31–50.
+
+Repeating the same command resumes automatically. A result is skipped only when
+it has an accepted completion marker, exactly 50 numbered measurement windows,
+the correct phase markers, finite primary metrics and rewards, applied
+parameters, and—where applicable—complete dual-loop metadata. Truncated,
+malformed, non-finite, or interrupted histories remain available for diagnosis
+but are not reused. `--rerun-existing` explicitly repeats valid jobs.
+
+### Outputs and inspection
+
+```text
+results/reproduced_core/
+├── claim_report.md              Human-readable C1–C4 result
+├── claim_report.json            Machine-readable factors and statuses
+├── archived/plots/              Regenerated paper Plots 1, 2, and 5 + latency CSV
+└── fresh/
+    ├── raw/                     Complete optimization histories
+    ├── logs/                    One log per selected configuration
+    ├── run_configs/             Exact materialized configurations
+    ├── run_status.json          Resume state and elapsed times
+    ├── host_state_before.json   Captured host controls
+    ├── restoration_report.json  Byte-verification result
+    ├── plots/                   Four fresh C1–C4 PDFs
+    └── tables/                  Phase, factor, claim, and scaling CSVs
+```
+
+Inspect the results with:
+
+```bash
+RESULTS=results/reproduced_core
+cat "$RESULTS/claim_report.md"
+jq '.fresh_claims' "$RESULTS/claim_report.json"
+jq '.failures, .elapsed_seconds_this_invocation' "$RESULTS/fresh/run_status.json"
+jq . "$RESULTS/fresh/restoration_report.json"
+ls -lh "$RESULTS/fresh/plots" "$RESULTS/fresh/tables" "$RESULTS/archived/plots"
+```
+
+Fresh plotting and calculation are implemented by
+[`plot_claims.py`](plot_claims.py). Archived evidence is generated by
+[`plot_all.sh`](plot_all.sh), which invokes the canonical paper wrappers for
+Plots 1, 2, and 5 and validates `latency_by_params.csv`. No error bars are
+invented for the single fresh repetition.
 
 > **Dedicated-machine warning:** live reproduction changes scheduler, network,
 > VM, CPU-frequency, P-state, and C-state controls. Use only the paper-compatible
 > dedicated/disposable bare-metal host. Do not run it on a shared machine.
 
-## Commands
+The preconfigured CloudLab host is strongly recommended. Otherwise use the
+[parameterized `small-lan` profile](https://www.cloudlab.us/p/PortalProfiles/small-lan&rerun_paramset=77c05171-9bff-4316-8832-cc0b265f4bdb)
+on Wisconsin `c220` nodes and follow the
+[full installation instructions](../docs/FULL_INSTALL.md). The complete
+distributed experiments require two nodes.
+
+## Complete all-plot workflow
+
+The complete workflow maps every active empirical paper plot to exact SemaTune
+configurations. It performs one fresh rerun per unique configuration, not the
+five repetitions used for the paper. A run shared by multiple plots is executed
+once.
+
+### Commands
 
 Read-only plan, including the number of unique configurations and windows:
 
