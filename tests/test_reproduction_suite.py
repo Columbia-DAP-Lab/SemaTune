@@ -11,6 +11,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 REPRO = ROOT / "reproduction"
+TRACE_BASELINE = REPRO / "trace_baselines" / "c1_c4_provider"
 
 
 def load_suite_module():
@@ -19,6 +20,18 @@ def load_suite_module():
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
     return module
+
+
+def load_compare_module():
+    sys.path.insert(0, str(REPRO))
+    try:
+        spec = importlib.util.spec_from_file_location("reproduction_compare_replay", REPRO / "compare_replay.py")
+        assert spec and spec.loader
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        return module
+    finally:
+        sys.path.remove(str(REPRO))
 
 
 def test_manifest_covers_all_plots_with_one_rerun_and_reuse() -> None:
@@ -127,6 +140,227 @@ def test_scoped_dry_run_reports_expected_windows_and_reuse(tmp_path: Path) -> No
     assert "LLM configurations: 15" in completed.stdout
     assert "total benchmark windows: 1050" in completed.stdout
     assert "claim 4: 15 configs" in completed.stdout
+    assert not output.exists()
+
+
+def test_committed_claim_trace_baseline_is_complete_and_provider_free() -> None:
+    suite = load_suite_module()
+    manifest = suite.load_manifest(REPRO / "claim_manifest.json")
+    bundle = suite.load_trace_bundle(TRACE_BASELINE)
+    assert bundle["job_count"] == 21
+    assert bundle["trace_count"] == 15
+    assert bundle["measurement_windows"] == 1050
+    assert bundle["provider_models"] == ["gemini-2.5-flash", "gemini-2.5-flash-lite"]
+    assert suite.trace_bundle_errors(manifest["jobs"], TRACE_BASELINE) == []
+    for record in bundle["traces"].values():
+        trace = json.loads((TRACE_BASELINE / record["path"]).read_text(encoding="utf-8"))
+        assert trace["provider_requests"] == 0
+        assert not str(trace["source_history"]).startswith("/")
+
+
+def test_committed_claim_replay_wrapper_dry_run_is_read_only(tmp_path: Path) -> None:
+    output = tmp_path / "must-not-exist"
+    completed = subprocess.run(
+        [
+            str(REPRO / "replay_claims.sh"),
+            "--dry-run",
+            "--output-dir",
+            str(output),
+        ],
+        cwd=ROOT,
+        capture_output=True,
+        text=True,
+    )
+    assert completed.returncode == 0, completed.stdout + completed.stderr
+    assert "TRACE_REPLAY_BUNDLE: PASS" in completed.stdout
+    assert "unique one-rerun configurations: 21" in completed.stdout
+    assert "LLM configurations: 15" in completed.stdout
+    assert "total benchmark windows: 1050" in completed.stdout
+    assert not output.exists()
+
+
+def test_live_preflight_requires_generated_database_environment(monkeypatch) -> None:
+    suite = load_suite_module()
+    manifest = suite.load_manifest(REPRO / "claim_manifest.json")
+    for name in (
+        "SEMATUNE_SYSBENCH_HOST",
+        "SEMATUNE_SYSBENCH_PORT",
+        "SEMATUNE_SYSBENCH_USER",
+        "SEMATUNE_SYSBENCH_PASSWORD",
+        "SEMATUNE_SYSBENCH_DB",
+    ):
+        monkeypatch.delenv(name, raising=False)
+    errors = suite.live_preflight(suite.select_jobs(manifest, {1, 2, 3, 4}))
+    for name in (
+        "SEMATUNE_SYSBENCH_HOST",
+        "SEMATUNE_SYSBENCH_PORT",
+        "SEMATUNE_SYSBENCH_USER",
+        "SEMATUNE_SYSBENCH_PASSWORD",
+        "SEMATUNE_SYSBENCH_DB",
+    ):
+        assert f"missing site environment variable: {name}" in errors
+
+
+def test_clean_is_rejected_in_read_only_dry_run(tmp_path: Path) -> None:
+    output = tmp_path / "must-not-exist"
+    completed = subprocess.run(
+        [
+            str(REPRO / "reproduce_claims.sh"),
+            "--dry-run",
+            "--clean",
+            "--output-dir",
+            str(output),
+        ],
+        cwd=ROOT,
+        capture_output=True,
+        text=True,
+    )
+    assert completed.returncode == 2
+    assert "--clean cannot be combined with --dry-run" in completed.stderr
+    assert not output.exists()
+
+
+def test_trace_builder_preserves_actions_delays_and_noops(tmp_path: Path) -> None:
+    suite = load_suite_module()
+    history = tmp_path / "dual_loop_actor_speculator_test.json"
+    history.write_text(
+        json.dumps(
+            {
+                "mode": "actor-speculator",
+                "config": {"benchmark": "tailbench", "max_iterations": 2},
+                "history": [
+                    {
+                        "iteration": 1,
+                        "tuner_timing": {
+                            "quick": {
+                                "proposed_parameters": {"latency_ns": 1000},
+                                "tuner_duration": 1.25,
+                                "parameters_applied": True,
+                            },
+                            "reasoning": {
+                                "proposed_parameters": {"latency_ns": 2000},
+                                "tuner_start_iteration": 1,
+                                "tuner_duration": 3.5,
+                                "parameters_applied": True,
+                            },
+                        },
+                    },
+                    {
+                        "iteration": 2,
+                        "tuner_timing": {
+                            "reasoning_final_before_stable": {
+                                "proposed_parameters": None,
+                                "tuner_duration": 4.75,
+                                "parameters_applied": False,
+                                "justification": "Recorded final no-op.",
+                            }
+                        },
+                    },
+                ],
+            }
+        ),
+        encoding="utf-8",
+    )
+
+    trace = suite.build_replay_trace("test:dual", history)
+    entries = {row["iteration"]: row["responses"] for row in trace["history"]}
+    assert trace["provider_requests"] == 0
+    assert trace["recorded_responses"] == 3
+    assert trace["recorded_actions"] == 2
+    assert trace["recorded_noops"] == 1
+    assert trace["synthetic_noops"] == 2
+    assert entries[0]["quick"]["parameters"] == {"latency_ns": 1000}
+    assert entries[0]["quick"]["response_time_seconds"] == 1.25
+    assert entries[0]["reasoning"]["parameters"] == {"latency_ns": 2000}
+    assert entries[1]["quick"]["recorded_response"] is False
+    assert entries[1]["reasoning"]["recorded_response"] is False
+    assert entries[2]["reasoning_final"]["parameters"] == {}
+    assert entries[2]["reasoning_final"]["recorded_response"] is True
+    assert entries[2]["reasoning_final"]["response_time_seconds"] == 4.75
+
+
+def test_replay_action_audit_counts_an_unobserved_source_action(monkeypatch, tmp_path: Path) -> None:
+    compare = load_compare_module()
+    source = tmp_path / "source.json"
+    replay = tmp_path / "replay.json"
+    trace = tmp_path / "trace.json"
+    source.write_text(
+        json.dumps(
+            {
+                "config": {"max_iterations": 2},
+                "history": [
+                    {
+                        "iteration": 1,
+                        "tuner_timing": {"quick": {"proposed_parameters": {"latency_ns": 1000}}},
+                    }
+                ],
+            }
+        ),
+        encoding="utf-8",
+    )
+    replay.write_text(
+        json.dumps(
+            {
+                "config": {"max_iterations": 2, "llm_replay_file": str(trace)},
+                "history": [],
+            }
+        ),
+        encoding="utf-8",
+    )
+    trace.write_text(json.dumps({"provider_requests": 0}), encoding="utf-8")
+    job = {"id": "test:replay", "target_results_dir": "unused"}
+    results = iter((replay, source))
+    monkeypatch.setattr(compare.suite, "materialized_config", lambda _: {"tuner_type": "llm"})
+    monkeypatch.setattr(compare.suite, "completed_result", lambda *_: next(results))
+
+    rows = compare.action_audit(
+        {"jobs": [job]},
+        tmp_path / "original",
+        tmp_path / "replayed",
+        {"jobs": {job["id"]: {"replay_trace": str(trace)}}},
+    )
+
+    assert rows[0]["source_actions"] == 1
+    assert rows[0]["replay_actions"] == 0
+    assert rows[0]["unobserved_actions"] == 1
+
+
+def test_trace_replay_same_source_and_output_requires_clean(tmp_path: Path) -> None:
+    completed = subprocess.run(
+        [
+            str(REPRO / "reproduce_claims.sh"),
+            "--run",
+            "--trace-replay-from",
+            str(tmp_path),
+            "--output-dir",
+            str(tmp_path),
+        ],
+        cwd=ROOT,
+        capture_output=True,
+        text=True,
+    )
+    assert completed.returncode == 2
+    assert "--clean is required to archive the source first" in completed.stderr
+
+
+def test_trace_replay_dry_run_rejects_missing_source_without_writes(tmp_path: Path) -> None:
+    source = tmp_path / "missing-source"
+    output = tmp_path / "must-not-exist"
+    completed = subprocess.run(
+        [
+            str(REPRO / "reproduce_claims.sh"),
+            "--dry-run",
+            "--trace-replay-from",
+            str(source),
+            "--output-dir",
+            str(output),
+        ],
+        cwd=ROOT,
+        capture_output=True,
+        text=True,
+    )
+    assert completed.returncode == 2
+    assert "trace replay source directory is missing" in completed.stderr
     assert not output.exists()
 
 

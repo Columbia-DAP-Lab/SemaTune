@@ -25,7 +25,8 @@ python reproduction/plot_claims.py \
   --results-dir results/reproduced_core/fresh/raw \
   --output-dir results/reproduced_core/fresh \
   --report-dir results/reproduced_core \
-  --archived-plots-dir results/reproduced_core/archived/plots
+  --archived-plots-dir results/reproduced_core/archived/plots \
+  --manifest reproduction/claim_manifest.json
 ```
 
 [`plot_claims.py`](../reproduction/plot_claims.py) generates the four fresh

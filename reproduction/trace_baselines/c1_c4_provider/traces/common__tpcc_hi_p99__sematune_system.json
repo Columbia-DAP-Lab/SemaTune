@@ -1,0 +1,1217 @@
+{
+  "benchmark": "tpcc",
+  "description": "Committed provider-backed C1-C4 response trace; workload measurements are not included and provider requests are forbidden.",
+  "history": [
+    {
+      "iteration": 0,
+      "responses": {
+        "quick": {
+          "confidence": 1.0,
+          "converged": null,
+          "justification": "Exploring a more aggressive C-state (C1) to potentially reduce latency by keeping the CPU more responsive, while maintaining other parameters from the initial configuration as a baseline.",
+          "parameters": {
+            "cstate_max": "C1",
+            "latency_ns": 24000000,
+            "max_perf_pct": 100,
+            "migration_cost_ns": 500000,
+            "min_granularity_ns": 3000000,
+            "min_perf_pct": 0,
+            "napi_busy_poll": 0,
+            "wakeup_granularity_ns": 4000000
+          },
+          "parameters_applied_in_source": true,
+          "recorded_response": true,
+          "response_time_seconds": 6.644294023513794,
+          "token_metrics": {
+            "api_total_tokens": 1397,
+            "billable_output_tokens": 167,
+            "billable_total_tokens": 1397,
+            "cached_content_token_count": 0,
+            "input_tokens": 1230,
+            "output_tokens": 167,
+            "thinking_tokens": 0,
+            "thinking_tokens_inferred_from_api_total": 0
+          }
+        },
+        "reasoning": {
+          "confidence": 1.0,
+          "converged": null,
+          "justification": "To minimize latency, we are reducing the maximum C-state allowed to C1 to ensure faster CPU wake-up times and decreasing the CFS scheduler latency to encourage more frequent task scheduling.",
+          "parameters": {
+            "cstate_max": "C1",
+            "latency_ns": 12000000
+          },
+          "parameters_applied_in_source": true,
+          "recorded_response": true,
+          "response_time_seconds": 4.425797462463379,
+          "token_metrics": {
+            "api_total_tokens": 1995,
+            "billable_output_tokens": 744,
+            "billable_total_tokens": 1995,
+            "cached_content_token_count": 0,
+            "input_tokens": 1251,
+            "output_tokens": 76,
+            "thinking_tokens": 668,
+            "thinking_tokens_inferred_from_api_total": 0
+          }
+        }
+      }
+    },
+    {
+      "iteration": 1,
+      "responses": {
+        "quick": {
+          "confidence": 0.0,
+          "converged": false,
+          "justification": "No recorded response; replayed as a no-op.",
+          "parameters": {},
+          "parameters_applied_in_source": false,
+          "recorded_response": false,
+          "response_time_seconds": 0.0,
+          "token_metrics": null
+        },
+        "reasoning": {
+          "confidence": 1.0,
+          "converged": null,
+          "justification": "To further minimize latency, this configuration explores the most aggressive C-state (POLL) to keep the CPU active. Concurrently, CFS scheduler parameters like latency, minimum granularity, and wakeup granularity are halved to promote more responsive scheduling, and network busy polling is enabled to reduce I/O latency.",
+          "parameters": {
+            "cstate_max": "POLL",
+            "latency_ns": 12000000,
+            "max_perf_pct": 100,
+            "migration_cost_ns": 500000,
+            "min_granularity_ns": 1500000,
+            "min_perf_pct": 0,
+            "napi_busy_poll": 100,
+            "wakeup_granularity_ns": 2000000
+          },
+          "parameters_applied_in_source": true,
+          "recorded_response": true,
+          "response_time_seconds": 9.043143510818481,
+          "token_metrics": {
+            "api_total_tokens": 3035,
+            "billable_output_tokens": 1529,
+            "billable_total_tokens": 3035,
+            "cached_content_token_count": 617,
+            "input_tokens": 1506,
+            "output_tokens": 195,
+            "thinking_tokens": 1334,
+            "thinking_tokens_inferred_from_api_total": 0
+          }
+        }
+      }
+    },
+    {
+      "iteration": 2,
+      "responses": {
+        "quick": {
+          "confidence": 1.0,
+          "converged": null,
+          "justification": "Continuing exploration by testing a more aggressive C-state (C6) to see if it can reduce latency without significantly impacting performance, given that C1 did not show a clear improvement. This probes a different aspect of power/performance trade-off.",
+          "parameters": {
+            "cstate_max": "C6"
+          },
+          "parameters_applied_in_source": true,
+          "recorded_response": true,
+          "response_time_seconds": 0.9109578132629395,
+          "token_metrics": {
+            "api_total_tokens": 1773,
+            "billable_output_tokens": 72,
+            "billable_total_tokens": 1773,
+            "cached_content_token_count": 0,
+            "input_tokens": 1701,
+            "output_tokens": 72,
+            "thinking_tokens": 0,
+            "thinking_tokens_inferred_from_api_total": 0
+          }
+        },
+        "reasoning": {
+          "confidence": 0.0,
+          "converged": false,
+          "justification": "No recorded response; replayed as a no-op.",
+          "parameters": {},
+          "parameters_applied_in_source": false,
+          "recorded_response": false,
+          "response_time_seconds": 0.0,
+          "token_metrics": null
+        }
+      }
+    },
+    {
+      "iteration": 3,
+      "responses": {
+        "quick": {
+          "confidence": 0.0,
+          "converged": false,
+          "justification": "No recorded response; replayed as a no-op.",
+          "parameters": {},
+          "parameters_applied_in_source": false,
+          "recorded_response": false,
+          "response_time_seconds": 0.0,
+          "token_metrics": null
+        },
+        "reasoning": {
+          "confidence": 1.0,
+          "converged": null,
+          "justification": "Further reducing CFS scheduler latencies and increasing migration cost aims to improve task responsiveness and reduce potentially disruptive CPU migrations, which are critical for minimizing P99 latency. We maintain an aggressive C-state and busy polling to prioritize low latency.",
+          "parameters": {
+            "cstate_max": "POLL",
+            "latency_ns": 6000000,
+            "max_perf_pct": 100,
+            "migration_cost_ns": 2000000,
+            "min_granularity_ns": 750000,
+            "min_perf_pct": 0,
+            "napi_busy_poll": 100,
+            "wakeup_granularity_ns": 1000000
+          },
+          "parameters_applied_in_source": true,
+          "recorded_response": true,
+          "response_time_seconds": 9.48696231842041,
+          "token_metrics": {
+            "api_total_tokens": 3611,
+            "billable_output_tokens": 1769,
+            "billable_total_tokens": 3611,
+            "cached_content_token_count": 665,
+            "input_tokens": 1842,
+            "output_tokens": 161,
+            "thinking_tokens": 1608,
+            "thinking_tokens_inferred_from_api_total": 0
+          }
+        }
+      }
+    },
+    {
+      "iteration": 4,
+      "responses": {
+        "quick": {
+          "confidence": 1.0,
+          "converged": null,
+          "justification": "The previous configuration with POLL c-state and reduced latency and wakeup granularity showed promising results. Continuing with these settings and exploring a slight increase in minimum performance percentage might further reduce latency by ensuring cores are more readily available.",
+          "parameters": {
+            "cstate_max": "POLL",
+            "latency_ns": 12000000,
+            "max_perf_pct": 100,
+            "migration_cost_ns": 500000,
+            "min_granularity_ns": 1500000,
+            "min_perf_pct": 0,
+            "napi_busy_poll": 100,
+            "wakeup_granularity_ns": 2000000
+          },
+          "parameters_applied_in_source": true,
+          "recorded_response": true,
+          "response_time_seconds": 1.3036906719207764,
+          "token_metrics": {
+            "api_total_tokens": 2108,
+            "billable_output_tokens": 178,
+            "billable_total_tokens": 2108,
+            "cached_content_token_count": 0,
+            "input_tokens": 1930,
+            "output_tokens": 178,
+            "thinking_tokens": 0,
+            "thinking_tokens_inferred_from_api_total": 0
+          }
+        },
+        "reasoning": {
+          "confidence": 0.0,
+          "converged": false,
+          "justification": "No recorded response; replayed as a no-op.",
+          "parameters": {},
+          "parameters_applied_in_source": false,
+          "recorded_response": false,
+          "response_time_seconds": 0.0,
+          "token_metrics": null
+        }
+      }
+    },
+    {
+      "iteration": 5,
+      "responses": {
+        "quick": {
+          "confidence": 1.0,
+          "converged": null,
+          "justification": "Continuing exploration by slightly increasing migration_cost_ns and decreasing latency_ns, wakeup_granularity_ns, and min_granularity_ns from the previous iteration to probe for lower latency.",
+          "parameters": {
+            "cstate_max": "POLL",
+            "latency_ns": 6000000,
+            "max_perf_pct": 100,
+            "migration_cost_ns": 2000000,
+            "min_granularity_ns": 750000,
+            "min_perf_pct": 0,
+            "napi_busy_poll": 100,
+            "wakeup_granularity_ns": 1000000
+          },
+          "parameters_applied_in_source": true,
+          "recorded_response": true,
+          "response_time_seconds": 1.0092158317565918,
+          "token_metrics": {
+            "api_total_tokens": 2218,
+            "billable_output_tokens": 174,
+            "billable_total_tokens": 2218,
+            "cached_content_token_count": 0,
+            "input_tokens": 2044,
+            "output_tokens": 174,
+            "thinking_tokens": 0,
+            "thinking_tokens_inferred_from_api_total": 0
+          }
+        },
+        "reasoning": {
+          "confidence": 1.0,
+          "converged": null,
+          "justification": "Continuing to explore lower scheduler latencies and higher migration costs to minimize task switching overhead and improve cache locality, while maintaining aggressive busy polling and shallow C-states for optimal responsiveness.",
+          "parameters": {
+            "cstate_max": "POLL",
+            "latency_ns": 3000000,
+            "max_perf_pct": 100,
+            "migration_cost_ns": 4000000,
+            "min_granularity_ns": 375000,
+            "min_perf_pct": 0,
+            "napi_busy_poll": 100,
+            "wakeup_granularity_ns": 500000
+          },
+          "parameters_applied_in_source": true,
+          "recorded_response": true,
+          "response_time_seconds": 5.855545520782471,
+          "token_metrics": {
+            "api_total_tokens": 3197,
+            "billable_output_tokens": 1131,
+            "billable_total_tokens": 3197,
+            "cached_content_token_count": 0,
+            "input_tokens": 2066,
+            "output_tokens": 148,
+            "thinking_tokens": 983,
+            "thinking_tokens_inferred_from_api_total": 0
+          }
+        }
+      }
+    },
+    {
+      "iteration": 6,
+      "responses": {
+        "quick": {
+          "confidence": 0.0,
+          "converged": false,
+          "justification": "No recorded response; replayed as a no-op.",
+          "parameters": {},
+          "parameters_applied_in_source": false,
+          "recorded_response": false,
+          "response_time_seconds": 0.0,
+          "token_metrics": null
+        },
+        "reasoning": {
+          "confidence": 0.0,
+          "converged": false,
+          "justification": "No recorded response; replayed as a no-op.",
+          "parameters": {},
+          "parameters_applied_in_source": false,
+          "recorded_response": false,
+          "response_time_seconds": 0.0,
+          "token_metrics": null
+        }
+      }
+    },
+    {
+      "iteration": 7,
+      "responses": {
+        "quick": {
+          "confidence": 0.0,
+          "converged": false,
+          "justification": "No recorded response; replayed as a no-op.",
+          "parameters": {},
+          "parameters_applied_in_source": false,
+          "recorded_response": false,
+          "response_time_seconds": 0.0,
+          "token_metrics": null
+        },
+        "reasoning": {
+          "confidence": 0.0,
+          "converged": false,
+          "justification": "No recorded response; replayed as a no-op.",
+          "parameters": {},
+          "parameters_applied_in_source": false,
+          "recorded_response": false,
+          "response_time_seconds": 0.0,
+          "token_metrics": null
+        }
+      }
+    },
+    {
+      "iteration": 8,
+      "responses": {
+        "quick": {
+          "confidence": 1.0,
+          "converged": null,
+          "justification": "Continuing exploration with the best performing configuration from the previous iteration, as we are still in the exploration phase and haven't converged on a stable optimum. This configuration has consistently yielded good results.",
+          "parameters": {
+            "cstate_max": "POLL",
+            "latency_ns": 3000000,
+            "max_perf_pct": 100,
+            "migration_cost_ns": 4000000,
+            "min_granularity_ns": 375000,
+            "min_perf_pct": 0,
+            "napi_busy_poll": 100,
+            "wakeup_granularity_ns": 500000
+          },
+          "parameters_applied_in_source": true,
+          "recorded_response": true,
+          "response_time_seconds": 1.207277774810791,
+          "token_metrics": {
+            "api_total_tokens": 2542,
+            "billable_output_tokens": 173,
+            "billable_total_tokens": 2542,
+            "cached_content_token_count": 0,
+            "input_tokens": 2369,
+            "output_tokens": 171,
+            "thinking_tokens": 2,
+            "thinking_tokens_inferred_from_api_total": 0
+          }
+        },
+        "reasoning": {
+          "confidence": 0.0,
+          "converged": false,
+          "justification": "No recorded response; replayed as a no-op.",
+          "parameters": {},
+          "parameters_applied_in_source": false,
+          "recorded_response": false,
+          "response_time_seconds": 0.0,
+          "token_metrics": null
+        }
+      }
+    },
+    {
+      "iteration": 9,
+      "responses": {
+        "quick": {
+          "confidence": 0.0,
+          "converged": false,
+          "justification": "No recorded response; replayed as a no-op.",
+          "parameters": {},
+          "parameters_applied_in_source": false,
+          "recorded_response": false,
+          "response_time_seconds": 0.0,
+          "token_metrics": null
+        },
+        "reasoning": {
+          "confidence": 0.0,
+          "converged": false,
+          "justification": "No recorded response; replayed as a no-op.",
+          "parameters": {},
+          "parameters_applied_in_source": false,
+          "recorded_response": false,
+          "response_time_seconds": 0.0,
+          "token_metrics": null
+        }
+      }
+    },
+    {
+      "iteration": 10,
+      "responses": {
+        "quick": {
+          "confidence": 0.0,
+          "converged": false,
+          "justification": "No recorded response; replayed as a no-op.",
+          "parameters": {},
+          "parameters_applied_in_source": false,
+          "recorded_response": false,
+          "response_time_seconds": 0.0,
+          "token_metrics": null
+        },
+        "reasoning": {
+          "confidence": 0.0,
+          "converged": false,
+          "justification": "No recorded response; replayed as a no-op.",
+          "parameters": {},
+          "parameters_applied_in_source": false,
+          "recorded_response": false,
+          "response_time_seconds": 0.0,
+          "token_metrics": null
+        }
+      }
+    },
+    {
+      "iteration": 11,
+      "responses": {
+        "quick": {
+          "confidence": 1.0,
+          "converged": null,
+          "justification": "Continuing exploration with the best performing configuration to observe its stability and explore minor variations in a stable region. The current parameters have shown consistent results, so we will maintain them to gather more data points.",
+          "parameters": {
+            "cstate_max": "POLL",
+            "latency_ns": 3000000,
+            "max_perf_pct": 100,
+            "migration_cost_ns": 4000000,
+            "min_granularity_ns": 375000,
+            "min_perf_pct": 0,
+            "napi_busy_poll": 100,
+            "wakeup_granularity_ns": 500000
+          },
+          "parameters_applied_in_source": true,
+          "recorded_response": true,
+          "response_time_seconds": 1.1033680438995361,
+          "token_metrics": {
+            "api_total_tokens": 2872,
+            "billable_output_tokens": 172,
+            "billable_total_tokens": 2872,
+            "cached_content_token_count": 771,
+            "input_tokens": 2700,
+            "output_tokens": 172,
+            "thinking_tokens": 0,
+            "thinking_tokens_inferred_from_api_total": 0
+          }
+        },
+        "reasoning": {
+          "confidence": 0.0,
+          "converged": false,
+          "justification": "No recorded response; replayed as a no-op.",
+          "parameters": {},
+          "parameters_applied_in_source": false,
+          "recorded_response": false,
+          "response_time_seconds": 0.0,
+          "token_metrics": null
+        }
+      }
+    },
+    {
+      "iteration": 12,
+      "responses": {
+        "quick": {
+          "confidence": 0.0,
+          "converged": false,
+          "justification": "No recorded response; replayed as a no-op.",
+          "parameters": {},
+          "parameters_applied_in_source": false,
+          "recorded_response": false,
+          "response_time_seconds": 0.0,
+          "token_metrics": null
+        },
+        "reasoning": {
+          "confidence": 0.0,
+          "converged": false,
+          "justification": "No recorded response; replayed as a no-op.",
+          "parameters": {},
+          "parameters_applied_in_source": false,
+          "recorded_response": false,
+          "response_time_seconds": 0.0,
+          "token_metrics": null
+        }
+      }
+    },
+    {
+      "iteration": 13,
+      "responses": {
+        "quick": {
+          "confidence": 1.0,
+          "converged": null,
+          "justification": "Continuing exploration with the current best parameters, as they have consistently performed well across multiple iterations. This approach allows for further observation and potential fine-tuning without deviating too early from a promising configuration.",
+          "parameters": {
+            "cstate_max": "POLL",
+            "latency_ns": 3000000,
+            "max_perf_pct": 100,
+            "migration_cost_ns": 4000000,
+            "min_granularity_ns": 375000,
+            "min_perf_pct": 0,
+            "napi_busy_poll": 100,
+            "wakeup_granularity_ns": 500000
+          },
+          "parameters_applied_in_source": true,
+          "recorded_response": true,
+          "response_time_seconds": 1.4055681228637695,
+          "token_metrics": {
+            "api_total_tokens": 3094,
+            "billable_output_tokens": 172,
+            "billable_total_tokens": 3094,
+            "cached_content_token_count": 786,
+            "input_tokens": 2922,
+            "output_tokens": 172,
+            "thinking_tokens": 0,
+            "thinking_tokens_inferred_from_api_total": 0
+          }
+        },
+        "reasoning": {
+          "confidence": 0.0,
+          "converged": false,
+          "justification": "No recorded response; replayed as a no-op.",
+          "parameters": {},
+          "parameters_applied_in_source": false,
+          "recorded_response": false,
+          "response_time_seconds": 0.0,
+          "token_metrics": null
+        }
+      }
+    },
+    {
+      "iteration": 14,
+      "responses": {
+        "quick": {
+          "confidence": 1.0,
+          "converged": null,
+          "justification": "The system has been consistently performing well with low latency using C1 or POLL states and very low latency values for scheduler parameters. Continuing exploration around this very stable configuration by slightly increasing migration_cost_ns and decreasing latency_ns to explore the lower bounds of latency without significant risk.",
+          "parameters": {
+            "cstate_max": "POLL",
+            "latency_ns": 3000000,
+            "migration_cost_ns": 4000000,
+            "min_granularity_ns": 375000,
+            "min_perf_pct": 0,
+            "napi_busy_poll": 100,
+            "wakeup_granularity_ns": 500000
+          },
+          "parameters_applied_in_source": true,
+          "recorded_response": true,
+          "response_time_seconds": 1.0033695697784424,
+          "token_metrics": {
+            "api_total_tokens": 3209,
+            "billable_output_tokens": 175,
+            "billable_total_tokens": 3209,
+            "cached_content_token_count": 1585,
+            "input_tokens": 3034,
+            "output_tokens": 175,
+            "thinking_tokens": 0,
+            "thinking_tokens_inferred_from_api_total": 0
+          }
+        },
+        "reasoning": {
+          "confidence": 0.0,
+          "converged": false,
+          "justification": "No recorded response; replayed as a no-op.",
+          "parameters": {},
+          "parameters_applied_in_source": false,
+          "recorded_response": false,
+          "response_time_seconds": 0.0,
+          "token_metrics": null
+        }
+      }
+    },
+    {
+      "iteration": 15,
+      "responses": {
+        "quick": {
+          "confidence": 1.0,
+          "converged": null,
+          "justification": "The system has been exploring aggressive low latency settings, including very low latency_ns, wakeup_granularity_ns, and min_granularity_ns, while keeping cstate_max at POLL and max_perf_pct at 100. The current configuration has been stable for several iterations. To continue exploring without significant risk, we will slightly increase migration_cost_ns to see if it impacts latency, while keeping other parameters the same.",
+          "parameters": {
+            "cstate_max": "POLL",
+            "latency_ns": 3000000,
+            "max_perf_pct": 100,
+            "migration_cost_ns": 4000000,
+            "min_granularity_ns": 375000,
+            "min_perf_pct": 0,
+            "napi_busy_poll": 100,
+            "wakeup_granularity_ns": 500000
+          },
+          "parameters_applied_in_source": true,
+          "recorded_response": true,
+          "response_time_seconds": 1.5031793117523193,
+          "token_metrics": {
+            "api_total_tokens": 3371,
+            "billable_output_tokens": 225,
+            "billable_total_tokens": 3371,
+            "cached_content_token_count": 799,
+            "input_tokens": 3146,
+            "output_tokens": 225,
+            "thinking_tokens": 0,
+            "thinking_tokens_inferred_from_api_total": 0
+          }
+        },
+        "reasoning": {
+          "confidence": 0.0,
+          "converged": false,
+          "justification": "No recorded response; replayed as a no-op.",
+          "parameters": {},
+          "parameters_applied_in_source": false,
+          "recorded_response": false,
+          "response_time_seconds": 0.0,
+          "token_metrics": null
+        }
+      }
+    },
+    {
+      "iteration": 16,
+      "responses": {
+        "quick": {
+          "confidence": 1.0,
+          "converged": null,
+          "justification": "The current configuration has shown consistent performance. To continue exploration without significant risk, we will slightly increase the migration cost to observe its impact on latency, while keeping other parameters stable.",
+          "parameters": {
+            "cstate_max": "POLL",
+            "latency_ns": 3000000,
+            "max_perf_pct": 100,
+            "migration_cost_ns": 4000000,
+            "min_granularity_ns": 375000,
+            "min_perf_pct": 0,
+            "napi_busy_poll": 100,
+            "wakeup_granularity_ns": 500000
+          },
+          "parameters_applied_in_source": true,
+          "recorded_response": true,
+          "response_time_seconds": 6.714839458465576,
+          "token_metrics": {
+            "api_total_tokens": 3426,
+            "billable_output_tokens": 168,
+            "billable_total_tokens": 3426,
+            "cached_content_token_count": 0,
+            "input_tokens": 3258,
+            "output_tokens": 168,
+            "thinking_tokens": 0,
+            "thinking_tokens_inferred_from_api_total": 0
+          }
+        },
+        "reasoning": {
+          "confidence": 0.0,
+          "converged": false,
+          "justification": "No recorded response; replayed as a no-op.",
+          "parameters": {},
+          "parameters_applied_in_source": false,
+          "recorded_response": false,
+          "response_time_seconds": 0.0,
+          "token_metrics": null
+        }
+      }
+    },
+    {
+      "iteration": 17,
+      "responses": {
+        "quick": {
+          "confidence": 1.0,
+          "converged": null,
+          "justification": "The current configuration has stabilized around very low latency values with C-state set to POLL and aggressive scheduling parameters. To continue exploration, we will maintain these core settings and slightly increase the migration cost to observe its impact on latency, while keeping other parameters consistent.",
+          "parameters": {
+            "cstate_max": "POLL",
+            "latency_ns": 3000000,
+            "max_perf_pct": 100,
+            "migration_cost_ns": 4000000,
+            "min_granularity_ns": 375000,
+            "min_perf_pct": 0,
+            "napi_busy_poll": 100,
+            "wakeup_granularity_ns": 500000
+          },
+          "parameters_applied_in_source": true,
+          "recorded_response": true,
+          "response_time_seconds": 1.105628490447998,
+          "token_metrics": {
+            "api_total_tokens": 3554,
+            "billable_output_tokens": 184,
+            "billable_total_tokens": 3554,
+            "cached_content_token_count": 1622,
+            "input_tokens": 3370,
+            "output_tokens": 184,
+            "thinking_tokens": 0,
+            "thinking_tokens_inferred_from_api_total": 0
+          }
+        },
+        "reasoning": {
+          "confidence": 0.0,
+          "converged": false,
+          "justification": "No recorded response; replayed as a no-op.",
+          "parameters": {},
+          "parameters_applied_in_source": false,
+          "recorded_response": false,
+          "response_time_seconds": 0.0,
+          "token_metrics": null
+        }
+      }
+    },
+    {
+      "iteration": 18,
+      "responses": {
+        "quick": {
+          "confidence": 1.0,
+          "converged": null,
+          "justification": "The system has been consistently performing well with low latency and minimal C-state usage (POLL). To continue exploration and potentially find a slightly better configuration, we will slightly increase the migration cost and slightly decrease the minimum granularity, while keeping other parameters stable. This aims to test the system's sensitivity to these minor adjustments.",
+          "parameters": {
+            "cstate_max": "POLL",
+            "latency_ns": 3000000,
+            "max_perf_pct": 100,
+            "migration_cost_ns": 4000000,
+            "min_granularity_ns": 375000,
+            "min_perf_pct": 0,
+            "napi_busy_poll": 100,
+            "wakeup_granularity_ns": 500000
+          },
+          "parameters_applied_in_source": true,
+          "recorded_response": true,
+          "response_time_seconds": 1.5044517517089844,
+          "token_metrics": {
+            "api_total_tokens": 3680,
+            "billable_output_tokens": 198,
+            "billable_total_tokens": 3680,
+            "cached_content_token_count": 2450,
+            "input_tokens": 3482,
+            "output_tokens": 198,
+            "thinking_tokens": 0,
+            "thinking_tokens_inferred_from_api_total": 0
+          }
+        },
+        "reasoning": {
+          "confidence": 0.0,
+          "converged": false,
+          "justification": "No recorded response; replayed as a no-op.",
+          "parameters": {},
+          "parameters_applied_in_source": false,
+          "recorded_response": false,
+          "response_time_seconds": 0.0,
+          "token_metrics": null
+        }
+      }
+    },
+    {
+      "iteration": 19,
+      "responses": {
+        "quick": {
+          "confidence": 0.0,
+          "converged": false,
+          "justification": "No recorded response; replayed as a no-op.",
+          "parameters": {},
+          "parameters_applied_in_source": false,
+          "recorded_response": false,
+          "response_time_seconds": 0.0,
+          "token_metrics": null
+        },
+        "reasoning": {
+          "confidence": 0.0,
+          "converged": false,
+          "justification": "No recorded response; replayed as a no-op.",
+          "parameters": {},
+          "parameters_applied_in_source": false,
+          "recorded_response": false,
+          "response_time_seconds": 0.0,
+          "token_metrics": null
+        }
+      }
+    },
+    {
+      "iteration": 20,
+      "responses": {
+        "quick": {
+          "confidence": 1.0,
+          "converged": null,
+          "justification": "The system has stabilized around low latency values with C-state set to POLL. To continue exploration while maintaining low latency, we'll slightly increase migration_cost_ns to observe its impact on context switching overhead.",
+          "parameters": {
+            "cstate_max": "POLL",
+            "latency_ns": 3000000,
+            "max_perf_pct": 100,
+            "migration_cost_ns": 4000000,
+            "min_granularity_ns": 375000,
+            "min_perf_pct": 0,
+            "napi_busy_poll": 100,
+            "wakeup_granularity_ns": 500000
+          },
+          "parameters_applied_in_source": true,
+          "recorded_response": true,
+          "response_time_seconds": 5.813831806182861,
+          "token_metrics": {
+            "api_total_tokens": 3879,
+            "billable_output_tokens": 176,
+            "billable_total_tokens": 3879,
+            "cached_content_token_count": 1653,
+            "input_tokens": 3703,
+            "output_tokens": 176,
+            "thinking_tokens": 0,
+            "thinking_tokens_inferred_from_api_total": 0
+          }
+        },
+        "reasoning": {
+          "confidence": 0.0,
+          "converged": false,
+          "justification": "No recorded response; replayed as a no-op.",
+          "parameters": {},
+          "parameters_applied_in_source": false,
+          "recorded_response": false,
+          "response_time_seconds": 0.0,
+          "token_metrics": null
+        }
+      }
+    },
+    {
+      "iteration": 21,
+      "responses": {
+        "quick": {
+          "confidence": 0.0,
+          "converged": false,
+          "justification": "No recorded response; replayed as a no-op.",
+          "parameters": {},
+          "parameters_applied_in_source": false,
+          "recorded_response": false,
+          "response_time_seconds": 0.0,
+          "token_metrics": null
+        },
+        "reasoning": {
+          "confidence": 0.0,
+          "converged": false,
+          "justification": "No recorded response; replayed as a no-op.",
+          "parameters": {},
+          "parameters_applied_in_source": false,
+          "recorded_response": false,
+          "response_time_seconds": 0.0,
+          "token_metrics": null
+        }
+      }
+    },
+    {
+      "iteration": 22,
+      "responses": {
+        "quick": {
+          "confidence": 1.0,
+          "converged": null,
+          "justification": "The system has been stable in the low latency range with C-states set to POLL and napi_busy_poll enabled. We will continue exploring this low latency region by slightly increasing migration_cost_ns to see if it further reduces latency, while keeping other parameters at their current best observed values.",
+          "parameters": {
+            "latency_ns": 3000000,
+            "migration_cost_ns": 4000000,
+            "wakeup_granularity_ns": 500000
+          },
+          "parameters_applied_in_source": true,
+          "recorded_response": true,
+          "response_time_seconds": 0.9077763557434082,
+          "token_metrics": {
+            "api_total_tokens": 4046,
+            "billable_output_tokens": 122,
+            "billable_total_tokens": 4046,
+            "cached_content_token_count": 2507,
+            "input_tokens": 3924,
+            "output_tokens": 122,
+            "thinking_tokens": 0,
+            "thinking_tokens_inferred_from_api_total": 0
+          }
+        },
+        "reasoning": {
+          "confidence": 0.0,
+          "converged": false,
+          "justification": "No recorded response; replayed as a no-op.",
+          "parameters": {},
+          "parameters_applied_in_source": false,
+          "recorded_response": false,
+          "response_time_seconds": 0.0,
+          "token_metrics": null
+        }
+      }
+    },
+    {
+      "iteration": 23,
+      "responses": {
+        "quick": {
+          "confidence": 0.0,
+          "converged": false,
+          "justification": "No recorded response; replayed as a no-op.",
+          "parameters": {},
+          "parameters_applied_in_source": false,
+          "recorded_response": false,
+          "response_time_seconds": 0.0,
+          "token_metrics": null
+        },
+        "reasoning": {
+          "confidence": 0.0,
+          "converged": false,
+          "justification": "No recorded response; replayed as a no-op.",
+          "parameters": {},
+          "parameters_applied_in_source": false,
+          "recorded_response": false,
+          "response_time_seconds": 0.0,
+          "token_metrics": null
+        }
+      }
+    },
+    {
+      "iteration": 24,
+      "responses": {
+        "quick": {
+          "confidence": 1.0,
+          "converged": null,
+          "justification": "The current configuration with POLL cstate, low latency_ns, and high migration_cost_ns has been stable. To continue exploration while maintaining low latency, we will slightly decrease wakeup_granularity_ns and min_granularity_ns to probe for potential further improvements in responsiveness.",
+          "parameters": {
+            "cstate_max": "POLL",
+            "latency_ns": 3000000,
+            "max_perf_pct": 100,
+            "migration_cost_ns": 4000000,
+            "min_granularity_ns": 375000,
+            "min_perf_pct": 0,
+            "napi_busy_poll": 100,
+            "wakeup_granularity_ns": 500000
+          },
+          "parameters_applied_in_source": true,
+          "recorded_response": true,
+          "response_time_seconds": 2.7057411670684814,
+          "token_metrics": {
+            "api_total_tokens": 4336,
+            "billable_output_tokens": 191,
+            "billable_total_tokens": 4336,
+            "cached_content_token_count": 1688,
+            "input_tokens": 4145,
+            "output_tokens": 191,
+            "thinking_tokens": 0,
+            "thinking_tokens_inferred_from_api_total": 0
+          }
+        },
+        "reasoning": {
+          "confidence": 0.0,
+          "converged": false,
+          "justification": "No recorded response; replayed as a no-op.",
+          "parameters": {},
+          "parameters_applied_in_source": false,
+          "recorded_response": false,
+          "response_time_seconds": 0.0,
+          "token_metrics": null
+        }
+      }
+    },
+    {
+      "iteration": 25,
+      "responses": {
+        "quick": {
+          "confidence": 0.0,
+          "converged": false,
+          "justification": "No recorded response; replayed as a no-op.",
+          "parameters": {},
+          "parameters_applied_in_source": false,
+          "recorded_response": false,
+          "response_time_seconds": 0.0,
+          "token_metrics": null
+        },
+        "reasoning": {
+          "confidence": 0.0,
+          "converged": false,
+          "justification": "No recorded response; replayed as a no-op.",
+          "parameters": {},
+          "parameters_applied_in_source": false,
+          "recorded_response": false,
+          "response_time_seconds": 0.0,
+          "token_metrics": null
+        }
+      }
+    },
+    {
+      "iteration": 26,
+      "responses": {
+        "quick": {
+          "confidence": 1.0,
+          "converged": null,
+          "justification": "The current configuration has shown consistent, low latency. To continue exploration, we will slightly increase migration_cost_ns to observe its impact on latency, keeping other parameters stable.",
+          "parameters": {
+            "cstate_max": "POLL",
+            "latency_ns": 3000000,
+            "max_perf_pct": 100,
+            "migration_cost_ns": 4000000,
+            "min_granularity_ns": 375000,
+            "min_perf_pct": 0,
+            "napi_busy_poll": 100,
+            "wakeup_granularity_ns": 500000
+          },
+          "parameters_applied_in_source": true,
+          "recorded_response": true,
+          "response_time_seconds": 1.105602502822876,
+          "token_metrics": {
+            "api_total_tokens": 4535,
+            "billable_output_tokens": 168,
+            "billable_total_tokens": 4535,
+            "cached_content_token_count": 0,
+            "input_tokens": 4367,
+            "output_tokens": 168,
+            "thinking_tokens": 0,
+            "thinking_tokens_inferred_from_api_total": 0
+          }
+        },
+        "reasoning": {
+          "confidence": 0.0,
+          "converged": false,
+          "justification": "No recorded response; replayed as a no-op.",
+          "parameters": {},
+          "parameters_applied_in_source": false,
+          "recorded_response": false,
+          "response_time_seconds": 0.0,
+          "token_metrics": null
+        }
+      }
+    },
+    {
+      "iteration": 27,
+      "responses": {
+        "quick": {
+          "confidence": 1.0,
+          "converged": null,
+          "justification": "The system has been consistently performing well with low latency using POLL c-state, low latency_ns, and high migration_cost_ns. To continue exploration without significant risk, we will slightly increase migration_cost_ns to probe its upper bounds and observe any potential negative impact on latency.",
+          "parameters": {
+            "cstate_max": "POLL",
+            "latency_ns": 3000000,
+            "max_perf_pct": 100,
+            "migration_cost_ns": 4000000,
+            "min_granularity_ns": 375000,
+            "min_perf_pct": 0,
+            "napi_busy_poll": 100,
+            "wakeup_granularity_ns": 500000
+          },
+          "parameters_applied_in_source": true,
+          "recorded_response": true,
+          "response_time_seconds": 2.608044385910034,
+          "token_metrics": {
+            "api_total_tokens": 4671,
+            "billable_output_tokens": 192,
+            "billable_total_tokens": 4671,
+            "cached_content_token_count": 0,
+            "input_tokens": 4479,
+            "output_tokens": 192,
+            "thinking_tokens": 0,
+            "thinking_tokens_inferred_from_api_total": 0
+          }
+        },
+        "reasoning": {
+          "confidence": 0.0,
+          "converged": false,
+          "justification": "No recorded response; replayed as a no-op.",
+          "parameters": {},
+          "parameters_applied_in_source": false,
+          "recorded_response": false,
+          "response_time_seconds": 0.0,
+          "token_metrics": null
+        }
+      }
+    },
+    {
+      "iteration": 28,
+      "responses": {
+        "quick": {
+          "confidence": 1.0,
+          "converged": null,
+          "justification": "The system has been exploring very low latency and high performance settings. The current best configuration with C-state set to POLL, very low latency_ns, and high migration_cost_ns seems to be stable. To continue exploration, we will slightly increase migration_cost_ns to probe potential gains or stability issues at higher migration costs.",
+          "parameters": {
+            "cstate_max": "POLL",
+            "latency_ns": 3000000,
+            "max_perf_pct": 100,
+            "migration_cost_ns": 4000000,
+            "min_granularity_ns": 375000,
+            "min_perf_pct": 0,
+            "napi_busy_poll": 100,
+            "wakeup_granularity_ns": 500000
+          },
+          "parameters_applied_in_source": true,
+          "recorded_response": true,
+          "response_time_seconds": 1.3033499717712402,
+          "token_metrics": {
+            "api_total_tokens": 4792,
+            "billable_output_tokens": 201,
+            "billable_total_tokens": 4792,
+            "cached_content_token_count": 2575,
+            "input_tokens": 4591,
+            "output_tokens": 201,
+            "thinking_tokens": 0,
+            "thinking_tokens_inferred_from_api_total": 0
+          }
+        },
+        "reasoning": {
+          "confidence": 0.0,
+          "converged": false,
+          "justification": "No recorded response; replayed as a no-op.",
+          "parameters": {},
+          "parameters_applied_in_source": false,
+          "recorded_response": false,
+          "response_time_seconds": 0.0,
+          "token_metrics": null
+        }
+      }
+    },
+    {
+      "iteration": 29,
+      "responses": {
+        "quick": {
+          "confidence": 1.0,
+          "converged": null,
+          "justification": "Continuing to explore the stable region around the current best configuration to refine latency reduction without introducing significant risk, focusing on minimal changes to explore nearby parameter space.",
+          "parameters": {
+            "cstate_max": "POLL",
+            "latency_ns": 3000000,
+            "max_perf_pct": 100,
+            "migration_cost_ns": 4000000,
+            "min_granularity_ns": 375000,
+            "min_perf_pct": 0,
+            "napi_busy_poll": 100,
+            "wakeup_granularity_ns": 500000
+          },
+          "parameters_applied_in_source": true,
+          "recorded_response": true,
+          "response_time_seconds": 1.106400489807129,
+          "token_metrics": {
+            "api_total_tokens": 4871,
+            "billable_output_tokens": 163,
+            "billable_total_tokens": 4871,
+            "cached_content_token_count": 3448,
+            "input_tokens": 4708,
+            "output_tokens": 163,
+            "thinking_tokens": 0,
+            "thinking_tokens_inferred_from_api_total": 0
+          }
+        },
+        "reasoning": {
+          "confidence": 0.0,
+          "converged": false,
+          "justification": "No recorded response; replayed as a no-op.",
+          "parameters": {},
+          "parameters_applied_in_source": false,
+          "recorded_response": false,
+          "response_time_seconds": 0.0,
+          "token_metrics": null
+        }
+      }
+    },
+    {
+      "iteration": 30,
+      "responses": {
+        "reasoning_final": {
+          "confidence": 1.0,
+          "converged": null,
+          "justification": "This configuration has been consistently identified as a strong performer across multiple iterations, indicating a robust region for minimizing latency_p99 by optimizing scheduling aggressiveness, CPU idle states, and network busy polling.",
+          "parameters": {
+            "cstate_max": "POLL",
+            "latency_ns": 3000000,
+            "max_perf_pct": 100,
+            "migration_cost_ns": 4000000,
+            "min_granularity_ns": 375000,
+            "min_perf_pct": 0,
+            "napi_busy_poll": 100,
+            "wakeup_granularity_ns": 500000
+          },
+          "parameters_applied_in_source": true,
+          "recorded_response": true,
+          "response_time_seconds": 93.38965654373169,
+          "token_metrics": {
+            "api_total_tokens": 6406,
+            "billable_output_tokens": 1571,
+            "billable_total_tokens": 6406,
+            "cached_content_token_count": 0,
+            "input_tokens": 4835,
+            "output_tokens": 172,
+            "thinking_tokens": 1399,
+            "thinking_tokens_inferred_from_api_total": 0
+          }
+        }
+      }
+    }
+  ],
+  "job_id": "common:tpcc_hi_p99:sematune_system",
+  "provider_requests": 0,
+  "recorded_actions": 24,
+  "recorded_noops": 0,
+  "recorded_responses": 24,
+  "schema_version": 1,
+  "source_history": "provider-run/common:tpcc_hi_p99:sematune_system/dual_loop_actor_speculator_tpcc_20260713_041142.json",
+  "source_history_sha256": "acf5d77803be9b0be768256a1e05bde14b768719aad297a39e7dc480cfbd7f65",
+  "source_optimizer_gist": "This Linux kernel tuning run converged rapidly on an optimal configuration by Iteration 6 and maintained it for the remaining 45 iterations, indicating successful parameter identification for the given workload.\n\n**Key Patterns and Impact:**\n*   **Significant Impact**: `napi_busy_poll`, `migration_cost_ns`, `latency_ns`, `wakeup_granularity_ns`, `min_granularity_ns`, and `cstate_max` were all actively tuned and converged to stable values.\n    *   `napi_busy_poll` quickly moved from 0 to 100.\n    *   `migration_cost_ns` increased from 500000 to 4000000.\n    *   `latency_ns`, `wakeup_granularity_ns`, and `min_granularity_ns` all significantly decreased, suggesting a preference for lower latency/finer granularity scheduling. The ratio between `wakeup_granularity_ns` and `min_granularity_ns` remained consistently 1.33 throughout the tuning.\n    *   `cstate_max` shifted from 'unlimited' to 'C1' and finally to 'POLL', indicating a strong preference for avoiding deep C-states to minimize latency.\n*   **Irrelevant/Stable Parameters**: `max_perf_pct` (100) and `min_perf_pct` (0) remained unchanged across all iterations, suggesting they are either at their optimal values or have negligible impact on this workload.\n\n**Optimal Configuration:**\nThe optimal configuration identified and consistently used from Iteration 6 onwards is:\n`{napi_busy_poll=100, migration_cost_ns=4000000, latency_ns=3000000, wakeup_granularity_ns=500000, min_granularity_ns=375000, max_perf_pct=100, min_perf_pct=0, cstate_max=POLL}`\n\n**Takeaways for Future Runs:**\n*   **Start Configuration**: Begin future runs with the identified optimal configuration as a strong baseline to accelerate convergence.\n*   **Narrow Parameter Ranges**: Focus tuning efforts around the converged values for `napi_busy_poll` (100), `migration_cost_ns` (4000000), `latency_ns` (3000000), `wakeup_granularity_ns` (500000), `min_granularity_ns` (375000), and `cstate_max` (POLL).\n*   **Fixed Parameters**: `max_perf_pct` (100) and `min_perf_pct` (0) can likely be fixed and excluded from future tuning to improve efficiency.\n*   **Parameter Relationship**: Investigate if `wakeup_granularity_ns` and `min_granularity_ns` are intrinsically linked by a fixed ratio (e.g., 1.33). If so, one could be derived from the other, reducing the search space.",
+  "source_optimizer_gist_raw": {
+    "backend": "gemini",
+    "model": "gemini-2.5-flash",
+    "response_model": "gemini-2.5-flash",
+    "text": "This Linux kernel tuning run converged rapidly on an optimal configuration by Iteration 6 and maintained it for the remaining 45 iterations, indicating successful parameter identification for the given workload.\n\n**Key Patterns and Impact:**\n*   **Significant Impact**: `napi_busy_poll`, `migration_cost_ns`, `latency_ns`, `wakeup_granularity_ns`, `min_granularity_ns`, and `cstate_max` were all actively tuned and converged to stable values.\n    *   `napi_busy_poll` quickly moved from 0 to 100.\n    *   `migration_cost_ns` increased from 500000 to 4000000.\n    *   `latency_ns`, `wakeup_granularity_ns`, and `min_granularity_ns` all significantly decreased, suggesting a preference for lower latency/finer granularity scheduling. The ratio between `wakeup_granularity_ns` and `min_granularity_ns` remained consistently 1.33 throughout the tuning.\n    *   `cstate_max` shifted from 'unlimited' to 'C1' and finally to 'POLL', indicating a strong preference for avoiding deep C-states to minimize latency.\n*   **Irrelevant/Stable Parameters**: `max_perf_pct` (100) and `min_perf_pct` (0) remained unchanged across all iterations, suggesting they are either at their optimal values or have negligible impact on this workload.\n\n**Optimal Configuration:**\nThe optimal configuration identified and consistently used from Iteration 6 onwards is:\n`{napi_busy_poll=100, migration_cost_ns=4000000, latency_ns=3000000, wakeup_granularity_ns=500000, min_granularity_ns=375000, max_perf_pct=100, min_perf_pct=0, cstate_max=POLL}`\n\n**Takeaways for Future Runs:**\n*   **Start Configuration**: Begin future runs with the identified optimal configuration as a strong baseline to accelerate convergence.\n*   **Narrow Parameter Ranges**: Focus tuning efforts around the converged values for `napi_busy_poll` (100), `migration_cost_ns` (4000000), `latency_ns` (3000000), `wakeup_granularity_ns` (500000), `min_granularity_ns` (375000), and `cstate_max` (POLL).\n*   **Fixed Parameters**: `max_perf_pct` (100) and `min_perf_pct` (0) can likely be fixed and excluded from future tuning to improve efficiency.\n*   **Parameter Relationship**: Investigate if `wakeup_granularity_ns` and `min_granularity_ns` are intrinsically linked by a fixed ratio (e.g., 1.33). If so, one could be derived from the other, reducing the search space.",
+    "token_usage": {
+      "api_total_tokens": 7879,
+      "billable_output_tokens": 2626,
+      "billable_total_tokens": 7879,
+      "cached_content_token_count": 0,
+      "input_tokens": 5253,
+      "output_tokens": 678,
+      "thinking_tokens": 1948,
+      "thinking_tokens_inferred_from_api_total": 0
+    },
+    "usage_metadata": {
+      "cached_content_token_count": null,
+      "candidates_token_count": 678,
+      "prompt_token_count": 5253,
+      "thoughts_token_count": 1948,
+      "total_token_count": 7879
+    }
+  },
+  "synthetic_noops": 37
+}

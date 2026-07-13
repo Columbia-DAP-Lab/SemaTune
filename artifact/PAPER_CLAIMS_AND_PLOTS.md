@@ -15,7 +15,7 @@ From the repository root:
 ```bash
 reproduction/reproduce_claims.sh --dry-run
 reproduction/reproduce_claims.sh --archived-only --output-dir results/reproduced_core
-reproduction/reproduce_claims.sh --run --output-dir results/reproduced_core
+reproduction/reproduce_claims.sh --run --clean --output-dir results/reproduced_core
 ```
 
 `reproduction/claim_manifest.json` maps the scoped C1–C4 evaluation to 21 unique

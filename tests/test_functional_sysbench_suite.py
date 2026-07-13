@@ -53,6 +53,10 @@ def test_recorded_replay_preserves_roles_justification_convergence_and_final(mon
     assert set(final_response.parameters) == set(config.parameters_to_tune)
     assert final_response.justification
     assert quick.client is None and actor.client is None
+    gist, gist_raw = actor.generate_gist([{"iteration": 1, "parameters": {}, "metrics": {}, "reward": 0.0}])
+    assert gist == "Optimization run completed under provider-free trace replay."
+    assert gist_raw["mode"] == "trace-replay"
+    assert gist_raw["provider_requests"] == 0
 
 
 def test_tuner_package_is_lazy():

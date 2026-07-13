@@ -1,0 +1,1347 @@
+{
+  "benchmark": "tpcc",
+  "description": "Committed provider-backed C1-C4 response trace; workload measurements are not included and provider requests are forbidden.",
+  "history": [
+    {
+      "iteration": 0,
+      "responses": {
+        "quick": {
+          "confidence": 1.0,
+          "converged": null,
+          "justification": "Exploring a more aggressive C-state to potentially reduce latency by minimizing idle power states, while keeping other parameters from the initial default which performed acceptably.",
+          "parameters": {
+            "cstate_max": "POLL",
+            "latency_ns": 24000000,
+            "max_perf_pct": 100,
+            "migration_cost_ns": 500000,
+            "min_granularity_ns": 3000000,
+            "min_perf_pct": 0,
+            "napi_busy_poll": 0,
+            "wakeup_granularity_ns": 4000000
+          },
+          "parameters_applied_in_source": true,
+          "recorded_response": true,
+          "response_time_seconds": 1.0208005905151367,
+          "token_metrics": {
+            "api_total_tokens": 1461,
+            "billable_output_tokens": 163,
+            "billable_total_tokens": 1461,
+            "cached_content_token_count": 0,
+            "input_tokens": 1298,
+            "output_tokens": 163,
+            "thinking_tokens": 0,
+            "thinking_tokens_inferred_from_api_total": 0
+          }
+        },
+        "reasoning": {
+          "confidence": 1.0,
+          "converged": null,
+          "justification": "Restricting C-states to POLL will keep the CPU more active, aiming to reduce wake-up latency. Reducing CFS latency_ns makes the scheduler more aggressive, potentially improving responsiveness for latency-sensitive workloads.",
+          "parameters": {
+            "cstate_max": "POLL",
+            "latency_ns": 12000000,
+            "max_perf_pct": 100,
+            "migration_cost_ns": 500000,
+            "min_granularity_ns": 3000000,
+            "min_perf_pct": 0,
+            "napi_busy_poll": 0,
+            "wakeup_granularity_ns": 4000000
+          },
+          "parameters_applied_in_source": true,
+          "recorded_response": true,
+          "response_time_seconds": 3.8898258209228516,
+          "token_metrics": {
+            "api_total_tokens": 1952,
+            "billable_output_tokens": 633,
+            "billable_total_tokens": 1952,
+            "cached_content_token_count": 0,
+            "input_tokens": 1319,
+            "output_tokens": 155,
+            "thinking_tokens": 478,
+            "thinking_tokens_inferred_from_api_total": 0
+          }
+        }
+      }
+    },
+    {
+      "iteration": 1,
+      "responses": {
+        "quick": {
+          "confidence": 1.0,
+          "converged": null,
+          "justification": "Continuing exploration by changing cstate_max to C1E to test its impact on latency, keeping other parameters from the best performing iteration to maintain stability.",
+          "parameters": {
+            "cstate_max": "C1E",
+            "latency_ns": 12000000,
+            "max_perf_pct": 100,
+            "migration_cost_ns": 500000,
+            "min_granularity_ns": 3000000,
+            "min_perf_pct": 0,
+            "napi_busy_poll": 0,
+            "wakeup_granularity_ns": 4000000
+          },
+          "parameters_applied_in_source": true,
+          "recorded_response": true,
+          "response_time_seconds": 3.0115585327148438,
+          "token_metrics": {
+            "api_total_tokens": 1778,
+            "billable_output_tokens": 165,
+            "billable_total_tokens": 1778,
+            "cached_content_token_count": 0,
+            "input_tokens": 1613,
+            "output_tokens": 165,
+            "thinking_tokens": 0,
+            "thinking_tokens_inferred_from_api_total": 0
+          }
+        },
+        "reasoning": {
+          "confidence": 0.0,
+          "converged": false,
+          "justification": "No recorded response; replayed as a no-op.",
+          "parameters": {},
+          "parameters_applied_in_source": false,
+          "recorded_response": false,
+          "response_time_seconds": 0.0,
+          "token_metrics": null
+        }
+      }
+    },
+    {
+      "iteration": 2,
+      "responses": {
+        "quick": {
+          "confidence": 1.0,
+          "converged": null,
+          "justification": "Continuing exploration by testing a more aggressive C-state (C1) which might further reduce latency while keeping other beneficial parameters from the previous iteration.",
+          "parameters": {
+            "cstate_max": "C1",
+            "latency_ns": 12000000,
+            "max_perf_pct": 100,
+            "migration_cost_ns": 500000,
+            "min_granularity_ns": 3000000,
+            "min_perf_pct": 0,
+            "napi_busy_poll": 0,
+            "wakeup_granularity_ns": 4000000
+          },
+          "parameters_applied_in_source": true,
+          "recorded_response": true,
+          "response_time_seconds": 1.005307674407959,
+          "token_metrics": {
+            "api_total_tokens": 2057,
+            "billable_output_tokens": 162,
+            "billable_total_tokens": 2057,
+            "cached_content_token_count": 0,
+            "input_tokens": 1895,
+            "output_tokens": 162,
+            "thinking_tokens": 0,
+            "thinking_tokens_inferred_from_api_total": 0
+          }
+        },
+        "reasoning": {
+          "confidence": 0.0,
+          "converged": false,
+          "justification": "No recorded response; replayed as a no-op.",
+          "parameters": {},
+          "parameters_applied_in_source": false,
+          "recorded_response": false,
+          "response_time_seconds": 0.0,
+          "token_metrics": null
+        }
+      }
+    },
+    {
+      "iteration": 3,
+      "responses": {
+        "quick": {
+          "confidence": 1.0,
+          "converged": null,
+          "justification": "The previous iteration with C1 resulted in increased latency. Returning to C6, which performed well in Iteration 2, and keeping other parameters consistent with the best performing configuration, aims to re-establish lower p99 latency while exploring a different C-state.",
+          "parameters": {
+            "cstate_max": "C6",
+            "latency_ns": 12000000,
+            "max_perf_pct": 100,
+            "migration_cost_ns": 500000,
+            "min_granularity_ns": 3000000,
+            "min_perf_pct": 0,
+            "napi_busy_poll": 0,
+            "wakeup_granularity_ns": 4000000
+          },
+          "parameters_applied_in_source": true,
+          "recorded_response": true,
+          "response_time_seconds": 2.8143277168273926,
+          "token_metrics": {
+            "api_total_tokens": 2250,
+            "billable_output_tokens": 187,
+            "billable_total_tokens": 2250,
+            "cached_content_token_count": 0,
+            "input_tokens": 2063,
+            "output_tokens": 187,
+            "thinking_tokens": 0,
+            "thinking_tokens_inferred_from_api_total": 0
+          }
+        },
+        "reasoning": {
+          "confidence": 0.0,
+          "converged": false,
+          "justification": "No recorded response; replayed as a no-op.",
+          "parameters": {},
+          "parameters_applied_in_source": false,
+          "recorded_response": false,
+          "response_time_seconds": 0.0,
+          "token_metrics": null
+        }
+      }
+    },
+    {
+      "iteration": 4,
+      "responses": {
+        "quick": {
+          "confidence": 1.0,
+          "converged": null,
+          "justification": "Iteration 4 with C6 state significantly degraded performance, indicating it's not suitable for this workload. We will revert to C1E, which previously yielded the best p99 latency, and explore a slightly lower latency_ns to see if further latency reduction is possible without sacrificing throughput.",
+          "parameters": {
+            "cstate_max": "C1E",
+            "latency_ns": 12000000,
+            "max_perf_pct": 100,
+            "migration_cost_ns": 500000,
+            "min_granularity_ns": 3000000,
+            "min_perf_pct": 0,
+            "napi_busy_poll": 0,
+            "wakeup_granularity_ns": 4000000
+          },
+          "parameters_applied_in_source": true,
+          "recorded_response": true,
+          "response_time_seconds": 6.02241849899292,
+          "token_metrics": {
+            "api_total_tokens": 2425,
+            "billable_output_tokens": 193,
+            "billable_total_tokens": 2425,
+            "cached_content_token_count": 0,
+            "input_tokens": 2232,
+            "output_tokens": 193,
+            "thinking_tokens": 0,
+            "thinking_tokens_inferred_from_api_total": 0
+          }
+        },
+        "reasoning": {
+          "confidence": 0.0,
+          "converged": false,
+          "justification": "No recorded response; replayed as a no-op.",
+          "parameters": {},
+          "parameters_applied_in_source": false,
+          "recorded_response": false,
+          "response_time_seconds": 0.0,
+          "token_metrics": null
+        }
+      }
+    },
+    {
+      "iteration": 5,
+      "responses": {
+        "quick": {
+          "confidence": 0.0,
+          "converged": false,
+          "justification": "No recorded response; replayed as a no-op.",
+          "parameters": {},
+          "parameters_applied_in_source": false,
+          "recorded_response": false,
+          "response_time_seconds": 0.0,
+          "token_metrics": null
+        },
+        "reasoning": {
+          "confidence": 0.0,
+          "converged": false,
+          "justification": "No recorded response; replayed as a no-op.",
+          "parameters": {},
+          "parameters_applied_in_source": false,
+          "recorded_response": false,
+          "response_time_seconds": 0.0,
+          "token_metrics": null
+        }
+      }
+    },
+    {
+      "iteration": 6,
+      "responses": {
+        "quick": {
+          "confidence": 1.0,
+          "converged": null,
+          "justification": "The C1E state has consistently shown the lowest P99 latency, and iteration 2 achieved the best result with it. We'll keep the same C1E setting and explore slightly lower latency_ns to see if further gains are possible without significantly impacting throughput. Iteration 6 was very close to iteration 2, suggesting C1E is a good state.",
+          "parameters": {
+            "cstate_max": "C1E",
+            "latency_ns": 12000000,
+            "max_perf_pct": 100,
+            "migration_cost_ns": 500000,
+            "min_granularity_ns": 3000000,
+            "min_perf_pct": 0,
+            "napi_busy_poll": 0,
+            "wakeup_granularity_ns": 4000000
+          },
+          "parameters_applied_in_source": true,
+          "recorded_response": true,
+          "response_time_seconds": 1.311884880065918,
+          "token_metrics": {
+            "api_total_tokens": 2779,
+            "billable_output_tokens": 210,
+            "billable_total_tokens": 2779,
+            "cached_content_token_count": 0,
+            "input_tokens": 2569,
+            "output_tokens": 210,
+            "thinking_tokens": 0,
+            "thinking_tokens_inferred_from_api_total": 0
+          }
+        },
+        "reasoning": {
+          "confidence": 0.0,
+          "converged": false,
+          "justification": "No recorded response; replayed as a no-op.",
+          "parameters": {},
+          "parameters_applied_in_source": false,
+          "recorded_response": false,
+          "response_time_seconds": 0.0,
+          "token_metrics": null
+        }
+      }
+    },
+    {
+      "iteration": 7,
+      "responses": {
+        "quick": {
+          "confidence": 1.0,
+          "converged": null,
+          "justification": "The C1E state has consistently yielded the lowest p99 latency. We will continue exploring this state to refine the optimal parameters, while keeping other parameters stable.",
+          "parameters": {
+            "cstate_max": "C1E",
+            "latency_ns": 12000000,
+            "max_perf_pct": 100,
+            "migration_cost_ns": 500000,
+            "min_granularity_ns": 3000000,
+            "min_perf_pct": 0,
+            "napi_busy_poll": 0,
+            "wakeup_granularity_ns": 4000000
+          },
+          "parameters_applied_in_source": true,
+          "recorded_response": true,
+          "response_time_seconds": 1.7064650058746338,
+          "token_metrics": {
+            "api_total_tokens": 2907,
+            "billable_output_tokens": 167,
+            "billable_total_tokens": 2907,
+            "cached_content_token_count": 0,
+            "input_tokens": 2740,
+            "output_tokens": 167,
+            "thinking_tokens": 0,
+            "thinking_tokens_inferred_from_api_total": 0
+          }
+        },
+        "reasoning": {
+          "confidence": 0.0,
+          "converged": false,
+          "justification": "No recorded response; replayed as a no-op.",
+          "parameters": {},
+          "parameters_applied_in_source": false,
+          "recorded_response": false,
+          "response_time_seconds": 0.0,
+          "token_metrics": null
+        }
+      }
+    },
+    {
+      "iteration": 8,
+      "responses": {
+        "quick": {
+          "confidence": 1.0,
+          "converged": null,
+          "justification": "The previous iteration with C1E resulted in a significant latency spike, suggesting it might not be optimal for this workload. Reverting to POLL for cstate_max, which has shown good results in iteration 1 and did not cause major regressions in subsequent iterations, while keeping other parameters from the best performing runs.",
+          "parameters": {
+            "cstate_max": "POLL",
+            "latency_ns": 12000000,
+            "max_perf_pct": 100,
+            "migration_cost_ns": 500000,
+            "min_granularity_ns": 3000000,
+            "min_perf_pct": 0,
+            "napi_busy_poll": 0,
+            "wakeup_granularity_ns": 4000000
+          },
+          "parameters_applied_in_source": true,
+          "recorded_response": true,
+          "response_time_seconds": 1.3056588172912598,
+          "token_metrics": {
+            "api_total_tokens": 3106,
+            "billable_output_tokens": 196,
+            "billable_total_tokens": 3106,
+            "cached_content_token_count": 785,
+            "input_tokens": 2910,
+            "output_tokens": 196,
+            "thinking_tokens": 0,
+            "thinking_tokens_inferred_from_api_total": 0
+          }
+        },
+        "reasoning": {
+          "confidence": 0.0,
+          "converged": false,
+          "justification": "No recorded response; replayed as a no-op.",
+          "parameters": {},
+          "parameters_applied_in_source": false,
+          "recorded_response": false,
+          "response_time_seconds": 0.0,
+          "token_metrics": null
+        }
+      }
+    },
+    {
+      "iteration": 9,
+      "responses": {
+        "quick": {
+          "confidence": 1.0,
+          "converged": null,
+          "justification": "The C1E cstate has consistently yielded the best p99 latency results. We will continue to explore this promising state, probing slightly lower latency_ns to see if further improvements can be made without sacrificing throughput.",
+          "parameters": {
+            "cstate_max": "C1E",
+            "latency_ns": 12000000,
+            "max_perf_pct": 100,
+            "migration_cost_ns": 500000,
+            "min_granularity_ns": 3000000,
+            "min_perf_pct": 0,
+            "napi_busy_poll": 0,
+            "wakeup_granularity_ns": 4000000
+          },
+          "parameters_applied_in_source": true,
+          "recorded_response": true,
+          "response_time_seconds": 1.5052106380462646,
+          "token_metrics": {
+            "api_total_tokens": 3258,
+            "billable_output_tokens": 178,
+            "billable_total_tokens": 3258,
+            "cached_content_token_count": 0,
+            "input_tokens": 3080,
+            "output_tokens": 178,
+            "thinking_tokens": 0,
+            "thinking_tokens_inferred_from_api_total": 0
+          }
+        },
+        "reasoning": {
+          "confidence": 0.0,
+          "converged": false,
+          "justification": "No recorded response; replayed as a no-op.",
+          "parameters": {},
+          "parameters_applied_in_source": false,
+          "recorded_response": false,
+          "response_time_seconds": 0.0,
+          "token_metrics": null
+        }
+      }
+    },
+    {
+      "iteration": 10,
+      "responses": {
+        "quick": {
+          "confidence": 1.0,
+          "converged": null,
+          "justification": "The C1E state has consistently provided the best latency_p99 results. We will continue to explore this state, but also test POLL to see if it can offer comparable or better latency with potentially lower power consumption, given its slightly worse performance in iteration 9.",
+          "parameters": {
+            "latency_ns": 12000000,
+            "max_perf_pct": 100,
+            "migration_cost_ns": 500000,
+            "min_granularity_ns": 3000000,
+            "min_perf_pct": 0,
+            "napi_busy_poll": 0,
+            "wakeup_granularity_ns": 4000000
+          },
+          "parameters_applied_in_source": true,
+          "recorded_response": true,
+          "response_time_seconds": 1.1060187816619873,
+          "token_metrics": {
+            "api_total_tokens": 3430,
+            "billable_output_tokens": 176,
+            "billable_total_tokens": 3430,
+            "cached_content_token_count": 1610,
+            "input_tokens": 3254,
+            "output_tokens": 176,
+            "thinking_tokens": 0,
+            "thinking_tokens_inferred_from_api_total": 0
+          }
+        },
+        "reasoning": {
+          "confidence": 0.0,
+          "converged": false,
+          "justification": "No recorded response; replayed as a no-op.",
+          "parameters": {},
+          "parameters_applied_in_source": false,
+          "recorded_response": false,
+          "response_time_seconds": 0.0,
+          "token_metrics": null
+        }
+      }
+    },
+    {
+      "iteration": 11,
+      "responses": {
+        "quick": {
+          "confidence": 1.0,
+          "converged": null,
+          "justification": "Continuing exploration, C1E has shown good results, but we will test POLL again to see if it provides a more consistent low latency, as seen in iteration 9.",
+          "parameters": {
+            "cstate_max": "POLL",
+            "latency_ns": 12000000,
+            "max_perf_pct": 100,
+            "migration_cost_ns": 500000,
+            "min_granularity_ns": 3000000,
+            "min_perf_pct": 0,
+            "napi_busy_poll": 0,
+            "wakeup_granularity_ns": 4000000
+          },
+          "parameters_applied_in_source": true,
+          "recorded_response": true,
+          "response_time_seconds": 1.4066150188446045,
+          "token_metrics": {
+            "api_total_tokens": 3593,
+            "billable_output_tokens": 168,
+            "billable_total_tokens": 3593,
+            "cached_content_token_count": 0,
+            "input_tokens": 3425,
+            "output_tokens": 168,
+            "thinking_tokens": 0,
+            "thinking_tokens_inferred_from_api_total": 0
+          }
+        },
+        "reasoning": {
+          "confidence": 0.0,
+          "converged": false,
+          "justification": "No recorded response; replayed as a no-op.",
+          "parameters": {},
+          "parameters_applied_in_source": false,
+          "recorded_response": false,
+          "response_time_seconds": 0.0,
+          "token_metrics": null
+        }
+      }
+    },
+    {
+      "iteration": 12,
+      "responses": {
+        "quick": {
+          "confidence": 1.0,
+          "converged": null,
+          "justification": "The previous iterations show that C1E generally provides lower latency_p99, but the best result was achieved with C1E. Iteration 12 regressed slightly with POLL. To continue exploration, we'll revert to C1E, which has shown the most promise for minimizing latency_p99, and slightly increase migration_cost_ns to see if it offers further benefits in this low-latency configuration.",
+          "parameters": {
+            "cstate_max": "POLL",
+            "latency_ns": 12000000,
+            "max_perf_pct": 100,
+            "migration_cost_ns": 500000,
+            "min_granularity_ns": 3000000,
+            "min_perf_pct": 0,
+            "napi_busy_poll": 0,
+            "wakeup_granularity_ns": 4000000
+          },
+          "parameters_applied_in_source": true,
+          "recorded_response": true,
+          "response_time_seconds": 1.5043859481811523,
+          "token_metrics": {
+            "api_total_tokens": 3817,
+            "billable_output_tokens": 223,
+            "billable_total_tokens": 3817,
+            "cached_content_token_count": 0,
+            "input_tokens": 3594,
+            "output_tokens": 221,
+            "thinking_tokens": 2,
+            "thinking_tokens_inferred_from_api_total": 0
+          }
+        },
+        "reasoning": {
+          "confidence": 0.0,
+          "converged": false,
+          "justification": "No recorded response; replayed as a no-op.",
+          "parameters": {},
+          "parameters_applied_in_source": false,
+          "recorded_response": false,
+          "response_time_seconds": 0.0,
+          "token_metrics": null
+        }
+      }
+    },
+    {
+      "iteration": 13,
+      "responses": {
+        "quick": {
+          "confidence": 1.0,
+          "converged": null,
+          "justification": "The C1E cstate has consistently yielded the best P99 latency results, with the top three configurations all using it. While the last iteration with POLL was poor, we will re-test C1E to confirm its stability and explore if slightly higher latency_ns values around 12ms could offer further improvements without significant degradation.",
+          "parameters": {
+            "cstate_max": "C1E",
+            "latency_ns": 12000000,
+            "max_perf_pct": 100,
+            "migration_cost_ns": 500000,
+            "min_granularity_ns": 3000000,
+            "min_perf_pct": 0,
+            "napi_busy_poll": 0,
+            "wakeup_granularity_ns": 4000000
+          },
+          "parameters_applied_in_source": true,
+          "recorded_response": true,
+          "response_time_seconds": 1.4038538932800293,
+          "token_metrics": {
+            "api_total_tokens": 3969,
+            "billable_output_tokens": 205,
+            "billable_total_tokens": 3969,
+            "cached_content_token_count": 2487,
+            "input_tokens": 3764,
+            "output_tokens": 203,
+            "thinking_tokens": 2,
+            "thinking_tokens_inferred_from_api_total": 0
+          }
+        },
+        "reasoning": {
+          "confidence": 0.0,
+          "converged": false,
+          "justification": "No recorded response; replayed as a no-op.",
+          "parameters": {},
+          "parameters_applied_in_source": false,
+          "recorded_response": false,
+          "response_time_seconds": 0.0,
+          "token_metrics": null
+        }
+      }
+    },
+    {
+      "iteration": 14,
+      "responses": {
+        "quick": {
+          "confidence": 1.0,
+          "converged": null,
+          "justification": "Continuing exploration with C1E showing promising results for latency_p99. Switching to POLL to explore a different C-state option while keeping other parameters consistent with previous good performance.",
+          "parameters": {
+            "cstate_max": "POLL",
+            "latency_ns": 12000000,
+            "max_perf_pct": 100,
+            "migration_cost_ns": 500000,
+            "min_granularity_ns": 3000000,
+            "min_perf_pct": 0,
+            "napi_busy_poll": 0,
+            "wakeup_granularity_ns": 4000000
+          },
+          "parameters_applied_in_source": true,
+          "recorded_response": true,
+          "response_time_seconds": 1.1080443859100342,
+          "token_metrics": {
+            "api_total_tokens": 4106,
+            "billable_output_tokens": 170,
+            "billable_total_tokens": 4106,
+            "cached_content_token_count": 0,
+            "input_tokens": 3936,
+            "output_tokens": 170,
+            "thinking_tokens": 0,
+            "thinking_tokens_inferred_from_api_total": 0
+          }
+        },
+        "reasoning": {
+          "confidence": 0.0,
+          "converged": false,
+          "justification": "No recorded response; replayed as a no-op.",
+          "parameters": {},
+          "parameters_applied_in_source": false,
+          "recorded_response": false,
+          "response_time_seconds": 0.0,
+          "token_metrics": null
+        }
+      }
+    },
+    {
+      "iteration": 15,
+      "responses": {
+        "quick": {
+          "confidence": 1.0,
+          "converged": null,
+          "justification": "The C1E cstate has consistently yielded the lowest latency_p99 values. To continue exploration in a promising direction, we will re-test C1E with a slightly adjusted latency_ns to probe the surrounding performance space.",
+          "parameters": {
+            "cstate_max": "C1E",
+            "latency_ns": 12000000,
+            "max_perf_pct": 100,
+            "migration_cost_ns": 500000,
+            "min_granularity_ns": 3000000,
+            "min_perf_pct": 0,
+            "napi_busy_poll": 0,
+            "wakeup_granularity_ns": 4000000
+          },
+          "parameters_applied_in_source": true,
+          "recorded_response": true,
+          "response_time_seconds": 1.103804588317871,
+          "token_metrics": {
+            "api_total_tokens": 4287,
+            "billable_output_tokens": 182,
+            "billable_total_tokens": 4287,
+            "cached_content_token_count": 2527,
+            "input_tokens": 4105,
+            "output_tokens": 182,
+            "thinking_tokens": 0,
+            "thinking_tokens_inferred_from_api_total": 0
+          }
+        },
+        "reasoning": {
+          "confidence": 0.0,
+          "converged": false,
+          "justification": "No recorded response; replayed as a no-op.",
+          "parameters": {},
+          "parameters_applied_in_source": false,
+          "recorded_response": false,
+          "response_time_seconds": 0.0,
+          "token_metrics": null
+        }
+      }
+    },
+    {
+      "iteration": 16,
+      "responses": {
+        "quick": {
+          "confidence": 1.0,
+          "converged": null,
+          "justification": "The best results have been achieved with C1E, but C1E and POLL are close. We will explore POLL to see if it can match or beat the current best latency_p99. Other parameters remain stable.",
+          "parameters": {
+            "cstate_max": "POLL",
+            "latency_ns": 12000000,
+            "max_perf_pct": 100,
+            "migration_cost_ns": 500000,
+            "min_granularity_ns": 3000000,
+            "min_perf_pct": 0,
+            "napi_busy_poll": 0,
+            "wakeup_granularity_ns": 4000000
+          },
+          "parameters_applied_in_source": true,
+          "recorded_response": true,
+          "response_time_seconds": 3.111672878265381,
+          "token_metrics": {
+            "api_total_tokens": 4456,
+            "billable_output_tokens": 179,
+            "billable_total_tokens": 4456,
+            "cached_content_token_count": 0,
+            "input_tokens": 4277,
+            "output_tokens": 179,
+            "thinking_tokens": 0,
+            "thinking_tokens_inferred_from_api_total": 0
+          }
+        },
+        "reasoning": {
+          "confidence": 0.0,
+          "converged": false,
+          "justification": "No recorded response; replayed as a no-op.",
+          "parameters": {},
+          "parameters_applied_in_source": false,
+          "recorded_response": false,
+          "response_time_seconds": 0.0,
+          "token_metrics": null
+        }
+      }
+    },
+    {
+      "iteration": 17,
+      "responses": {
+        "quick": {
+          "confidence": 1.0,
+          "converged": null,
+          "justification": "The best performing configurations consistently use C1E for cstate_max and keep other parameters stable. We will continue exploring this promising region by re-testing the C1E configuration to confirm its robustness against noise, as the last C1E test (iter 16) was slightly worse than the current best.",
+          "parameters": {
+            "cstate_max": "C1E",
+            "latency_ns": 12000000,
+            "max_perf_pct": 100,
+            "migration_cost_ns": 500000,
+            "min_granularity_ns": 3000000,
+            "min_perf_pct": 0,
+            "napi_busy_poll": 0,
+            "wakeup_granularity_ns": 4000000
+          },
+          "parameters_applied_in_source": true,
+          "recorded_response": true,
+          "response_time_seconds": 2.4048409461975098,
+          "token_metrics": {
+            "api_total_tokens": 4646,
+            "billable_output_tokens": 200,
+            "billable_total_tokens": 4646,
+            "cached_content_token_count": 0,
+            "input_tokens": 4446,
+            "output_tokens": 198,
+            "thinking_tokens": 2,
+            "thinking_tokens_inferred_from_api_total": 0
+          }
+        },
+        "reasoning": {
+          "confidence": 0.0,
+          "converged": false,
+          "justification": "No recorded response; replayed as a no-op.",
+          "parameters": {},
+          "parameters_applied_in_source": false,
+          "recorded_response": false,
+          "response_time_seconds": 0.0,
+          "token_metrics": null
+        }
+      }
+    },
+    {
+      "iteration": 18,
+      "responses": {
+        "quick": {
+          "confidence": 1.0,
+          "converged": null,
+          "justification": "While C1E has shown good results, C1E and POLL have similar latency_p99 in the top configurations. Exploring POLL again with the current best latency_ns and migration_cost_ns might reveal a more robust low-latency setting or confirm C1E's superiority.",
+          "parameters": {
+            "cstate_max": "POLL",
+            "latency_ns": 12000000,
+            "max_perf_pct": 100,
+            "migration_cost_ns": 500000,
+            "min_granularity_ns": 3000000,
+            "min_perf_pct": 0,
+            "napi_busy_poll": 0,
+            "wakeup_granularity_ns": 4000000
+          },
+          "parameters_applied_in_source": true,
+          "recorded_response": true,
+          "response_time_seconds": 3.0118496417999268,
+          "token_metrics": {
+            "api_total_tokens": 4813,
+            "billable_output_tokens": 195,
+            "billable_total_tokens": 4813,
+            "cached_content_token_count": 4297,
+            "input_tokens": 4618,
+            "output_tokens": 193,
+            "thinking_tokens": 2,
+            "thinking_tokens_inferred_from_api_total": 0
+          }
+        },
+        "reasoning": {
+          "confidence": 0.0,
+          "converged": false,
+          "justification": "No recorded response; replayed as a no-op.",
+          "parameters": {},
+          "parameters_applied_in_source": false,
+          "recorded_response": false,
+          "response_time_seconds": 0.0,
+          "token_metrics": null
+        }
+      }
+    },
+    {
+      "iteration": 19,
+      "responses": {
+        "quick": {
+          "confidence": 1.0,
+          "converged": null,
+          "justification": "The previous best configurations consistently used C1E, however, recent explorations with POLL have shown competitive results. To continue exploration and potentially find a better trade-off, we will test POLL again, slightly increasing latency_ns to see if it can further reduce p99 latency.",
+          "parameters": {
+            "cstate_max": "POLL",
+            "latency_ns": 12000000,
+            "max_perf_pct": 100,
+            "migration_cost_ns": 500000,
+            "min_granularity_ns": 3000000,
+            "min_perf_pct": 0,
+            "napi_busy_poll": 0,
+            "wakeup_granularity_ns": 4000000
+          },
+          "parameters_applied_in_source": true,
+          "recorded_response": true,
+          "response_time_seconds": 1.2054648399353027,
+          "token_metrics": {
+            "api_total_tokens": 4976,
+            "billable_output_tokens": 189,
+            "billable_total_tokens": 4976,
+            "cached_content_token_count": 3457,
+            "input_tokens": 4787,
+            "output_tokens": 189,
+            "thinking_tokens": 0,
+            "thinking_tokens_inferred_from_api_total": 0
+          }
+        },
+        "reasoning": {
+          "confidence": 0.0,
+          "converged": false,
+          "justification": "No recorded response; replayed as a no-op.",
+          "parameters": {},
+          "parameters_applied_in_source": false,
+          "recorded_response": false,
+          "response_time_seconds": 0.0,
+          "token_metrics": null
+        }
+      }
+    },
+    {
+      "iteration": 20,
+      "responses": {
+        "quick": {
+          "confidence": 1.0,
+          "converged": null,
+          "justification": "The C1E state has shown the best latency_p99 performance historically, and iteration 2 yielded the lowest p99 latency. While iteration 20 with POLL also performed well, C1E is a safer bet to explore further based on past results, while keeping other parameters consistent to isolate the effect of cstate_max.",
+          "parameters": {
+            "cstate_max": "C1E",
+            "latency_ns": 12000000,
+            "max_perf_pct": 100,
+            "migration_cost_ns": 500000,
+            "min_granularity_ns": 3000000,
+            "min_perf_pct": 0,
+            "napi_busy_poll": 0,
+            "wakeup_granularity_ns": 4000000
+          },
+          "parameters_applied_in_source": true,
+          "recorded_response": true,
+          "response_time_seconds": 1.308243751525879,
+          "token_metrics": {
+            "api_total_tokens": 5163,
+            "billable_output_tokens": 206,
+            "billable_total_tokens": 5163,
+            "cached_content_token_count": 1738,
+            "input_tokens": 4957,
+            "output_tokens": 204,
+            "thinking_tokens": 2,
+            "thinking_tokens_inferred_from_api_total": 0
+          }
+        },
+        "reasoning": {
+          "confidence": 0.0,
+          "converged": false,
+          "justification": "No recorded response; replayed as a no-op.",
+          "parameters": {},
+          "parameters_applied_in_source": false,
+          "recorded_response": false,
+          "response_time_seconds": 0.0,
+          "token_metrics": null
+        }
+      }
+    },
+    {
+      "iteration": 21,
+      "responses": {
+        "quick": {
+          "confidence": 1.0,
+          "converged": null,
+          "justification": "The previous best latency_p99 was achieved with C1E, and while iteration 21 regressed, it's likely noise. We will re-test C1E to confirm its performance, as it has historically provided the lowest p99 latency.",
+          "parameters": {
+            "cstate_max": "C1E",
+            "latency_ns": 12000000,
+            "max_perf_pct": 100,
+            "migration_cost_ns": 500000,
+            "min_granularity_ns": 3000000,
+            "min_perf_pct": 0,
+            "napi_busy_poll": 0,
+            "wakeup_granularity_ns": 4000000
+          },
+          "parameters_applied_in_source": true,
+          "recorded_response": true,
+          "response_time_seconds": 1.2066636085510254,
+          "token_metrics": {
+            "api_total_tokens": 5318,
+            "billable_output_tokens": 189,
+            "billable_total_tokens": 5318,
+            "cached_content_token_count": 2620,
+            "input_tokens": 5129,
+            "output_tokens": 189,
+            "thinking_tokens": 0,
+            "thinking_tokens_inferred_from_api_total": 0
+          }
+        },
+        "reasoning": {
+          "confidence": 0.0,
+          "converged": false,
+          "justification": "No recorded response; replayed as a no-op.",
+          "parameters": {},
+          "parameters_applied_in_source": false,
+          "recorded_response": false,
+          "response_time_seconds": 0.0,
+          "token_metrics": null
+        }
+      }
+    },
+    {
+      "iteration": 22,
+      "responses": {
+        "quick": {
+          "confidence": 1.0,
+          "converged": null,
+          "justification": "The C1E state has consistently yielded good latency_p99 values, with the best overall result at 17.30. Although iteration 22 showed a slight increase in latency, it's within the noise range. We will continue exploring C1E to see if further minor improvements can be found or to confirm its robustness.",
+          "parameters": {
+            "cstate_max": "C1E",
+            "latency_ns": 12000000,
+            "max_perf_pct": 100,
+            "migration_cost_ns": 500000,
+            "min_granularity_ns": 3000000,
+            "min_perf_pct": 0,
+            "napi_busy_poll": 0,
+            "wakeup_granularity_ns": 4000000
+          },
+          "parameters_applied_in_source": true,
+          "recorded_response": true,
+          "response_time_seconds": 1.410170316696167,
+          "token_metrics": {
+            "api_total_tokens": 5505,
+            "billable_output_tokens": 205,
+            "billable_total_tokens": 5505,
+            "cached_content_token_count": 4388,
+            "input_tokens": 5300,
+            "output_tokens": 205,
+            "thinking_tokens": 0,
+            "thinking_tokens_inferred_from_api_total": 0
+          }
+        },
+        "reasoning": {
+          "confidence": 0.0,
+          "converged": false,
+          "justification": "No recorded response; replayed as a no-op.",
+          "parameters": {},
+          "parameters_applied_in_source": false,
+          "recorded_response": false,
+          "response_time_seconds": 0.0,
+          "token_metrics": null
+        }
+      }
+    },
+    {
+      "iteration": 23,
+      "responses": {
+        "quick": {
+          "confidence": 1.0,
+          "converged": null,
+          "justification": "The previous best configuration used C1E, and while it yielded good results, switching to POLL provides a different exploration point. This is a safe variation to continue exploring latency-performance trade-offs, as POLL has shown competitive results previously.",
+          "parameters": {
+            "cstate_max": "POLL",
+            "latency_ns": 12000000,
+            "max_perf_pct": 100,
+            "migration_cost_ns": 500000,
+            "min_granularity_ns": 3000000,
+            "min_perf_pct": 0,
+            "napi_busy_poll": 0,
+            "wakeup_granularity_ns": 4000000
+          },
+          "parameters_applied_in_source": true,
+          "recorded_response": true,
+          "response_time_seconds": 1.4066789150238037,
+          "token_metrics": {
+            "api_total_tokens": 5652,
+            "billable_output_tokens": 181,
+            "billable_total_tokens": 5652,
+            "cached_content_token_count": 0,
+            "input_tokens": 5471,
+            "output_tokens": 181,
+            "thinking_tokens": 0,
+            "thinking_tokens_inferred_from_api_total": 0
+          }
+        },
+        "reasoning": {
+          "confidence": 0.0,
+          "converged": false,
+          "justification": "No recorded response; replayed as a no-op.",
+          "parameters": {},
+          "parameters_applied_in_source": false,
+          "recorded_response": false,
+          "response_time_seconds": 0.0,
+          "token_metrics": null
+        }
+      }
+    },
+    {
+      "iteration": 24,
+      "responses": {
+        "quick": {
+          "confidence": 1.0,
+          "converged": null,
+          "justification": "The best observed latency_p99 of 17.30 was achieved with C1E. While POLL has also shown good results, C1E appears to be more consistently providing lower p99 latency, and we should continue exploring this direction.",
+          "parameters": {
+            "cstate_max": "C1E"
+          },
+          "parameters_applied_in_source": true,
+          "recorded_response": true,
+          "response_time_seconds": 0.8038632869720459,
+          "token_metrics": {
+            "api_total_tokens": 5716,
+            "billable_output_tokens": 76,
+            "billable_total_tokens": 5716,
+            "cached_content_token_count": 4426,
+            "input_tokens": 5640,
+            "output_tokens": 76,
+            "thinking_tokens": 0,
+            "thinking_tokens_inferred_from_api_total": 0
+          }
+        },
+        "reasoning": {
+          "confidence": 0.0,
+          "converged": false,
+          "justification": "No recorded response; replayed as a no-op.",
+          "parameters": {},
+          "parameters_applied_in_source": false,
+          "recorded_response": false,
+          "response_time_seconds": 0.0,
+          "token_metrics": null
+        }
+      }
+    },
+    {
+      "iteration": 25,
+      "responses": {
+        "quick": {
+          "confidence": 1.0,
+          "converged": null,
+          "justification": "The C1E state has consistently yielded good latency results, with the best observed latency at 17.30. While POLL also showed promise, C1E has appeared more frequently in the top results. We will continue exploring C1E to see if we can further refine latency, while keeping other parameters stable.",
+          "parameters": {
+            "cstate_max": "C1E",
+            "latency_ns": 12000000,
+            "max_perf_pct": 100,
+            "migration_cost_ns": 500000,
+            "min_granularity_ns": 3000000,
+            "min_perf_pct": 0,
+            "napi_busy_poll": 0,
+            "wakeup_granularity_ns": 4000000
+          },
+          "parameters_applied_in_source": true,
+          "recorded_response": true,
+          "response_time_seconds": 1.6068854331970215,
+          "token_metrics": {
+            "api_total_tokens": 6013,
+            "billable_output_tokens": 201,
+            "billable_total_tokens": 6013,
+            "cached_content_token_count": 1777,
+            "input_tokens": 5812,
+            "output_tokens": 199,
+            "thinking_tokens": 2,
+            "thinking_tokens_inferred_from_api_total": 0
+          }
+        },
+        "reasoning": {
+          "confidence": 0.0,
+          "converged": false,
+          "justification": "No recorded response; replayed as a no-op.",
+          "parameters": {},
+          "parameters_applied_in_source": false,
+          "recorded_response": false,
+          "response_time_seconds": 0.0,
+          "token_metrics": null
+        }
+      }
+    },
+    {
+      "iteration": 26,
+      "responses": {
+        "quick": {
+          "confidence": 1.0,
+          "converged": null,
+          "justification": "The previous iteration with C1E resulted in a significant latency increase, indicating it might not be optimal for this workload. Exploring POLL again, which has shown good results previously, is a safe move to continue exploration. The other parameters have been stable and yielded good results, so they remain unchanged.",
+          "parameters": {
+            "cstate_max": "POLL"
+          },
+          "parameters_applied_in_source": true,
+          "recorded_response": true,
+          "response_time_seconds": 0.9052071571350098,
+          "token_metrics": {
+            "api_total_tokens": 6064,
+            "billable_output_tokens": 81,
+            "billable_total_tokens": 6064,
+            "cached_content_token_count": 3568,
+            "input_tokens": 5983,
+            "output_tokens": 81,
+            "thinking_tokens": 0,
+            "thinking_tokens_inferred_from_api_total": 0
+          }
+        },
+        "reasoning": {
+          "confidence": 0.0,
+          "converged": false,
+          "justification": "No recorded response; replayed as a no-op.",
+          "parameters": {},
+          "parameters_applied_in_source": false,
+          "recorded_response": false,
+          "response_time_seconds": 0.0,
+          "token_metrics": null
+        }
+      }
+    },
+    {
+      "iteration": 27,
+      "responses": {
+        "quick": {
+          "confidence": 1.0,
+          "converged": null,
+          "justification": "The previous iteration with C1E resulted in a latency_p99 of 29.57, which was a significant increase. However, the top two configurations for latency_p99 (17.30 and 17.42) also used C1E. To explore this promising state further and account for noise, we will re-test C1E with a slight variation in latency_ns, moving it slightly lower to 10ms (10,000,000 ns) to see if it further reduces latency.",
+          "parameters": {
+            "cstate_max": "C1E",
+            "latency_ns": 12000000,
+            "max_perf_pct": 100,
+            "migration_cost_ns": 500000,
+            "min_granularity_ns": 3000000,
+            "min_perf_pct": 0,
+            "napi_busy_poll": 0,
+            "wakeup_granularity_ns": 4000000
+          },
+          "parameters_applied_in_source": true,
+          "recorded_response": true,
+          "response_time_seconds": 1.403893232345581,
+          "token_metrics": {
+            "api_total_tokens": 6405,
+            "billable_output_tokens": 253,
+            "billable_total_tokens": 6405,
+            "cached_content_token_count": 4476,
+            "input_tokens": 6152,
+            "output_tokens": 253,
+            "thinking_tokens": 0,
+            "thinking_tokens_inferred_from_api_total": 0
+          }
+        },
+        "reasoning": {
+          "confidence": 0.0,
+          "converged": false,
+          "justification": "No recorded response; replayed as a no-op.",
+          "parameters": {},
+          "parameters_applied_in_source": false,
+          "recorded_response": false,
+          "response_time_seconds": 0.0,
+          "token_metrics": null
+        }
+      }
+    },
+    {
+      "iteration": 28,
+      "responses": {
+        "quick": {
+          "confidence": 1.0,
+          "converged": null,
+          "justification": "The best results have consistently been achieved with C1E as the cstate_max, and similar latency and granularity settings. To continue exploration while staying in a promising region, we will maintain these settings and probe a slightly different latency value to see if further latency reduction is possible without significant throughput degradation.",
+          "parameters": {
+            "cstate_max": "C1E",
+            "latency_ns": 12000000,
+            "max_perf_pct": 100,
+            "migration_cost_ns": 500000,
+            "min_granularity_ns": 3000000,
+            "min_perf_pct": 0,
+            "napi_busy_poll": 0,
+            "wakeup_granularity_ns": 4000000
+          },
+          "parameters_applied_in_source": true,
+          "recorded_response": true,
+          "response_time_seconds": 2.114105224609375,
+          "token_metrics": {
+            "api_total_tokens": 6518,
+            "billable_output_tokens": 194,
+            "billable_total_tokens": 6518,
+            "cached_content_token_count": 3593,
+            "input_tokens": 6324,
+            "output_tokens": 194,
+            "thinking_tokens": 0,
+            "thinking_tokens_inferred_from_api_total": 0
+          }
+        },
+        "reasoning": {
+          "confidence": 0.0,
+          "converged": false,
+          "justification": "No recorded response; replayed as a no-op.",
+          "parameters": {},
+          "parameters_applied_in_source": false,
+          "recorded_response": false,
+          "response_time_seconds": 0.0,
+          "token_metrics": null
+        }
+      }
+    },
+    {
+      "iteration": 29,
+      "responses": {
+        "quick": {
+          "confidence": 1.0,
+          "converged": null,
+          "justification": "Continuing exploration around the best performing C-states (C1E and POLL). C1E has shown slightly better p99 latency, but POLL is also a strong contender. We will test POLL again to confirm its performance and explore if there's a slight benefit over C1E.",
+          "parameters": {
+            "cstate_max": "POLL",
+            "latency_ns": 12000000,
+            "max_perf_pct": 100,
+            "migration_cost_ns": 500000,
+            "min_granularity_ns": 3000000,
+            "min_perf_pct": 0,
+            "napi_busy_poll": 0,
+            "wakeup_granularity_ns": 4000000
+          },
+          "parameters_applied_in_source": true,
+          "recorded_response": true,
+          "response_time_seconds": 1.2142245769500732,
+          "token_metrics": {
+            "api_total_tokens": 6692,
+            "billable_output_tokens": 192,
+            "billable_total_tokens": 6692,
+            "cached_content_token_count": 0,
+            "input_tokens": 6500,
+            "output_tokens": 192,
+            "thinking_tokens": 0,
+            "thinking_tokens_inferred_from_api_total": 0
+          }
+        },
+        "reasoning": {
+          "confidence": 0.0,
+          "converged": false,
+          "justification": "No recorded response; replayed as a no-op.",
+          "parameters": {},
+          "parameters_applied_in_source": false,
+          "recorded_response": false,
+          "response_time_seconds": 0.0,
+          "token_metrics": null
+        }
+      }
+    },
+    {
+      "iteration": 30,
+      "responses": {
+        "reasoning_final": {
+          "confidence": 1.0,
+          "converged": null,
+          "justification": "The configuration with a reduced CFS scheduler latency (12,000,000 ns) and an active C-state of C1E consistently yielded the lowest P99 latency values, with 17.30 ns being the absolute minimum observed. This combination demonstrates the most robust performance for minimizing latency across the tuning iterations.",
+          "parameters": {
+            "cstate_max": "C1E",
+            "latency_ns": 12000000,
+            "max_perf_pct": 100,
+            "migration_cost_ns": 500000,
+            "min_granularity_ns": 3000000,
+            "min_perf_pct": 0,
+            "napi_busy_poll": 0,
+            "wakeup_granularity_ns": 4000000
+          },
+          "parameters_applied_in_source": true,
+          "recorded_response": true,
+          "response_time_seconds": 27.618530988693237,
+          "token_metrics": {
+            "api_total_tokens": 8018,
+            "billable_output_tokens": 1334,
+            "billable_total_tokens": 8018,
+            "cached_content_token_count": 0,
+            "input_tokens": 6684,
+            "output_tokens": 204,
+            "thinking_tokens": 1130,
+            "thinking_tokens_inferred_from_api_total": 0
+          }
+        }
+      }
+    }
+  ],
+  "job_id": "common:tpcc_hi_p99:sematune_app",
+  "provider_requests": 0,
+  "recorded_actions": 31,
+  "recorded_noops": 0,
+  "recorded_responses": 31,
+  "schema_version": 1,
+  "source_history": "provider-run/common:tpcc_hi_p99:sematune_app/dual_loop_actor_speculator_tpcc_20260713_040236.json",
+  "source_history_sha256": "6eab31c821980baff6f0d2fd0d4547d192636fcef3f6dfcd32384ce3afcef8bc",
+  "source_optimizer_gist": "The optimal configuration achieved a P99 latency of 17.301 at Iter 2 with `cstate_max=C1E` and `latency_ns=12000000`.\n\n**Key Patterns & Parameter Impact:**\n*   **`cstate_max`** was the most impactful parameter. `C1E` and `POLL` consistently yielded the lowest P99 latencies, with `C1E` achieving the absolute best. However, `C1E` also showed significant variability, leading to some of the worst P99 latencies (e.g., 48.775). `POLL` was slightly less performant at its best but appeared more stable. `C1`, `C6`, and `unlimited` consistently resulted in poor performance (high P99 latency).\n*   **`latency_ns`** was initially set to `24000000` (Iter 0, P99=22.101) and then fixed to `12000000` for all subsequent iterations, which generally led to improved P99 latencies. This suggests `12000000` is a better value for this workload.\n*   All other parameters (`max_perf_pct`, `napi_busy_poll`, `wakeup_granularity_ns`, `min_granularity_ns`, `min_perf_pct`, `migration_cost_ns`) remained constant throughout the tuning, indicating they were either outside the tuning scope or already at optimal fixed values for this run.\n\n**Takeaways for Future Runs to Improve Efficiency:**\n*   **Narrow `cstate_max` range:** Focus future explorations primarily on `C1E` and `POLL`. Exclude `C1`, `C6`, and `unlimited` from the search space as they consistently perform poorly.\n*   **Fix `latency_ns`:** The value `12000000` for `latency_ns` appears robustly optimal. Consider fixing this parameter unless further marginal gains are critical, in which case a very narrow range around `12000000` could be explored.\n*   **Fix irrelevant parameters:** The following parameters can be fixed to their current values: `max_perf_pct=100`, `napi_busy_poll=0`, `wakeup_granularity_ns=4000000`, `min_granularity_ns=3000000`, `min_perf_pct=0`, `migration_cost_ns=500000`. They showed no variation or significant impact in this tuning run.\n*   **Starting Configuration:** Begin future runs with the configuration `{max_perf_pct=100, napi_busy_poll=0, wakeup_granularity_ns=4000000, min_granularity_ns=3000000, min_perf_pct=0, migration_cost_ns=500000, latency_ns=12000000, cstate_max=C1E}` as it delivered the lowest P99 latency. If `C1E` proves unstable or causes high variability, `cstate_max=POLL` is a strong, more consistent alternative.",
+  "source_optimizer_gist_raw": {
+    "backend": "gemini",
+    "model": "gemini-2.5-flash",
+    "response_model": "gemini-2.5-flash",
+    "text": "The optimal configuration achieved a P99 latency of 17.301 at Iter 2 with `cstate_max=C1E` and `latency_ns=12000000`.\n\n**Key Patterns & Parameter Impact:**\n*   **`cstate_max`** was the most impactful parameter. `C1E` and `POLL` consistently yielded the lowest P99 latencies, with `C1E` achieving the absolute best. However, `C1E` also showed significant variability, leading to some of the worst P99 latencies (e.g., 48.775). `POLL` was slightly less performant at its best but appeared more stable. `C1`, `C6`, and `unlimited` consistently resulted in poor performance (high P99 latency).\n*   **`latency_ns`** was initially set to `24000000` (Iter 0, P99=22.101) and then fixed to `12000000` for all subsequent iterations, which generally led to improved P99 latencies. This suggests `12000000` is a better value for this workload.\n*   All other parameters (`max_perf_pct`, `napi_busy_poll`, `wakeup_granularity_ns`, `min_granularity_ns`, `min_perf_pct`, `migration_cost_ns`) remained constant throughout the tuning, indicating they were either outside the tuning scope or already at optimal fixed values for this run.\n\n**Takeaways for Future Runs to Improve Efficiency:**\n*   **Narrow `cstate_max` range:** Focus future explorations primarily on `C1E` and `POLL`. Exclude `C1`, `C6`, and `unlimited` from the search space as they consistently perform poorly.\n*   **Fix `latency_ns`:** The value `12000000` for `latency_ns` appears robustly optimal. Consider fixing this parameter unless further marginal gains are critical, in which case a very narrow range around `12000000` could be explored.\n*   **Fix irrelevant parameters:** The following parameters can be fixed to their current values: `max_perf_pct=100`, `napi_busy_poll=0`, `wakeup_granularity_ns=4000000`, `min_granularity_ns=3000000`, `min_perf_pct=0`, `migration_cost_ns=500000`. They showed no variation or significant impact in this tuning run.\n*   **Starting Configuration:** Begin future runs with the configuration `{max_perf_pct=100, napi_busy_poll=0, wakeup_granularity_ns=4000000, min_granularity_ns=3000000, min_perf_pct=0, migration_cost_ns=500000, latency_ns=12000000, cstate_max=C1E}` as it delivered the lowest P99 latency. If `C1E` proves unstable or causes high variability, `cstate_max=POLL` is a strong, more consistent alternative.",
+    "token_usage": {
+      "api_total_tokens": 12955,
+      "billable_output_tokens": 4344,
+      "billable_total_tokens": 12955,
+      "cached_content_token_count": 0,
+      "input_tokens": 8611,
+      "output_tokens": 729,
+      "thinking_tokens": 3615,
+      "thinking_tokens_inferred_from_api_total": 0
+    },
+    "usage_metadata": {
+      "cached_content_token_count": null,
+      "candidates_token_count": 729,
+      "prompt_token_count": 8611,
+      "thoughts_token_count": 3615,
+      "total_token_count": 12955
+    }
+  },
+  "synthetic_noops": 30
+}

@@ -140,6 +140,23 @@ nominal benchmark hours before setup and provider delays and incurs additional
 real-LLM cost. This is why the default reviewer workflow uses the representative
 three-workload subset.
 
+#### Quick claim map
+
+All fresh comparisons use the geometric mean across Silo, TPC-C, and Sysbench
+OLTP-RW. The stable phase is windows 31–50; C4 also plots tuning windows 1–30.
+
+| Claim | Fresh comparison | Required configurations | Generated plot |
+|---|---|---:|---|
+| C1 | 8-knob SemaTune App vs. Default Parameters | 6 | `fresh/plots/c1_sematune_vs_default.pdf` |
+| C2 | 8-knob SemaTune App vs. application-metric MLOS | 9 | `fresh/plots/c2_sematune_vs_mlos.pdf` |
+| C3 | System-metric SemaTune vs. application-metric MLOS | 9 | `fresh/plots/c3_system_vs_mlos.pdf` |
+| C4 | SemaTune App vs. Default at 2, 8, 16, and 41 knobs | 15 | `fresh/plots/c4_parameter_scaling.pdf` |
+
+Configurations shared between claims are run once, so the union is 21 jobs
+rather than the sum of the per-claim counts. `claim_report.md` records each
+claim as `COMPLETE` or incomplete and its fresh direction as `CONSISTENT` or
+`DIVERGENT`.
+
 1. **SSH into the supplied preconfigured CloudLab host** (about 1 minute).
 
    ```bash
@@ -169,18 +186,23 @@ three-workload subset.
    ```bash
    export GEMINI_API_KEY='<provided-key>'
    mkdir -p results
-   RUN_DIR="$(mktemp -d -p "$PWD/results" reproduced_core_real_XXXXXXXX)"
+   RUN_DIR="$PWD/results/reproduced_core"
 
-   reproduction/reproduce_claims.sh --run --output-dir "$RUN_DIR"
+   reproduction/reproduce_claims.sh --run --clean --output-dir "$RUN_DIR"
 
    echo "Results: $RUN_DIR"
    ```
 
    The key is supplied on the evaluator CloudLab machine. The command first
    regenerates Plots 1, 2, and 5 from the archived five-repeat evidence, then
-   runs one fresh repetition. There is no mock/replay substitute for the fresh
-   Results Reproduced run. If interrupted, invoke the same command with the
-   same `RUN_DIR`; only structurally complete 50-window histories are skipped.
+   runs one fresh repetition. This real-provider path is the primary Results
+   Reproduced workflow. If interrupted, invoke the same command with the same
+   `RUN_DIR` but omit `--clean`; only structurally complete 50-window histories
+   are skipped. `--clean` preserves an older result tree under
+   `results/archive/` and prints its exact destination. If a valid API key is
+   temporarily unusable because of provider availability, quota, rate limits,
+   or model access, use the trace-replay fallback below. Replay reruns the real
+   workloads but does not retest generation of new decisions by the provider.
 
 4. **Regenerate the fresh C1–C4 plots if desired** (less than 1 minute after the
    runs finish). A successful complete run already performs this step.
@@ -190,7 +212,8 @@ three-workload subset.
      --results-dir "$RUN_DIR/fresh/raw" \
      --output-dir "$RUN_DIR/fresh" \
      --report-dir "$RUN_DIR" \
-     --archived-plots-dir "$RUN_DIR/archived/plots"
+     --archived-plots-dir "$RUN_DIR/archived/plots" \
+     --manifest reproduction/claim_manifest.json
    ```
 
    This writes `c1_sematune_vs_default.pdf`, `c2_sematune_vs_mlos.pdf`,
@@ -225,6 +248,65 @@ three-workload subset.
    means the fresh aggregate has the expected direction. A stochastic
    `DIVERGENT` result is reported rather than hidden; reviewers should inspect
    its workload rows and logs instead of requiring the exact paper percentage.
+
+#### Provider-free trace replay
+
+Hosted-model availability is external to the artifact: a supplied API key can
+occasionally fail because the service, quota, rate limit, model, or account is
+temporarily unavailable. Reviewers should try the real-provider command first.
+If provider access prevents it from completing, the recommended fallback is to
+rerun the system from the
+[committed provider-response baseline](reproduction/trace_baselines/c1_c4_provider/).
+The runner validates every baseline checksum before changing any output.
+
+Trace replay runs all 21 configurations and all 1,050 workload windows again:
+the 15 SemaTune jobs consume role-aware Actor/Speculator responses extracted
+from the completed histories, while Fixed and MLOS run normally. It does not
+copy workload measurements. Recorded response delays are preserved so
+asynchronous action timing remains comparable, and hosted-model requests are
+forbidden.
+
+The packaged fallback is intentionally two short commands:
+
+```bash
+reproduction/replay_claims.sh --dry-run
+reproduction/replay_claims.sh --run
+```
+
+The wrapper removes Gemini and OpenRouter keys from the child environment and
+uses `reproduction/trace_baselines/c1_c4_provider` directly. `--run` archives an
+older `results/reproduced_core` tree before starting. If replay itself is
+interrupted, resume its structurally complete jobs without archiving them:
+
+```bash
+reproduction/replay_claims.sh --run --resume
+```
+
+The committed bundle contains the 15 provider-backed Actor/Speculator response
+streams plus checksummed baseline claim and per-workload factor files. It does
+not contain replay measurements: Fixed, MLOS, and every SemaTune configuration
+still execute on the machine. A maintainer may also replay a different
+completed live result tree with the lower-level `--trace-replay-from` option,
+but reviewers do not need a timestamped archive for the packaged fallback.
+
+Reviewer-facing aggregate and disaggregated evidence is laid out as follows:
+
+| Path | Audit purpose |
+|---|---|
+| [`reproduction/trace_baselines/c1_c4_provider/manifest.json`](reproduction/trace_baselines/c1_c4_provider/manifest.json) | Committed job-to-trace map, checksums, provider models, and baseline scope |
+| [`reproduction/trace_baselines/c1_c4_provider/traces/`](reproduction/trace_baselines/c1_c4_provider/traces/) | The 15 committed provider-response traces used by the fallback |
+| [`replay_comparison.md`](results/reproduced_core/replay_comparison.md) | Concise live-versus-replay C1–C4 conclusion |
+| [`replay_comparison.csv`](results/reproduced_core/replay_comparison.csv) | Claim rows plus every workload/method/knob-count/phase factor |
+| [`replay_comparison.json`](results/reproduced_core/replay_comparison.json) | Per-job action matching, source hashes, and machine-readable totals |
+| [`fresh/tables/phase_metrics.csv`](results/reproduced_core/fresh/tables/phase_metrics.csv) | Mean metric for every job and tuning/stable phase, with its history path |
+| [`fresh/tables/improvement_factors.csv`](results/reproduced_core/fresh/tables/improvement_factors.csv) | Disaggregated per-workload improvement factors |
+| [`fresh/tables/claim_summary.csv`](results/reproduced_core/fresh/tables/claim_summary.csv) | Inputs to the four aggregate claim observations |
+| [`fresh/tables/parameter_scaling.csv`](results/reproduced_core/fresh/tables/parameter_scaling.csv) | C4 values at 2, 8, 16, and 41 knobs |
+| [`fresh/replay_traces/`](results/reproduced_core/fresh/replay_traces/) | One hashed, provider-free trace for each of the 15 SemaTune jobs |
+| [`fresh/raw/`](results/reproduced_core/fresh/raw/) | Newly measured per-window optimization histories and metrics |
+| [`fresh/logs/`](results/reproduced_core/fresh/logs/) and [`fresh/run_configs/`](results/reproduced_core/fresh/run_configs/) | One execution log and exact materialized configuration per job |
+| [`fresh/run_status.json`](results/reproduced_core/fresh/run_status.json) | All 21 job outcomes, replay mode, and zero-provider-request contract |
+| [`fresh/restoration_report.json`](results/reproduced_core/fresh/restoration_report.json) | Host-control restoration and byte-verification evidence |
 
 The optional full-workload C1–C4 command is
 `reproduction/reproduce_claims.sh --run --full --output-dir DIR`. It selects

@@ -14,15 +14,17 @@ reproduction/reproduce_claims.sh --dry-run
 
 export GEMINI_API_KEY='<provided-key>'
 mkdir -p results
-RUN_DIR="$(mktemp -d -p "$PWD/results" reproduced_core_real_XXXXXXXX)"
-reproduction/reproduce_claims.sh --run --output-dir "$RUN_DIR"
+RUN_DIR="$PWD/results/reproduced_core"
+reproduction/reproduce_claims.sh --run --clean --output-dir "$RUN_DIR"
 echo "Results: $RUN_DIR"
 ```
 
 The dry run should report 21 unique configurations, 15 LLM configurations, and
 1,050 benchmark windows. The live command resumes complete jobs automatically.
 Only histories with all required finite measurements and the exact method phase
-schedule are reused.
+schedule are reused. `--clean` moves an older canonical result tree to
+`results/archive/reproduced_core-<UTC timestamp>` before creating a fresh one;
+omit it when resuming an interrupted run.
 
 After the run, inspect:
 
@@ -39,6 +41,44 @@ Open the four PDFs in `fresh/plots/` and compare them with the regenerated paper
 plots in `archived/plots/`. `COMPLETE` means structurally valid evidence was
 produced. `CONSISTENT` or `DIVERGENT` reports whether the one-repeat aggregate
 has the claimed direction; it is not an exact-percentage acceptance test.
+
+To verify the completed SemaTune decisions without provider access, use the
+committed provider-response baseline:
+
+```bash
+reproduction/replay_claims.sh --dry-run
+reproduction/replay_claims.sh --run
+cat "$RUN_DIR/replay_comparison.md"
+```
+
+The wrapper verifies the committed bundle, removes provider keys from the child
+environment, and safely archives an older canonical output before running.
+Trace replay preserves recorded response delays and therefore still takes a few
+hours, but it issues no hosted-model requests.
+
+The real-provider run is preferred, but hosted-model access can be temporarily
+unavailable even with a supplied key because of service availability, quota,
+rate limits, or model/account access. If that prevents completion, use the two
+wrapper commands above. The baseline is committed at
+`reproduction/trace_baselines/c1_c4_provider/`; no timestamped result archive is
+required. Resume an interrupted replay with:
+
+```bash
+reproduction/replay_claims.sh --run --resume
+```
+
+Trace replay reruns all workload windows but cannot validate generation of new
+provider decisions.
+
+For disaggregated checks, inspect `replay_comparison.csv` for every
+workload/method/knob-count/phase factor, `replay_comparison.json` for per-job
+action matching, `fresh/tables/phase_metrics.csv` and
+`fresh/tables/improvement_factors.csv` for job/workload values,
+`fresh/replay_traces/*.json` for source hashes, and `fresh/raw/`, `fresh/logs/`,
+and `fresh/run_configs/` for per-window evidence and exact execution inputs.
+The committed baseline's `manifest.json`, `claim_report.json`,
+`tables/improvement_factors.csv`, and `traces/*.json` provide the provider-run
+provenance against which those fresh replay files are compared.
 
 The paper used five repetitions over 13 workloads. Hosted LLM choices and
 system measurements are nondeterministic, so the fresh three-workload run is

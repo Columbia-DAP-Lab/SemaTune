@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import argparse
 import fcntl
+import hashlib
 import json
 import math
 import os
@@ -94,6 +95,10 @@ def materialized_config(job: dict[str, Any]) -> dict[str, Any]:
     return payload
 
 
+def is_llm_config(config: dict[str, Any]) -> bool:
+    return str(config.get("tuner_type", "")).startswith("llm") or bool(config.get("llm_actor_model"))
+
+
 def history_files(directory: Path) -> list[Path]:
     files: list[Path] = []
     for pattern in HISTORY_PATTERNS:
@@ -176,6 +181,214 @@ def completed_result(directory: Path, job: dict[str, Any] | None = None) -> Path
             continue
         return path
     return None
+
+
+def _plain_parameters(parameters: dict[str, Any] | None) -> dict[str, Any]:
+    return {
+        name: value.get("value") if isinstance(value, dict) and "value" in value else value
+        for name, value in (parameters or {}).items()
+    }
+
+
+def _replay_response(timing: dict[str, Any] | None, *, recorded: bool) -> dict[str, Any]:
+    timing = timing or {}
+    parameters = _plain_parameters(timing.get("proposed_parameters"))
+    return {
+        "parameters": parameters,
+        "confidence": float(timing.get("confidence") or (1.0 if parameters else 0.0)),
+        "converged": timing.get("converged") if recorded else False,
+        "justification": timing.get("justification")
+        or ("Recorded provider response with no accepted action." if recorded else "No recorded response; replayed as a no-op."),
+        "response_time_seconds": max(0.0, float(timing.get("tuner_duration") or 0.0)),
+        "token_metrics": timing.get("token_metrics") if recorded else None,
+        "recorded_response": recorded,
+        "parameters_applied_in_source": bool(timing.get("parameters_applied")) if recorded else False,
+    }
+
+
+def build_replay_trace(job_id: str, history_path: Path) -> dict[str, Any]:
+    """Convert a completed Actor/Speculator history into an offline role-aware trace."""
+
+    payload = json.loads(history_path.read_text(encoding="utf-8"))
+    config = payload.get("config") or {}
+    max_iterations = int(config.get("max_iterations", 0))
+    if payload.get("mode") != "actor-speculator" or max_iterations <= 0:
+        raise ValueError(f"{job_id}: source is not a completed Actor/Speculator history")
+    history = payload.get("history")
+    if not isinstance(history, list):
+        raise ValueError(f"{job_id}: source history rows are missing")
+
+    entries = {
+        iteration: {
+            "iteration": iteration,
+            "responses": {
+                **(
+                    {
+                        "quick": _replay_response(None, recorded=False),
+                        "reasoning": _replay_response(None, recorded=False),
+                    }
+                    if iteration < max_iterations
+                    else {}
+                ),
+                **(
+                    {"reasoning_final": _replay_response(None, recorded=False)}
+                    if iteration == max_iterations
+                    else {}
+                ),
+            },
+        }
+        for iteration in range(max_iterations + 1)
+    }
+    seen: set[tuple[int, str]] = set()
+    recorded_responses = 0
+    recorded_actions = 0
+
+    def record(iteration: int, role: str, timing: dict[str, Any]) -> None:
+        nonlocal recorded_actions, recorded_responses
+        if iteration not in entries:
+            raise ValueError(f"{job_id}: replay {role} iteration {iteration} is outside 0-{max_iterations}")
+        key = (iteration, role)
+        if key in seen:
+            raise ValueError(f"{job_id}: duplicate replay response for {role} iteration {iteration}")
+        seen.add(key)
+        entries[iteration]["responses"][role] = _replay_response(timing, recorded=True)
+        recorded_responses += 1
+        recorded_actions += bool(timing.get("proposed_parameters"))
+
+    for row in history:
+        if not isinstance(row, dict):
+            continue
+        row_iteration = int(row.get("iteration", -1))
+        timing = row.get("tuner_timing") or {}
+        if not isinstance(timing, dict):
+            continue
+        quick = timing.get("quick")
+        if isinstance(quick, dict) and row_iteration >= 1:
+            record(row_iteration - 1, "quick", quick)
+        reasoning = timing.get("reasoning")
+        if isinstance(reasoning, dict):
+            start_iteration = int(reasoning.get("tuner_start_iteration", row_iteration))
+            record(max(0, start_iteration - 1), "reasoning", reasoning)
+        final = timing.get("reasoning_final_before_stable") or timing.get("reasoning_final")
+        if isinstance(final, dict):
+            record(max_iterations, "reasoning_final", final)
+
+    if (max_iterations, "reasoning_final") not in seen:
+        raise ValueError(f"{job_id}: source history lacks a recorded final Actor response")
+
+    total_slots = max_iterations * 2 + 1
+    return {
+        "schema_version": 1,
+        "benchmark": config.get("benchmark"),
+        "job_id": job_id,
+        "description": "Role-aware replay extracted from the fresh C1-C4 run; provider requests are forbidden.",
+        "provider_requests": 0,
+        "source_history": str(history_path.resolve()),
+        "source_history_sha256": hashlib.sha256(history_path.read_bytes()).hexdigest(),
+        "source_optimizer_gist": payload.get("optimizer_gist"),
+        "source_optimizer_gist_raw": payload.get("optimizer_gist_raw"),
+        "recorded_responses": recorded_responses,
+        "recorded_actions": recorded_actions,
+        "recorded_noops": recorded_responses - recorded_actions,
+        "synthetic_noops": total_slots - recorded_responses,
+        "history": [entries[index] for index in sorted(entries)],
+    }
+
+
+def replay_source_errors(jobs: list[dict[str, Any]], replay_root: Path) -> list[str]:
+    errors: list[str] = []
+    if not replay_root.is_dir():
+        return [f"trace replay source directory is missing: {replay_root}"]
+    for job in jobs:
+        source = completed_result(replay_root / job["target_results_dir"], job)
+        if source is None:
+            errors.append(f"{job['id']}: trace replay source lacks a complete result")
+            continue
+        config = materialized_config(job)
+        if is_llm_config(config):
+            try:
+                build_replay_trace(job["id"], source)
+            except (OSError, ValueError, json.JSONDecodeError) as exc:
+                errors.append(str(exc))
+    return errors
+
+
+def load_trace_bundle(bundle_root: Path) -> dict[str, Any]:
+    manifest_path = bundle_root / "manifest.json"
+    if not manifest_path.is_file():
+        raise ValueError(f"trace replay bundle manifest is missing: {manifest_path}")
+    payload = json.loads(manifest_path.read_text(encoding="utf-8"))
+    if payload.get("schema_version") != 1 or payload.get("kind") != "sematune-provider-trace-baseline":
+        raise ValueError(f"unsupported trace replay bundle: {manifest_path}")
+    if not isinstance(payload.get("traces"), dict):
+        raise ValueError(f"trace replay bundle has no trace map: {manifest_path}")
+    return payload
+
+
+def trace_bundle_path(bundle_root: Path, bundle: dict[str, Any], job_id: str) -> Path:
+    entry = bundle.get("traces", {}).get(job_id)
+    if not isinstance(entry, dict) or not entry.get("path"):
+        raise ValueError(f"{job_id}: committed trace replay bundle has no trace")
+    root = bundle_root.resolve()
+    path = (root / str(entry["path"])).resolve()
+    try:
+        path.relative_to(root)
+    except ValueError as exc:
+        raise ValueError(f"{job_id}: committed trace path escapes its bundle") from exc
+    return path
+
+
+def trace_bundle_errors(jobs: list[dict[str, Any]], bundle_root: Path) -> list[str]:
+    errors: list[str] = []
+    if not bundle_root.is_dir():
+        return [f"trace replay bundle directory is missing: {bundle_root}"]
+    try:
+        bundle = load_trace_bundle(bundle_root)
+    except (OSError, ValueError, json.JSONDecodeError) as exc:
+        return [str(exc)]
+    if bundle.get("trace_count") != len(bundle["traces"]):
+        errors.append("committed trace replay bundle trace count is inconsistent")
+    root = bundle_root.resolve()
+    for label in ("claim_report", "improvement_factors"):
+        record = bundle.get(label)
+        if not isinstance(record, dict) or not record.get("path") or not record.get("sha256"):
+            errors.append(f"committed trace replay bundle lacks {label} provenance")
+            continue
+        artifact = (root / str(record["path"])).resolve()
+        try:
+            artifact.relative_to(root)
+        except ValueError:
+            errors.append(f"committed trace replay bundle {label} path escapes its bundle")
+            continue
+        if not artifact.is_file() or hashlib.sha256(artifact.read_bytes()).hexdigest() != record["sha256"]:
+            errors.append(f"committed trace replay bundle {label} checksum mismatch")
+    for job in jobs:
+        config = materialized_config(job)
+        if not is_llm_config(config):
+            continue
+        try:
+            path = trace_bundle_path(bundle_root, bundle, job["id"])
+            if not path.is_file():
+                raise ValueError(f"{job['id']}: committed trace is missing: {path}")
+            entry = bundle["traces"][job["id"]]
+            digest = hashlib.sha256(path.read_bytes()).hexdigest()
+            if digest != entry.get("sha256"):
+                raise ValueError(f"{job['id']}: committed trace checksum mismatch")
+            trace = json.loads(path.read_text(encoding="utf-8"))
+            if trace.get("job_id") != job["id"]:
+                raise ValueError(f"{job['id']}: committed trace identifies another job")
+            if trace.get("provider_requests") != 0:
+                raise ValueError(f"{job['id']}: committed trace permits provider requests")
+            max_iterations = int(config.get("max_iterations", 0))
+            iterations = [row.get("iteration") for row in trace.get("history", [])]
+            if iterations != list(range(max_iterations + 1)):
+                raise ValueError(f"{job['id']}: committed trace has incomplete iteration coverage")
+            serialized = json.dumps(trace)
+            if any(pattern.search(serialized) for pattern in SECRET_PATTERNS):
+                raise ValueError(f"{job['id']}: committed trace contains a credential-like value")
+        except (OSError, ValueError, TypeError, json.JSONDecodeError) as exc:
+            errors.append(str(exc))
+    return errors
 
 
 def validate_manifest(manifest: dict[str, Any], *, verify_sources: bool) -> list[str]:
@@ -277,29 +490,55 @@ def command_plan(args: argparse.Namespace, manifest: dict[str, Any]) -> int:
     return 0
 
 
-def live_preflight(jobs: list[dict[str, Any]]) -> list[str]:
+def live_preflight(
+    jobs: list[dict[str, Any]],
+    replay_root: Path | None = None,
+    replay_bundle: Path | None = None,
+) -> list[str]:
     errors: list[str] = []
     commands = {"perf", "taskset"}
     benchmarks: set[str] = set()
     needs_llm = False
+    tailbench_binaries = {
+        "masstree": Path("masstree/mttest_integrated"),
+        "silo": Path("silo/out-perf.masstree/benchmarks/dbtest_integrated"),
+        "sphinx": Path("sphinx/decoder_integrated"),
+        "xapian": Path("xapian/xapian_integrated"),
+    }
     for job in jobs:
-        cfg = json.loads(config_path(job).read_text(encoding="utf-8"))
+        cfg = materialized_config(job)
         benchmark = str(cfg.get("benchmark", ""))
         benchmarks.add(benchmark)
-        needs_llm |= str(cfg.get("tuner_type", "")).startswith("llm") or bool(cfg.get("llm_actor_model"))
+        needs_llm |= is_llm_config(cfg)
         if benchmark.startswith("sysbench"):
-            commands.add("sysbench")
+            commands.update({"pg_isready", "psql", "sysbench"})
         if benchmark in {"tpcc", "ycsb", "sibench", "wikipedia", "twitter", "auctionmark", "otmetrics"}:
-            commands.add("java")
+            commands.update({"java", "pg_isready", "psql"})
             for key in ("benchbase_jar_path", "benchbase_config_file"):
                 path = REPO_ROOT / str(cfg.get(key, ""))
                 if not path.is_file():
                     errors.append(f"{job['id']}: missing {key}: {path}")
         if benchmark == "tailbench":
+            commands.add("ldd")
             for key in ("tailbench_root", "tailbench_data_root"):
                 path = (REPO_ROOT / str(cfg.get(key, ""))).resolve()
                 if not path.exists():
                     errors.append(f"{job['id']}: missing {key}: {path}")
+            root = (REPO_ROOT / str(cfg.get("tailbench_root", ""))).resolve()
+            app = str(cfg.get("tailbench_app", ""))
+            relative_binary = tailbench_binaries.get(app)
+            if relative_binary is None:
+                errors.append(f"{job['id']}: unsupported TailBench app for preflight: {app!r}")
+            else:
+                binary = root / relative_binary
+                if not binary.is_file() or not os.access(binary, os.X_OK):
+                    errors.append(f"{job['id']}: missing executable TailBench binary: {binary}")
+                elif shutil.which("ldd") is not None:
+                    linked = subprocess.run(
+                        ["ldd", str(binary)], capture_output=True, text=True, check=False
+                    )
+                    if linked.returncode != 0 or "not found" in linked.stdout:
+                        errors.append(f"{job['id']}: TailBench binary has unresolved shared libraries: {binary}")
         if benchmark == "dcperf_spark":
             path = (REPO_ROOT / str(cfg.get("dcperf_path") or "deps/DCPerf")).resolve()
             if not path.exists():
@@ -313,12 +552,102 @@ def live_preflight(jobs: list[dict[str, Any]]) -> list[str]:
     for command in sorted(commands):
         if shutil.which(command) is None:
             errors.append(f"missing command: {command}")
-    if needs_llm and not os.environ.get("GEMINI_API_KEY"):
+    if needs_llm and replay_root is None and replay_bundle is None and not os.environ.get("GEMINI_API_KEY"):
         errors.append("GEMINI_API_KEY is required for the selected live one-rerun suite")
-    if (os.cpu_count() or 0) < 20:
-        errors.append("the paper configurations require at least CPUs 0-19")
+    if replay_root is not None:
+        errors.extend(replay_source_errors(jobs, replay_root))
+    if replay_bundle is not None:
+        errors.extend(trace_bundle_errors(jobs, replay_bundle))
+    affinity = os.sched_getaffinity(0) if hasattr(os, "sched_getaffinity") else set(range(os.cpu_count() or 0))
+    missing_cpus = sorted(set(range(20)) - affinity)
+    if missing_cpus:
+        errors.append(f"the paper configurations require CPUs 0-19; unavailable: {missing_cpus}")
+    if os.geteuid() != 0 and shutil.which("sudo") is not None:
+        sudo_check = subprocess.run(
+            ["sudo", "-n", "true"], capture_output=True, text=True, check=False
+        )
+        if sudo_check.returncode != 0:
+            errors.append("non-interactive sudo is required for the live one-rerun suite")
+
+    database_benchmarks = benchmarks.intersection(
+        {"tpcc", "ycsb", "sibench", "wikipedia", "twitter", "auctionmark", "otmetrics"}
+    )
+    needs_database = bool(database_benchmarks) or any(item.startswith("sysbench") for item in benchmarks)
+    required_database_env = (
+        "SEMATUNE_SYSBENCH_HOST",
+        "SEMATUNE_SYSBENCH_PORT",
+        "SEMATUNE_SYSBENCH_USER",
+        "SEMATUNE_SYSBENCH_PASSWORD",
+        "SEMATUNE_SYSBENCH_DB",
+    )
+    missing_database_env = [name for name in required_database_env if not os.environ.get(name)]
+    if needs_database and missing_database_env:
+        errors.extend(f"missing site environment variable: {name}" for name in missing_database_env)
+    elif needs_database and shutil.which("psql") is not None:
+        connection = {
+            "host": os.environ["SEMATUNE_SYSBENCH_HOST"],
+            "port": os.environ["SEMATUNE_SYSBENCH_PORT"],
+            "user": os.environ["SEMATUNE_SYSBENCH_USER"],
+            "password": os.environ["SEMATUNE_SYSBENCH_PASSWORD"],
+            "database": os.environ["SEMATUNE_SYSBENCH_DB"],
+        }
+        checks = [connection]
+        if database_benchmarks:
+            benchbase_connection = {
+                "host": os.environ.get("SEMATUNE_BENCHBASE_HOST", connection["host"]),
+                "port": os.environ.get("SEMATUNE_BENCHBASE_PORT", connection["port"]),
+                "user": os.environ.get("SEMATUNE_BENCHBASE_USER", connection["user"]),
+                "password": os.environ.get("SEMATUNE_BENCHBASE_PASSWORD", connection["password"]),
+                "database": os.environ.get("SEMATUNE_BENCHBASE_DB", connection["database"]),
+            }
+            if benchbase_connection != connection:
+                checks.append(benchbase_connection)
+        for check in checks:
+            env = os.environ.copy()
+            env["PGPASSWORD"] = check["password"]
+            try:
+                connected = subprocess.run(
+                    [
+                        "psql",
+                        "--host", check["host"],
+                        "--port", check["port"],
+                        "--username", check["user"],
+                        "--dbname", check["database"],
+                        "--no-psqlrc",
+                        "--set", "ON_ERROR_STOP=1",
+                        "--tuples-only",
+                        "--command", "SELECT 1",
+                    ],
+                    env=env,
+                    capture_output=True,
+                    text=True,
+                    check=False,
+                    timeout=10,
+                )
+            except subprocess.TimeoutExpired:
+                connected = None
+            if connected is None or connected.returncode != 0:
+                errors.append(
+                    "PostgreSQL authentication/connectivity check failed for "
+                    f"{check['user']}@{check['host']}:{check['port']}/{check['database']}"
+                )
     # Deduplicate repeated dependency errors from many configs.
     return list(dict.fromkeys(errors))
+
+
+def command_preflight(args: argparse.Namespace, manifest: dict[str, Any]) -> int:
+    plots = parse_plots(args.plots, manifest)
+    jobs = select_jobs(manifest, plots)
+    replay_root = Path(args.replay_from).expanduser().resolve() if args.replay_from else None
+    replay_bundle = Path(args.replay_bundle).expanduser().resolve() if args.replay_bundle else None
+    errors = live_preflight(jobs, replay_root, replay_bundle)
+    for error in errors:
+        print(f"PREFLIGHT_ERROR: {error}", file=sys.stderr)
+    if errors:
+        return 2
+    mode = "trace replay" if replay_root is not None or replay_bundle is not None else "real provider"
+    print(f"LIVE_PREFLIGHT: PASS ({len(jobs)} configurations; {mode})")
+    return 0
 
 
 def write_json_atomic(path: Path, payload: Any) -> None:
@@ -376,14 +705,31 @@ def command_run(args: argparse.Namespace, manifest: dict[str, Any]) -> int:
     suite_started = time.time()
     plots = parse_plots(args.plots, manifest)
     jobs = select_jobs(manifest, plots)
+    replay_root = Path(args.replay_from).expanduser().resolve() if args.replay_from else None
+    replay_bundle = Path(args.replay_bundle).expanduser().resolve() if args.replay_bundle else None
+    replay_enabled = replay_root is not None or replay_bundle is not None
     if args.limit is not None:
         jobs = jobs[: args.limit]
     if args.dry_run:
+        if replay_root is not None:
+            replay_errors = replay_source_errors(jobs, replay_root)
+            for error in replay_errors:
+                print(f"PREFLIGHT_ERROR: {error}", file=sys.stderr)
+            if replay_errors:
+                return 2
+            print(f"TRACE_REPLAY_SOURCE: PASS ({replay_root})")
+        if replay_bundle is not None:
+            replay_errors = trace_bundle_errors(jobs, replay_bundle)
+            for error in replay_errors:
+                print(f"PREFLIGHT_ERROR: {error}", file=sys.stderr)
+            if replay_errors:
+                return 2
+            print(f"TRACE_REPLAY_BUNDLE: PASS ({replay_bundle})")
         print("DRY_RUN: no output, root, API, benchmark, or kernel operations")
         plan_args = argparse.Namespace(plots=args.plots, verbose=args.verbose)
         return command_plan(plan_args, manifest)
 
-    errors = live_preflight(jobs)
+    errors = live_preflight(jobs, replay_root, replay_bundle)
     if errors:
         for error in errors:
             print(f"PREFLIGHT_ERROR: {error}", file=sys.stderr)
@@ -393,7 +739,11 @@ def command_run(args: argparse.Namespace, manifest: dict[str, Any]) -> int:
     raw_root = output / "raw"
     logs_root = output / "logs"
     run_configs = output / "run_configs"
-    for path in (raw_root, logs_root, run_configs):
+    replay_traces = output / "replay_traces"
+    output_paths = [raw_root, logs_root, run_configs]
+    if replay_enabled:
+        output_paths.append(replay_traces)
+    for path in output_paths:
         path.mkdir(parents=True, exist_ok=True)
     status_path = output / "run_status.json"
     status: dict[str, Any] = {
@@ -401,6 +751,12 @@ def command_run(args: argparse.Namespace, manifest: dict[str, Any]) -> int:
         "plots": sorted(plots),
         "started_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
         "reruns_per_configuration": 1,
+        "execution_mode": "trace-replay" if replay_enabled else "real-provider",
+        "provider_requests_expected": 0 if replay_enabled else None,
+        "replay_source": str(replay_root or replay_bundle) if replay_enabled else None,
+        "replay_source_kind": (
+            "completed-results" if replay_root is not None else "committed-baseline" if replay_bundle is not None else None
+        ),
         "jobs": {},
     }
     if status_path.is_file():
@@ -408,38 +764,73 @@ def command_run(args: argparse.Namespace, manifest: dict[str, Any]) -> int:
             previous = json.loads(status_path.read_text(encoding="utf-8"))
             if isinstance(previous.get("jobs"), dict):
                 status["jobs"].update(previous["jobs"])
+            if previous.get("started_at"):
+                status["started_at"] = previous["started_at"]
         except (OSError, json.JSONDecodeError):
             pass
 
     env = os.environ.copy()
     env["PYTHONPATH"] = str(REPO_ROOT / "src")
     env["OS_PARAM_TUNING_ROOT"] = str(REPO_ROOT)
+    if replay_enabled:
+        env.pop("GEMINI_API_KEY", None)
+        env.pop("OPENROUTER_API_KEY", None)
+        env["SEMATUNE_TRACE_REPLAY"] = "1"
     failures = 0
     selected_ids = {job["id"] for job in jobs}
     for index, job in enumerate(jobs, start=1):
         target = raw_root / job["target_results_dir"]
+        cfg = materialized_config(job)
+        cfg["results_dir"] = str(target)
+        safe_name = re.sub(r"[^A-Za-z0-9_.-]+", "__", job["id"])
+        trace_path: Path | None = None
+        source_history: Path | None = None
+        source_trace: Path | None = None
+        if replay_root is not None and is_llm_config(cfg):
+            source_history = completed_result(replay_root / job["target_results_dir"], job)
+            if source_history is None:
+                raise RuntimeError(f"{job['id']}: complete replay source disappeared after preflight")
+            trace_path = replay_traces / f"{safe_name}.json"
+            write_json_atomic(trace_path, build_replay_trace(job["id"], source_history))
+            cfg["llm_replay_file"] = str(trace_path)
+            cfg["llm_api_key"] = None
+            cfg["openrouter_api_key"] = None
+        elif replay_bundle is not None and is_llm_config(cfg):
+            bundle = load_trace_bundle(replay_bundle)
+            source_trace = trace_bundle_path(replay_bundle, bundle, job["id"])
+            trace_path = replay_traces / f"{safe_name}.json"
+            shutil.copyfile(source_trace, trace_path)
+            cfg["llm_replay_file"] = str(trace_path)
+            cfg["llm_api_key"] = None
+            cfg["openrouter_api_key"] = None
+        replay_metadata = (
+            {
+                "replay_trace": str(trace_path),
+                "provider_requests_expected": 0,
+                **({"replay_source_history": str(source_history)} if source_history is not None else {}),
+                **({"replay_baseline_trace": str(source_trace)} if source_trace is not None else {}),
+            }
+            if trace_path is not None
+            else {}
+        )
+        runtime_config = run_configs / f"{safe_name}.json"
+        write_json_atomic(runtime_config, cfg)
+        log_path = logs_root / f"{safe_name}.log"
+
         existing = completed_result(target, job)
         if existing is not None and not args.rerun_existing:
             print(f"[{index}/{len(jobs)}] RESUME {job['id']} -> {existing.name}")
             previous_job = status["jobs"].get(job["id"], {})
             status["jobs"][job["id"]] = {
-                "status": "reused_existing",
+                **previous_job,
+                "status": "passed" if previous_job.get("status") == "passed" else "reused_existing",
                 "history": str(existing),
-                **(
-                    {"previous_duration_seconds": previous_job["duration_seconds"]}
-                    if "duration_seconds" in previous_job
-                    else {}
-                ),
+                "reused_existing_this_invocation": True,
+                **replay_metadata,
             }
             write_json_atomic(status_path, status)
             continue
 
-        cfg = materialized_config(job)
-        cfg["results_dir"] = str(target)
-        safe_name = re.sub(r"[^A-Za-z0-9_.-]+", "__", job["id"])
-        runtime_config = run_configs / f"{safe_name}.json"
-        write_json_atomic(runtime_config, cfg)
-        log_path = logs_root / f"{safe_name}.log"
         command = command_for(runtime_config)
         print(f"[{index}/{len(jobs)}] RUN {job['id']}")
         started = time.time()
@@ -473,6 +864,7 @@ def command_run(args: argparse.Namespace, manifest: dict[str, Any]) -> int:
                 "duration_seconds": round(duration, 3),
                 "history": str(produced),
                 "log": str(log_path),
+                **replay_metadata,
             }
         else:
             failures += 1
@@ -514,6 +906,18 @@ def build_parser() -> argparse.ArgumentParser:
     plan.add_argument("--plots", default="all", help="all or a comma-separated subset of 1-7")
     plan.add_argument("--verbose", action="store_true")
 
+    preflight = subparsers.add_parser("preflight", help="Validate live dependencies and connectivity without running a job.")
+    preflight.add_argument("--plots", default="all", help="all or a comma-separated subset of 1-7")
+    preflight_replay = preflight.add_mutually_exclusive_group()
+    preflight_replay.add_argument(
+        "--replay-from",
+        help="Completed raw-results tree used to build provider-free replay traces.",
+    )
+    preflight_replay.add_argument(
+        "--replay-bundle",
+        help="Committed provider-response trace bundle used without API access.",
+    )
+
     run = subparsers.add_parser("run", help="Execute exactly one run of each selected unique config.")
     run.add_argument("--plots", default="all", help="all or a comma-separated subset of 1-7")
     run.add_argument("--output-dir", default="results/reproduced")
@@ -521,6 +925,15 @@ def build_parser() -> argparse.ArgumentParser:
     run.add_argument("--verbose", action="store_true")
     run.add_argument("--keep-going", action="store_true")
     run.add_argument("--rerun-existing", action="store_true", help="Add another result even when a completed history exists.")
+    run_replay = run.add_mutually_exclusive_group()
+    run_replay.add_argument(
+        "--replay-from",
+        help="Completed raw-results tree used to build provider-free replay traces.",
+    )
+    run_replay.add_argument(
+        "--replay-bundle",
+        help="Committed provider-response trace bundle used without API access.",
+    )
     run.add_argument("--limit", type=int, help="Developer-only limit for smoke testing the selected job list.")
     return parser
 
@@ -543,6 +956,8 @@ def main() -> int:
                 return 0
             if args.command == "plan":
                 return command_plan(args, manifest)
+            if args.command == "preflight":
+                return command_preflight(args, manifest)
             if args.command == "run":
                 return command_run(args, manifest)
     except (OSError, ValueError, RuntimeError) as exc:

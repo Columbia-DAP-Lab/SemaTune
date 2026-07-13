@@ -1,0 +1,1182 @@
+{
+  "benchmark": "tailbench",
+  "description": "Committed provider-backed C1-C4 response trace; workload measurements are not included and provider requests are forbidden.",
+  "history": [
+    {
+      "iteration": 0,
+      "responses": {
+        "quick": {
+          "confidence": 0.0,
+          "converged": false,
+          "justification": "No recorded response; replayed as a no-op.",
+          "parameters": {},
+          "parameters_applied_in_source": false,
+          "recorded_response": false,
+          "response_time_seconds": 0.0,
+          "token_metrics": null
+        },
+        "reasoning": {
+          "confidence": 0.0,
+          "converged": null,
+          "justification": "This configuration aggressively tunes CPU, scheduler, network, and memory parameters for minimal latency. It prioritizes performance by setting the CPU governor to 'performance', restricting C-states to 'POLL', reducing scheduler latencies and granularities, enabling busy polling, and reducing swap and dirty memory writeback aggressiveness. Disabling NUMA balancing and using BBR congestion control are also included for potential latency benefits, along with increasing the listen backlog and allowing global TIME-WAIT reuse for better network handling under load, aiming to reduce p99 latency by minimizing various sources of delay and jitter within the OS and network stack. This is a significant exploration step to identify the impact of these common low-latency tunings for this workload in this environment. The goal is to explore the performance boundary by applying a set of parameters that are generally known to improve latency for high-performance applications, even if it means sacrificing some power efficiency or throughput in the short term. The changes are designed to be safe and within reasonable operating bounds for exploration, avoiding values that would cause system instability while still probing for significant performance shifts. Specific values like busy_poll=50, netdev_budget_usecs=4000, and vm_swappiness=10 are chosen as initial aggressive steps to gauge their impact on the p99 latency without going to the absolute extremes of their ranges immediately. The choice of tcp_congestion_control to bbr is to explore if a modern congestion control algorithm can offer better latency performance for this particular workload. The change of tcp_tw_reuse to 1 is to allow for quicker socket reuse which can be beneficial for high connection rate workloads. Overall, this configuration represents a concerted effort to push the system towards a low-latency operating point across multiple subsystems to get a strong signal on the potential for p99 latency reduction. The selected values for scheduler parameters (latency_ns, min_granularity_ns, wakeup_granularity_ns, migration_cost_ns) are significantly reduced to make the scheduler more responsive and prioritize task execution with less delay. The dirty memory settings are also made more aggressive to ensure writes are flushed more quickly, preventing potential latency spikes from full dirty buffers. The network settings are adjusted to reduce network stack processing delays and improve responsiveness for packet handling. The overall strategy is to explore a 'performance-at-all-costs' configuration to establish a lower bound for latency_p99, which will inform subsequent, more nuanced tuning iterations. This will help understand which subsystems are the primary bottlenecks and contribute most to the baseline p99 latency.",
+          "parameters": {},
+          "parameters_applied_in_source": false,
+          "recorded_response": true,
+          "response_time_seconds": 13.991233587265015,
+          "token_metrics": {
+            "api_total_tokens": 6164,
+            "billable_output_tokens": 2910,
+            "billable_total_tokens": 6164,
+            "cached_content_token_count": 0,
+            "input_tokens": 3254,
+            "output_tokens": 535,
+            "thinking_tokens": 2375,
+            "thinking_tokens_inferred_from_api_total": 0
+          }
+        }
+      }
+    },
+    {
+      "iteration": 1,
+      "responses": {
+        "quick": {
+          "confidence": 0.0,
+          "converged": false,
+          "justification": "No recorded response; replayed as a no-op.",
+          "parameters": {},
+          "parameters_applied_in_source": false,
+          "recorded_response": false,
+          "response_time_seconds": 0.0,
+          "token_metrics": null
+        },
+        "reasoning": {
+          "confidence": 0.0,
+          "converged": false,
+          "justification": "No recorded response; replayed as a no-op.",
+          "parameters": {},
+          "parameters_applied_in_source": false,
+          "recorded_response": false,
+          "response_time_seconds": 0.0,
+          "token_metrics": null
+        }
+      }
+    },
+    {
+      "iteration": 2,
+      "responses": {
+        "quick": {
+          "confidence": 0.0,
+          "converged": false,
+          "justification": "No recorded response; replayed as a no-op.",
+          "parameters": {},
+          "parameters_applied_in_source": false,
+          "recorded_response": false,
+          "response_time_seconds": 0.0,
+          "token_metrics": null
+        },
+        "reasoning": {
+          "confidence": 0.0,
+          "converged": false,
+          "justification": "No recorded response; replayed as a no-op.",
+          "parameters": {},
+          "parameters_applied_in_source": false,
+          "recorded_response": false,
+          "response_time_seconds": 0.0,
+          "token_metrics": null
+        }
+      }
+    },
+    {
+      "iteration": 3,
+      "responses": {
+        "quick": {
+          "confidence": 0.0,
+          "converged": false,
+          "justification": "No recorded response; replayed as a no-op.",
+          "parameters": {},
+          "parameters_applied_in_source": false,
+          "recorded_response": false,
+          "response_time_seconds": 0.0,
+          "token_metrics": null
+        },
+        "reasoning": {
+          "confidence": 0.0,
+          "converged": false,
+          "justification": "No recorded response; replayed as a no-op.",
+          "parameters": {},
+          "parameters_applied_in_source": false,
+          "recorded_response": false,
+          "response_time_seconds": 0.0,
+          "token_metrics": null
+        }
+      }
+    },
+    {
+      "iteration": 4,
+      "responses": {
+        "quick": {
+          "confidence": 0.0,
+          "converged": false,
+          "justification": "No recorded response; replayed as a no-op.",
+          "parameters": {},
+          "parameters_applied_in_source": false,
+          "recorded_response": false,
+          "response_time_seconds": 0.0,
+          "token_metrics": null
+        },
+        "reasoning": {
+          "confidence": 0.0,
+          "converged": false,
+          "justification": "No recorded response; replayed as a no-op.",
+          "parameters": {},
+          "parameters_applied_in_source": false,
+          "recorded_response": false,
+          "response_time_seconds": 0.0,
+          "token_metrics": null
+        }
+      }
+    },
+    {
+      "iteration": 5,
+      "responses": {
+        "quick": {
+          "confidence": 0.0,
+          "converged": false,
+          "justification": "No recorded response; replayed as a no-op.",
+          "parameters": {},
+          "parameters_applied_in_source": false,
+          "recorded_response": false,
+          "response_time_seconds": 0.0,
+          "token_metrics": null
+        },
+        "reasoning": {
+          "confidence": 0.0,
+          "converged": false,
+          "justification": "No recorded response; replayed as a no-op.",
+          "parameters": {},
+          "parameters_applied_in_source": false,
+          "recorded_response": false,
+          "response_time_seconds": 0.0,
+          "token_metrics": null
+        }
+      }
+    },
+    {
+      "iteration": 6,
+      "responses": {
+        "quick": {
+          "confidence": 0.0,
+          "converged": false,
+          "justification": "No recorded response; replayed as a no-op.",
+          "parameters": {},
+          "parameters_applied_in_source": false,
+          "recorded_response": false,
+          "response_time_seconds": 0.0,
+          "token_metrics": null
+        },
+        "reasoning": {
+          "confidence": 0.0,
+          "converged": false,
+          "justification": "No recorded response; replayed as a no-op.",
+          "parameters": {},
+          "parameters_applied_in_source": false,
+          "recorded_response": false,
+          "response_time_seconds": 0.0,
+          "token_metrics": null
+        }
+      }
+    },
+    {
+      "iteration": 7,
+      "responses": {
+        "quick": {
+          "confidence": 1.0,
+          "converged": null,
+          "justification": "Increased busy polling and netdev budget to reduce latency, while also decreasing dirty memory ratios and swappiness to prioritize responsiveness over background writes. Scaling governor is set to performance to ensure maximum CPU availability.",
+          "parameters": {
+            "busy_poll": 100,
+            "busy_read": 100,
+            "latency_ns": 10000000,
+            "netdev_budget": 500,
+            "netdev_budget_usecs": 4000,
+            "rmem_default": 16777216,
+            "rmem_max": 16777216,
+            "scaling_governor": "performance",
+            "tcp_fin_timeout": 30,
+            "vm_dirty_background_ratio": 5,
+            "vm_dirty_ratio": 10,
+            "vm_swappiness": 10,
+            "wmem_default": 16777216,
+            "wmem_max": 16777216
+          },
+          "parameters_applied_in_source": true,
+          "recorded_response": true,
+          "response_time_seconds": 1.7200877666473389,
+          "token_metrics": {
+            "api_total_tokens": 7594,
+            "billable_output_tokens": 257,
+            "billable_total_tokens": 7594,
+            "cached_content_token_count": 0,
+            "input_tokens": 7337,
+            "output_tokens": 257,
+            "thinking_tokens": 0,
+            "thinking_tokens_inferred_from_api_total": 0
+          }
+        },
+        "reasoning": {
+          "confidence": 0.0,
+          "converged": false,
+          "justification": "No recorded response; replayed as a no-op.",
+          "parameters": {},
+          "parameters_applied_in_source": false,
+          "recorded_response": false,
+          "response_time_seconds": 0.0,
+          "token_metrics": null
+        }
+      }
+    },
+    {
+      "iteration": 8,
+      "responses": {
+        "quick": {
+          "confidence": 1.0,
+          "converged": null,
+          "justification": "The previous iteration showed a significant increase in latency_p99, indicating a potential issue with the aggressive tuning. We will slightly increase busy_poll and busy_read to see if that helps with responsiveness, while keeping other parameters from the best performing configuration to explore the vicinity of the optimum.",
+          "parameters": {
+            "busy_poll": 50,
+            "busy_read": 50,
+            "latency_ns": 10000000,
+            "min_granularity_ns": 3000000,
+            "netdev_budget": 400,
+            "netdev_budget_usecs": 4000,
+            "rmem_max": 16777216,
+            "scaling_governor": "performance",
+            "tcp_fin_timeout": 30,
+            "tcp_sack": 1,
+            "tcp_timestamps": 1,
+            "tcp_window_scaling": 1,
+            "vm_dirty_background_ratio": 5,
+            "vm_dirty_ratio": 10,
+            "vm_swappiness": 10,
+            "wakeup_granularity_ns": 4000000,
+            "wmem_max": 16777216
+          },
+          "parameters_applied_in_source": true,
+          "recorded_response": true,
+          "response_time_seconds": 1.8163800239562988,
+          "token_metrics": {
+            "api_total_tokens": 8148,
+            "billable_output_tokens": 308,
+            "billable_total_tokens": 8148,
+            "cached_content_token_count": 5839,
+            "input_tokens": 7840,
+            "output_tokens": 308,
+            "thinking_tokens": 0,
+            "thinking_tokens_inferred_from_api_total": 0
+          }
+        },
+        "reasoning": {
+          "confidence": 0.0,
+          "converged": false,
+          "justification": "No recorded response; replayed as a no-op.",
+          "parameters": {},
+          "parameters_applied_in_source": false,
+          "recorded_response": false,
+          "response_time_seconds": 0.0,
+          "token_metrics": null
+        }
+      }
+    },
+    {
+      "iteration": 9,
+      "responses": {
+        "quick": {
+          "confidence": 0.0,
+          "converged": false,
+          "justification": "No recorded response; replayed as a no-op.",
+          "parameters": {},
+          "parameters_applied_in_source": false,
+          "recorded_response": false,
+          "response_time_seconds": 0.0,
+          "token_metrics": null
+        },
+        "reasoning": {
+          "confidence": 0.0,
+          "converged": false,
+          "justification": "No recorded response; replayed as a no-op.",
+          "parameters": {},
+          "parameters_applied_in_source": false,
+          "recorded_response": false,
+          "response_time_seconds": 0.0,
+          "token_metrics": null
+        }
+      }
+    },
+    {
+      "iteration": 10,
+      "responses": {
+        "quick": {
+          "confidence": 1.0,
+          "converged": null,
+          "justification": "Continuing exploration with a focus on network and scheduler parameters. Increased busy_poll and busy_read slightly, adjusted netdev_budget, and maintained performance-oriented settings to see if minor gains are possible without significant latency increases.",
+          "parameters": {
+            "busy_poll": 75,
+            "busy_read": 75,
+            "latency_ns": 10000000,
+            "netdev_budget": 450,
+            "netdev_budget_usecs": 4000,
+            "pmqos": 0,
+            "scaling_governor": "performance",
+            "scaling_max_freq": 0,
+            "scaling_min_freq": 0,
+            "tcp_fin_timeout": 30,
+            "tcp_sack": 1,
+            "tcp_timestamps": 1,
+            "tcp_window_scaling": 1,
+            "turbo": true,
+            "vm_dirty_background_ratio": 5,
+            "vm_dirty_ratio": 10,
+            "vm_swappiness": 10,
+            "wakeup_granularity_ns": 4000000,
+            "wmem_default": 16777216,
+            "wmem_max": 16777216
+          },
+          "parameters_applied_in_source": true,
+          "recorded_response": true,
+          "response_time_seconds": 2.018131971359253,
+          "token_metrics": {
+            "api_total_tokens": 9128,
+            "billable_output_tokens": 315,
+            "billable_total_tokens": 9128,
+            "cached_content_token_count": 6784,
+            "input_tokens": 8813,
+            "output_tokens": 315,
+            "thinking_tokens": 0,
+            "thinking_tokens_inferred_from_api_total": 0
+          }
+        },
+        "reasoning": {
+          "confidence": 0.0,
+          "converged": false,
+          "justification": "No recorded response; replayed as a no-op.",
+          "parameters": {},
+          "parameters_applied_in_source": false,
+          "recorded_response": false,
+          "response_time_seconds": 0.0,
+          "token_metrics": null
+        }
+      }
+    },
+    {
+      "iteration": 11,
+      "responses": {
+        "quick": {
+          "confidence": 1.0,
+          "converged": null,
+          "justification": "The last run showed a significant latency increase, suggesting that increasing netdev_budget and busy polling parameters might have been detrimental. We will revert these to values closer to iteration 10, which showed good performance, while slightly increasing busy_poll and busy_read to explore potential benefits in that range without overshooting.",
+          "parameters": {
+            "busy_poll": 75,
+            "busy_read": 75,
+            "netdev_budget": 450,
+            "netdev_budget_usecs": 4000,
+            "pmqos": 0,
+            "scaling_governor": "performance",
+            "scaling_min_freq": 0,
+            "vm_dirty_background_ratio": 5,
+            "vm_dirty_ratio": 10,
+            "vm_swappiness": 10,
+            "wakeup_granularity_ns": 4000000,
+            "wmem_max": 16777216
+          },
+          "parameters_applied_in_source": true,
+          "recorded_response": true,
+          "response_time_seconds": 1.819077491760254,
+          "token_metrics": {
+            "api_total_tokens": 9563,
+            "billable_output_tokens": 235,
+            "billable_total_tokens": 9563,
+            "cached_content_token_count": 6885,
+            "input_tokens": 9328,
+            "output_tokens": 235,
+            "thinking_tokens": 0,
+            "thinking_tokens_inferred_from_api_total": 0
+          }
+        },
+        "reasoning": {
+          "confidence": 0.0,
+          "converged": false,
+          "justification": "No recorded response; replayed as a no-op.",
+          "parameters": {},
+          "parameters_applied_in_source": false,
+          "recorded_response": false,
+          "response_time_seconds": 0.0,
+          "token_metrics": null
+        }
+      }
+    },
+    {
+      "iteration": 12,
+      "responses": {
+        "quick": {
+          "confidence": 0.0,
+          "converged": false,
+          "justification": "No recorded response; replayed as a no-op.",
+          "parameters": {},
+          "parameters_applied_in_source": false,
+          "recorded_response": false,
+          "response_time_seconds": 0.0,
+          "token_metrics": null
+        },
+        "reasoning": {
+          "confidence": 0.0,
+          "converged": false,
+          "justification": "No recorded response; replayed as a no-op.",
+          "parameters": {},
+          "parameters_applied_in_source": false,
+          "recorded_response": false,
+          "response_time_seconds": 0.0,
+          "token_metrics": null
+        }
+      }
+    },
+    {
+      "iteration": 13,
+      "responses": {
+        "quick": {
+          "confidence": 1.0,
+          "converged": null,
+          "justification": "The previous iteration showed a slight increase in latency_p99, indicating we might be pushing parameters too aggressively. We will slightly increase busy_poll and busy_read to potentially improve responsiveness, while keeping other parameters that showed good results from recent iterations.",
+          "parameters": {
+            "busy_poll": 60,
+            "busy_read": 60,
+            "latency_ns": 10000000,
+            "netdev_budget": 425,
+            "netdev_budget_usecs": 4000,
+            "rmem_max": 16777216,
+            "scaling_governor": "performance",
+            "tcp_fin_timeout": 30,
+            "tcp_timestamps": 1,
+            "tcp_window_scaling": 1,
+            "vm_swappiness": 10,
+            "wmem_max": 16777216
+          },
+          "parameters_applied_in_source": true,
+          "recorded_response": true,
+          "response_time_seconds": 1.7173314094543457,
+          "token_metrics": {
+            "api_total_tokens": 10510,
+            "billable_output_tokens": 225,
+            "billable_total_tokens": 10510,
+            "cached_content_token_count": 7834,
+            "input_tokens": 10285,
+            "output_tokens": 225,
+            "thinking_tokens": 0,
+            "thinking_tokens_inferred_from_api_total": 0
+          }
+        },
+        "reasoning": {
+          "confidence": 0.0,
+          "converged": false,
+          "justification": "No recorded response; replayed as a no-op.",
+          "parameters": {},
+          "parameters_applied_in_source": false,
+          "recorded_response": false,
+          "response_time_seconds": 0.0,
+          "token_metrics": null
+        }
+      }
+    },
+    {
+      "iteration": 14,
+      "responses": {
+        "quick": {
+          "confidence": 0.0,
+          "converged": false,
+          "justification": "No recorded response; replayed as a no-op.",
+          "parameters": {},
+          "parameters_applied_in_source": false,
+          "recorded_response": false,
+          "response_time_seconds": 0.0,
+          "token_metrics": null
+        },
+        "reasoning": {
+          "confidence": 0.0,
+          "converged": false,
+          "justification": "No recorded response; replayed as a no-op.",
+          "parameters": {},
+          "parameters_applied_in_source": false,
+          "recorded_response": false,
+          "response_time_seconds": 0.0,
+          "token_metrics": null
+        }
+      }
+    },
+    {
+      "iteration": 15,
+      "responses": {
+        "quick": {
+          "confidence": 0.0,
+          "converged": false,
+          "justification": "No recorded response; replayed as a no-op.",
+          "parameters": {},
+          "parameters_applied_in_source": false,
+          "recorded_response": false,
+          "response_time_seconds": 0.0,
+          "token_metrics": null
+        },
+        "reasoning": {
+          "confidence": 0.0,
+          "converged": false,
+          "justification": "No recorded response; replayed as a no-op.",
+          "parameters": {},
+          "parameters_applied_in_source": false,
+          "recorded_response": false,
+          "response_time_seconds": 0.0,
+          "token_metrics": null
+        }
+      }
+    },
+    {
+      "iteration": 16,
+      "responses": {
+        "quick": {
+          "confidence": 0.0,
+          "converged": false,
+          "justification": "No recorded response; replayed as a no-op.",
+          "parameters": {},
+          "parameters_applied_in_source": false,
+          "recorded_response": false,
+          "response_time_seconds": 0.0,
+          "token_metrics": null
+        },
+        "reasoning": {
+          "confidence": 0.0,
+          "converged": false,
+          "justification": "No recorded response; replayed as a no-op.",
+          "parameters": {},
+          "parameters_applied_in_source": false,
+          "recorded_response": false,
+          "response_time_seconds": 0.0,
+          "token_metrics": null
+        }
+      }
+    },
+    {
+      "iteration": 17,
+      "responses": {
+        "quick": {
+          "confidence": 1.0,
+          "converged": null,
+          "justification": "The previous iteration with `busy_poll=60` and `busy_read=60` resulted in a significant latency increase, deviating from the best observed results. To re-explore the lower end of these parameters and potentially improve latency, we will reduce `busy_poll` and `busy_read` slightly. All other parameters remain the same as the current best configuration to maintain stability.",
+          "parameters": {
+            "busy_poll": 50,
+            "busy_read": 50,
+            "latency_ns": 10000000,
+            "netdev_budget": 450,
+            "netdev_budget_usecs": 4000,
+            "scaling_governor": "performance",
+            "tcp_fin_timeout": 30,
+            "vm_dirty_background_ratio": 5,
+            "vm_dirty_ratio": 10,
+            "vm_swappiness": 10,
+            "wmem_max": 16777216
+          },
+          "parameters_applied_in_source": true,
+          "recorded_response": true,
+          "response_time_seconds": 1.71769380569458,
+          "token_metrics": {
+            "api_total_tokens": 12436,
+            "billable_output_tokens": 243,
+            "billable_total_tokens": 12436,
+            "cached_content_token_count": 9760,
+            "input_tokens": 12193,
+            "output_tokens": 243,
+            "thinking_tokens": 0,
+            "thinking_tokens_inferred_from_api_total": 0
+          }
+        },
+        "reasoning": {
+          "confidence": 0.0,
+          "converged": false,
+          "justification": "No recorded response; replayed as a no-op.",
+          "parameters": {},
+          "parameters_applied_in_source": false,
+          "recorded_response": false,
+          "response_time_seconds": 0.0,
+          "token_metrics": null
+        }
+      }
+    },
+    {
+      "iteration": 18,
+      "responses": {
+        "quick": {
+          "confidence": 1.0,
+          "converged": null,
+          "justification": "The previous iteration (iter 18) showed a significant increase in latency_p99, moving away from the best observed value. To explore the region around the best performance (iter 15), we will slightly adjust the busy_poll and busy_read parameters upwards, increase the netdev_budget, and keep the other parameters that yielded good results.",
+          "parameters": {
+            "busy_poll": 55,
+            "busy_read": 55,
+            "latency_ns": 10000000,
+            "netdev_budget": 435,
+            "netdev_budget_usecs": 4000,
+            "tcp_fin_timeout": 30,
+            "vm_swappiness": 10,
+            "wmem_max": 16777216
+          },
+          "parameters_applied_in_source": true,
+          "recorded_response": true,
+          "response_time_seconds": 1.5168139934539795,
+          "token_metrics": {
+            "api_total_tokens": 12872,
+            "billable_output_tokens": 197,
+            "billable_total_tokens": 12872,
+            "cached_content_token_count": 10656,
+            "input_tokens": 12675,
+            "output_tokens": 197,
+            "thinking_tokens": 0,
+            "thinking_tokens_inferred_from_api_total": 0
+          }
+        },
+        "reasoning": {
+          "confidence": 0.0,
+          "converged": false,
+          "justification": "No recorded response; replayed as a no-op.",
+          "parameters": {},
+          "parameters_applied_in_source": false,
+          "recorded_response": false,
+          "response_time_seconds": 0.0,
+          "token_metrics": null
+        }
+      }
+    },
+    {
+      "iteration": 19,
+      "responses": {
+        "quick": {
+          "confidence": 1.0,
+          "converged": null,
+          "justification": "The previous iteration showed a slight increase in latency_p99 compared to the best observed, but still within a good range. To continue exploration, we will slightly adjust busy_poll and busy_read downwards, while increasing netdev_budget to potentially improve packet handling. Other parameters remain the same as they have shown good results.",
+          "parameters": {
+            "busy_poll": 50,
+            "busy_read": 50,
+            "netdev_budget": 450,
+            "netdev_budget_usecs": 4000,
+            "tcp_fin_timeout": 30,
+            "vm_swappiness": 10,
+            "wmem_max": 16777216
+          },
+          "parameters_applied_in_source": true,
+          "recorded_response": true,
+          "response_time_seconds": 1.319683313369751,
+          "token_metrics": {
+            "api_total_tokens": 13331,
+            "billable_output_tokens": 173,
+            "billable_total_tokens": 13331,
+            "cached_content_token_count": 10735,
+            "input_tokens": 13158,
+            "output_tokens": 173,
+            "thinking_tokens": 0,
+            "thinking_tokens_inferred_from_api_total": 0
+          }
+        },
+        "reasoning": {
+          "confidence": 0.0,
+          "converged": false,
+          "justification": "No recorded response; replayed as a no-op.",
+          "parameters": {},
+          "parameters_applied_in_source": false,
+          "recorded_response": false,
+          "response_time_seconds": 0.0,
+          "token_metrics": null
+        }
+      }
+    },
+    {
+      "iteration": 20,
+      "responses": {
+        "quick": {
+          "confidence": 0.0,
+          "converged": false,
+          "justification": "No recorded response; replayed as a no-op.",
+          "parameters": {},
+          "parameters_applied_in_source": false,
+          "recorded_response": false,
+          "response_time_seconds": 0.0,
+          "token_metrics": null
+        },
+        "reasoning": {
+          "confidence": 0.0,
+          "converged": false,
+          "justification": "No recorded response; replayed as a no-op.",
+          "parameters": {},
+          "parameters_applied_in_source": false,
+          "recorded_response": false,
+          "response_time_seconds": 0.0,
+          "token_metrics": null
+        }
+      }
+    },
+    {
+      "iteration": 21,
+      "responses": {
+        "quick": {
+          "confidence": 1.0,
+          "converged": null,
+          "justification": "The previous best result (latency_p99=8.39) was achieved with vm_swappiness=10 and tcp_fin_timeout=30. To continue exploration around this promising region, we will slightly adjust busy_poll and busy_read, and netdev_budget to probe nearby values while keeping other parameters consistent.",
+          "parameters": {
+            "busy_poll": 65,
+            "busy_read": 65,
+            "netdev_budget": 430,
+            "netdev_budget_usecs": 4000,
+            "tcp_fin_timeout": 30,
+            "vm_swappiness": 10,
+            "wmem_max": 16777216
+          },
+          "parameters_applied_in_source": true,
+          "recorded_response": true,
+          "response_time_seconds": 1.318589448928833,
+          "token_metrics": {
+            "api_total_tokens": 14295,
+            "billable_output_tokens": 178,
+            "billable_total_tokens": 14295,
+            "cached_content_token_count": 11715,
+            "input_tokens": 14117,
+            "output_tokens": 178,
+            "thinking_tokens": 0,
+            "thinking_tokens_inferred_from_api_total": 0
+          }
+        },
+        "reasoning": {
+          "confidence": 0.0,
+          "converged": false,
+          "justification": "No recorded response; replayed as a no-op.",
+          "parameters": {},
+          "parameters_applied_in_source": false,
+          "recorded_response": false,
+          "response_time_seconds": 0.0,
+          "token_metrics": null
+        }
+      }
+    },
+    {
+      "iteration": 22,
+      "responses": {
+        "quick": {
+          "confidence": 1.0,
+          "converged": null,
+          "justification": "Continuing exploration, we slightly adjust busy polling and netdev budget parameters around the best observed values to further refine latency. We maintain the performance governor and low swappiness as they have shown good results.",
+          "parameters": {
+            "busy_poll": 50,
+            "busy_read": 50,
+            "netdev_budget": 440,
+            "netdev_budget_usecs": 4000,
+            "scaling_governor": "performance",
+            "vm_dirty_background_ratio": 5,
+            "vm_dirty_ratio": 10,
+            "vm_swappiness": 10
+          },
+          "parameters_applied_in_source": true,
+          "recorded_response": true,
+          "response_time_seconds": 1.4170429706573486,
+          "token_metrics": {
+            "api_total_tokens": 14750,
+            "billable_output_tokens": 153,
+            "billable_total_tokens": 14750,
+            "cached_content_token_count": 11786,
+            "input_tokens": 14597,
+            "output_tokens": 153,
+            "thinking_tokens": 0,
+            "thinking_tokens_inferred_from_api_total": 0
+          }
+        },
+        "reasoning": {
+          "confidence": 0.0,
+          "converged": false,
+          "justification": "No recorded response; replayed as a no-op.",
+          "parameters": {},
+          "parameters_applied_in_source": false,
+          "recorded_response": false,
+          "response_time_seconds": 0.0,
+          "token_metrics": null
+        }
+      }
+    },
+    {
+      "iteration": 23,
+      "responses": {
+        "quick": {
+          "confidence": 1.0,
+          "converged": null,
+          "justification": "The system has shown good performance with a performance scaling governor and low vm_swappiness. We will continue to explore similar settings by slightly adjusting busy polling parameters and netdev_budget to see if minor improvements can be found while maintaining the best latency observed.",
+          "parameters": {
+            "busy_poll": 50,
+            "busy_read": 50,
+            "netdev_budget": 430,
+            "netdev_budget_usecs": 4000,
+            "scaling_governor": "performance",
+            "tcp_fin_timeout": 30,
+            "vm_swappiness": 10
+          },
+          "parameters_applied_in_source": true,
+          "recorded_response": true,
+          "response_time_seconds": 1.3169589042663574,
+          "token_metrics": {
+            "api_total_tokens": 15228,
+            "billable_output_tokens": 151,
+            "billable_total_tokens": 15228,
+            "cached_content_token_count": 12699,
+            "input_tokens": 15077,
+            "output_tokens": 151,
+            "thinking_tokens": 0,
+            "thinking_tokens_inferred_from_api_total": 0
+          }
+        },
+        "reasoning": {
+          "confidence": 0.0,
+          "converged": false,
+          "justification": "No recorded response; replayed as a no-op.",
+          "parameters": {},
+          "parameters_applied_in_source": false,
+          "recorded_response": false,
+          "response_time_seconds": 0.0,
+          "token_metrics": null
+        }
+      }
+    },
+    {
+      "iteration": 24,
+      "responses": {
+        "quick": {
+          "confidence": 1.0,
+          "converged": null,
+          "justification": "The previous iteration showed a slight increase in latency_p99. To continue exploration, we will slightly increase busy_poll and busy_read, and maintain other parameters from the best performing configuration to explore that region further.",
+          "parameters": {
+            "busy_poll": 60,
+            "busy_read": 60,
+            "tcp_fin_timeout": 30,
+            "vm_swappiness": 10,
+            "wmem_max": 16777216
+          },
+          "parameters_applied_in_source": true,
+          "recorded_response": true,
+          "response_time_seconds": 1.311396837234497,
+          "token_metrics": {
+            "api_total_tokens": 15678,
+            "billable_output_tokens": 121,
+            "billable_total_tokens": 15678,
+            "cached_content_token_count": 12768,
+            "input_tokens": 15557,
+            "output_tokens": 121,
+            "thinking_tokens": 0,
+            "thinking_tokens_inferred_from_api_total": 0
+          }
+        },
+        "reasoning": {
+          "confidence": 0.0,
+          "converged": false,
+          "justification": "No recorded response; replayed as a no-op.",
+          "parameters": {},
+          "parameters_applied_in_source": false,
+          "recorded_response": false,
+          "response_time_seconds": 0.0,
+          "token_metrics": null
+        }
+      }
+    },
+    {
+      "iteration": 25,
+      "responses": {
+        "quick": {
+          "confidence": 1.0,
+          "converged": null,
+          "justification": "The last run (iter 25) showed a significant latency_p99 increase after a promising trend, suggesting potential instability. We will slightly adjust busy_poll and busy_read back towards the previous best performing values (iter 19, 23) while maintaining the netdev_budget from the most recent run to explore this narrow region further.",
+          "parameters": {
+            "busy_poll": 55,
+            "busy_read": 55,
+            "netdev_budget": 430,
+            "netdev_budget_usecs": 4000,
+            "tcp_fin_timeout": 30,
+            "vm_swappiness": 10,
+            "wmem_max": 16777216
+          },
+          "parameters_applied_in_source": true,
+          "recorded_response": true,
+          "response_time_seconds": 1.5177147388458252,
+          "token_metrics": {
+            "api_total_tokens": 16217,
+            "billable_output_tokens": 180,
+            "billable_total_tokens": 16217,
+            "cached_content_token_count": 13688,
+            "input_tokens": 16037,
+            "output_tokens": 180,
+            "thinking_tokens": 0,
+            "thinking_tokens_inferred_from_api_total": 0
+          }
+        },
+        "reasoning": {
+          "confidence": 0.0,
+          "converged": false,
+          "justification": "No recorded response; replayed as a no-op.",
+          "parameters": {},
+          "parameters_applied_in_source": false,
+          "recorded_response": false,
+          "response_time_seconds": 0.0,
+          "token_metrics": null
+        }
+      }
+    },
+    {
+      "iteration": 26,
+      "responses": {
+        "quick": {
+          "confidence": 1.0,
+          "converged": null,
+          "justification": "The previous best result (8.39) was achieved with specific network and VM settings. Iteration 26 showed a slight increase in latency (19.64), suggesting a need to re-explore the parameters around that configuration. We'll slightly adjust busy_poll and busy_read to be closer to the previous best, and keep netdev_budget and usecs consistent with the last good run, while also maintaining the low vm_swappiness and increased buffer sizes.",
+          "parameters": {
+            "busy_poll": 50,
+            "busy_read": 50,
+            "netdev_budget": 430,
+            "netdev_budget_usecs": 4000,
+            "tcp_fin_timeout": 30,
+            "vm_swappiness": 10,
+            "wakeup_granularity_ns": 4000000,
+            "wmem_max": 16777216
+          },
+          "parameters_applied_in_source": true,
+          "recorded_response": true,
+          "response_time_seconds": 1.718479871749878,
+          "token_metrics": {
+            "api_total_tokens": 16743,
+            "billable_output_tokens": 226,
+            "billable_total_tokens": 16743,
+            "cached_content_token_count": 13754,
+            "input_tokens": 16517,
+            "output_tokens": 226,
+            "thinking_tokens": 0,
+            "thinking_tokens_inferred_from_api_total": 0
+          }
+        },
+        "reasoning": {
+          "confidence": 0.0,
+          "converged": false,
+          "justification": "No recorded response; replayed as a no-op.",
+          "parameters": {},
+          "parameters_applied_in_source": false,
+          "recorded_response": false,
+          "response_time_seconds": 0.0,
+          "token_metrics": null
+        }
+      }
+    },
+    {
+      "iteration": 27,
+      "responses": {
+        "quick": {
+          "confidence": 1.0,
+          "converged": null,
+          "justification": "Continuing exploration, we are slightly adjusting busy_poll and busy_read parameters to probe a region near the current best performing configurations, aiming to find further latency improvements without deviating too drastically from the successful settings observed in iterations 15, 19, and 16.",
+          "parameters": {
+            "busy_poll": 55,
+            "busy_read": 55,
+            "latency_ns": 10000000,
+            "netdev_budget": 435,
+            "netdev_budget_usecs": 4000,
+            "tcp_fin_timeout": 30,
+            "vm_swappiness": 10,
+            "wakeup_granularity_ns": 4000000,
+            "wmem_max": 16777216
+          },
+          "parameters_applied_in_source": true,
+          "recorded_response": true,
+          "response_time_seconds": 1.821364402770996,
+          "token_metrics": {
+            "api_total_tokens": 17196,
+            "billable_output_tokens": 199,
+            "billable_total_tokens": 17196,
+            "cached_content_token_count": 14680,
+            "input_tokens": 16997,
+            "output_tokens": 199,
+            "thinking_tokens": 0,
+            "thinking_tokens_inferred_from_api_total": 0
+          }
+        },
+        "reasoning": {
+          "confidence": 0.0,
+          "converged": false,
+          "justification": "No recorded response; replayed as a no-op.",
+          "parameters": {},
+          "parameters_applied_in_source": false,
+          "recorded_response": false,
+          "response_time_seconds": 0.0,
+          "token_metrics": null
+        }
+      }
+    },
+    {
+      "iteration": 28,
+      "responses": {
+        "quick": {
+          "confidence": 1.0,
+          "converged": null,
+          "justification": "The previous best result (8.39) was achieved with vm_swappiness=10 and vm_dirty_ratio=10, suggesting a preference for lower swap usage and more aggressive memory writeback. We will explore slightly higher values for busy_poll and busy_read to see if further latency reduction is possible in that area, while keeping other parameters from the best performing configuration.",
+          "parameters": {
+            "busy_poll": 50,
+            "busy_read": 50,
+            "netdev_budget": 430,
+            "netdev_budget_usecs": 4000,
+            "tcp_fin_timeout": 30,
+            "vm_swappiness": 10,
+            "wakeup_granularity_ns": 4000000,
+            "wmem_max": 16777216
+          },
+          "parameters_applied_in_source": true,
+          "recorded_response": true,
+          "response_time_seconds": 1.417903184890747,
+          "token_metrics": {
+            "api_total_tokens": 17683,
+            "billable_output_tokens": 206,
+            "billable_total_tokens": 17683,
+            "cached_content_token_count": 14743,
+            "input_tokens": 17477,
+            "output_tokens": 206,
+            "thinking_tokens": 0,
+            "thinking_tokens_inferred_from_api_total": 0
+          }
+        },
+        "reasoning": {
+          "confidence": 0.0,
+          "converged": false,
+          "justification": "No recorded response; replayed as a no-op.",
+          "parameters": {},
+          "parameters_applied_in_source": false,
+          "recorded_response": false,
+          "response_time_seconds": 0.0,
+          "token_metrics": null
+        }
+      }
+    },
+    {
+      "iteration": 29,
+      "responses": {
+        "quick": {
+          "confidence": 0.0,
+          "converged": false,
+          "justification": "No recorded response; replayed as a no-op.",
+          "parameters": {},
+          "parameters_applied_in_source": false,
+          "recorded_response": false,
+          "response_time_seconds": 0.0,
+          "token_metrics": null
+        },
+        "reasoning": {
+          "confidence": 0.0,
+          "converged": false,
+          "justification": "No recorded response; replayed as a no-op.",
+          "parameters": {},
+          "parameters_applied_in_source": false,
+          "recorded_response": false,
+          "response_time_seconds": 0.0,
+          "token_metrics": null
+        }
+      }
+    },
+    {
+      "iteration": 30,
+      "responses": {
+        "reasoning_final": {
+          "confidence": 1.0,
+          "converged": null,
+          "justification": "Selecting the configuration from Iter 15, which achieved the lowest latency_p99 of 8.39, for the stable phase. This configuration utilizes performance-oriented CPU and network settings to minimize tail latencies.",
+          "parameters": {
+            "busy_poll": 60,
+            "busy_read": 60,
+            "cstate_max": "C1",
+            "epp": "default",
+            "latency_ns": 10000000,
+            "max_perf_pct": 100,
+            "migration_cost_ns": 500000,
+            "min_granularity_ns": 3000000,
+            "min_perf_pct": 0,
+            "napi_busy_poll": 0,
+            "netdev_budget": 425,
+            "netdev_budget_usecs": 4000,
+            "netdev_max_backlog": 1000,
+            "numa_balancing": true,
+            "pmqos": 0,
+            "rmem_default": 16777216,
+            "rmem_max": 16777216,
+            "scaling_governor": "performance",
+            "scaling_max_freq": 0,
+            "scaling_min_freq": 0,
+            "sched_autogroup_enabled": true,
+            "sched_cfs_bandwidth_slice_us": 5000,
+            "somaxconn": 4096,
+            "tcp_congestion_control": "cubic",
+            "tcp_fastopen": 1,
+            "tcp_fin_timeout": 30,
+            "tcp_sack": 1,
+            "tcp_timestamps": 1,
+            "tcp_window_scaling": 1,
+            "turbo": true,
+            "vm_dirty_background_ratio": 5,
+            "vm_dirty_expire_centisecs": 3000,
+            "vm_dirty_ratio": 10,
+            "vm_dirty_writeback_centisecs": 500,
+            "vm_swappiness": 10,
+            "wakeup_granularity_ns": 4000000,
+            "wmem_default": 16777216,
+            "wmem_max": 16777216,
+            "zone_reclaim_mode": 0
+          },
+          "parameters_applied_in_source": true,
+          "recorded_response": true,
+          "response_time_seconds": 58.52857995033264,
+          "token_metrics": {
+            "api_total_tokens": 24083,
+            "billable_output_tokens": 5627,
+            "billable_total_tokens": 24083,
+            "cached_content_token_count": 0,
+            "input_tokens": 18456,
+            "output_tokens": 620,
+            "thinking_tokens": 5007,
+            "thinking_tokens_inferred_from_api_total": 0
+          }
+        }
+      }
+    }
+  ],
+  "job_id": "parameter:silo_hi_p99_final:41_param:silo_hi_p99:llm_dual_app_metrics_final_actor",
+  "provider_requests": 0,
+  "recorded_actions": 17,
+  "recorded_noops": 1,
+  "recorded_responses": 18,
+  "schema_version": 1,
+  "source_history": "provider-run/parameter:silo_hi_p99_final:41_param:silo_hi_p99:llm_dual_app_metrics_final_actor/dual_loop_actor_speculator_tailbench_20260713_050214.json",
+  "source_history_sha256": "aaae0db16b72eedb56a137218275bdb6395db239c08f9cab205ea01892876e64",
+  "source_optimizer_gist": "This Linux kernel tuning run successfully reduced the 99th percentile latency (reward metric) from an initial average of ~18 to an optimal value of 4.81. Throughput remained consistently high, ranging from 2650 to 2760.\n\n**Key Patterns:**\nThe tuning process involved two significant shifts in configuration:\n1.  An initial broad change (Iter 8) that adjusted several core networking and VM parameters, moving from a `powersave` to `performance` CPU governor and increasing memory buffers. This established a new baseline with improved average latency.\n2.  A critical change at Iter 31, setting `cstate_max` to `C1`, which resulted in the most dramatic improvement, lowering latency_p99 to its lowest observed values.\nThe system exhibited noticeable run-to-run variability in latency_p99 even with identical parameters, indicating potential environmental factors or inherent workload fluctuations.\n\n**Parameters with Biggest Impact:**\n*   **`cstate_max=C1`**: This was the single most impactful change, reducing latency_p99 by approximately 50-75% from previous bests. Limiting CPU idle states to C1 significantly improved responsiveness.\n*   **`scaling_governor=performance`**: Switching from `powersave` to `performance` (Iter 8) helped maintain higher clock speeds, crucial for low-latency workloads.\n*   **Memory Buffers (`wmem_max`, `rmem_default`, `rmem_max`, `wmem_default` to 16777216)**: The substantial increase in TCP/UDP memory buffers contributed to a more stable performance baseline.\n*   **`vm_swappiness=10`, `vm_dirty_ratio=10`, `vm_dirty_background_ratio=5`**: These lower VM values reduced disk I/O, likely contributing to improved latency.\n*   **`latency_ns=10000000`**: A lower scheduler latency target generally helps with responsiveness.\n\n**Optimal Configuration:**\nThe configuration from Iter 31 (and subsequent runs in that phase) yielded the best results (Reward=4.809, latency_p99=4.81, latency_avg=1.00, throughput=2701.00). Key parameters for this optimal state are:\n*   `cstate_max=C1`\n*   `scaling_governor=performance`\n*   `tcp_fin_timeout=30`\n*   `vm_swappiness=10`\n*   `vm_dirty_ratio=10`\n*   `vm_dirty_background_ratio=5`\n*   `netdev_budget_usecs=4000`\n*   `netdev_budget=425`\n*   `busy_poll=60`\n*   `busy_read=60`\n*   `wmem_max=16777216`, `rmem_default=16777216`, `rmem_max=16777216`, `wmem_default=16777216`\n*   `latency_ns=10000000`\n*   All other parameters remained at their initial or default-like values throughout the best-performing runs.\n\n**Takeaways for Future Runs to be More Efficient:**\n1.  **Starting Configuration:** Begin future tuning runs with the optimal configuration identified above (Iter 31 parameters). This will provide a strong baseline and reduce the search space.\n2.  **Fix Critical Parameters:**\n    *   Fix `cstate_max=C1` and `scaling_governor=performance` as these had the most significant positive impact on latency.\n    *   Fix `wmem_max`, `rmem_default`, `rmem_max`, `wmem_default` to `16777216`.\n    *   Fix `tcp_fin_timeout=30`, `vm_swappiness=10`, `vm_dirty_ratio=10`, `vm_dirty_background_ratio=5`, `netdev_budget_usecs=4000`, `latency_ns=10000000`.\n3.  **Narrow Parameter Ranges:**\n    *   For `netdev_budget`, focus on the range of 400-450.\n    *   For `busy_poll` and `busy_read`, focus on the range of 50-75.\n4.  **Identify Irrelevant Parameters:** Many parameters (`napi_busy_poll`, `tcp_timestamps`, `wakeup_granularity_ns`, `somaxconn`, `tcp_window_scaling`, `pmqos`, `scaling_min_freq`, `tcp_fastopen`, `numa_balancing`, `min_granularity_ns`, `tcp_sack`, `sched_cfs_bandwidth_slice_us`, `netdev_max_backlog`, `scaling_max_freq`, `vm_dirty_expire_centisecs`, `epp`, `zone_reclaim_mode`, `tcp_congestion_control`, `turbo`, `max_perf_pct`, `tcp_tw_reuse`, `sched_autogroup_enabled`, `min_perf_pct`, `vm_dirty_writeback_centisecs`, `tcp_mtu_probing`, `migration_cost_ns`) were either never changed or showed no discernible impact. These can likely be fixed to their current values and excluded from further active tuning.\n5.  **Address Variability:** Given the significant reward fluctuations even with identical parameters, consider increasing the number of samples per configuration or implementing statistical methods to account for system noise in future evaluations.",
+  "source_optimizer_gist_raw": {
+    "backend": "gemini",
+    "model": "gemini-2.5-flash",
+    "response_model": "gemini-2.5-flash",
+    "text": "This Linux kernel tuning run successfully reduced the 99th percentile latency (reward metric) from an initial average of ~18 to an optimal value of 4.81. Throughput remained consistently high, ranging from 2650 to 2760.\n\n**Key Patterns:**\nThe tuning process involved two significant shifts in configuration:\n1.  An initial broad change (Iter 8) that adjusted several core networking and VM parameters, moving from a `powersave` to `performance` CPU governor and increasing memory buffers. This established a new baseline with improved average latency.\n2.  A critical change at Iter 31, setting `cstate_max` to `C1`, which resulted in the most dramatic improvement, lowering latency_p99 to its lowest observed values.\nThe system exhibited noticeable run-to-run variability in latency_p99 even with identical parameters, indicating potential environmental factors or inherent workload fluctuations.\n\n**Parameters with Biggest Impact:**\n*   **`cstate_max=C1`**: This was the single most impactful change, reducing latency_p99 by approximately 50-75% from previous bests. Limiting CPU idle states to C1 significantly improved responsiveness.\n*   **`scaling_governor=performance`**: Switching from `powersave` to `performance` (Iter 8) helped maintain higher clock speeds, crucial for low-latency workloads.\n*   **Memory Buffers (`wmem_max`, `rmem_default`, `rmem_max`, `wmem_default` to 16777216)**: The substantial increase in TCP/UDP memory buffers contributed to a more stable performance baseline.\n*   **`vm_swappiness=10`, `vm_dirty_ratio=10`, `vm_dirty_background_ratio=5`**: These lower VM values reduced disk I/O, likely contributing to improved latency.\n*   **`latency_ns=10000000`**: A lower scheduler latency target generally helps with responsiveness.\n\n**Optimal Configuration:**\nThe configuration from Iter 31 (and subsequent runs in that phase) yielded the best results (Reward=4.809, latency_p99=4.81, latency_avg=1.00, throughput=2701.00). Key parameters for this optimal state are:\n*   `cstate_max=C1`\n*   `scaling_governor=performance`\n*   `tcp_fin_timeout=30`\n*   `vm_swappiness=10`\n*   `vm_dirty_ratio=10`\n*   `vm_dirty_background_ratio=5`\n*   `netdev_budget_usecs=4000`\n*   `netdev_budget=425`\n*   `busy_poll=60`\n*   `busy_read=60`\n*   `wmem_max=16777216`, `rmem_default=16777216`, `rmem_max=16777216`, `wmem_default=16777216`\n*   `latency_ns=10000000`\n*   All other parameters remained at their initial or default-like values throughout the best-performing runs.\n\n**Takeaways for Future Runs to be More Efficient:**\n1.  **Starting Configuration:** Begin future tuning runs with the optimal configuration identified above (Iter 31 parameters). This will provide a strong baseline and reduce the search space.\n2.  **Fix Critical Parameters:**\n    *   Fix `cstate_max=C1` and `scaling_governor=performance` as these had the most significant positive impact on latency.\n    *   Fix `wmem_max`, `rmem_default`, `rmem_max`, `wmem_default` to `16777216`.\n    *   Fix `tcp_fin_timeout=30`, `vm_swappiness=10`, `vm_dirty_ratio=10`, `vm_dirty_background_ratio=5`, `netdev_budget_usecs=4000`, `latency_ns=10000000`.\n3.  **Narrow Parameter Ranges:**\n    *   For `netdev_budget`, focus on the range of 400-450.\n    *   For `busy_poll` and `busy_read`, focus on the range of 50-75.\n4.  **Identify Irrelevant Parameters:** Many parameters (`napi_busy_poll`, `tcp_timestamps`, `wakeup_granularity_ns`, `somaxconn`, `tcp_window_scaling`, `pmqos`, `scaling_min_freq`, `tcp_fastopen`, `numa_balancing`, `min_granularity_ns`, `tcp_sack`, `sched_cfs_bandwidth_slice_us`, `netdev_max_backlog`, `scaling_max_freq`, `vm_dirty_expire_centisecs`, `epp`, `zone_reclaim_mode`, `tcp_congestion_control`, `turbo`, `max_perf_pct`, `tcp_tw_reuse`, `sched_autogroup_enabled`, `min_perf_pct`, `vm_dirty_writeback_centisecs`, `tcp_mtu_probing`, `migration_cost_ns`) were either never changed or showed no discernible impact. These can likely be fixed to their current values and excluded from further active tuning.\n5.  **Address Variability:** Given the significant reward fluctuations even with identical parameters, consider increasing the number of samples per configuration or implementing statistical methods to account for system noise in future evaluations.",
+    "token_usage": {
+      "api_total_tokens": 29937,
+      "billable_output_tokens": 5652,
+      "billable_total_tokens": 29937,
+      "cached_content_token_count": 0,
+      "input_tokens": 24285,
+      "output_tokens": 1276,
+      "thinking_tokens": 4376,
+      "thinking_tokens_inferred_from_api_total": 0
+    },
+    "usage_metadata": {
+      "cached_content_token_count": null,
+      "candidates_token_count": 1276,
+      "prompt_token_count": 24285,
+      "thoughts_token_count": 4376,
+      "total_token_count": 29937
+    }
+  },
+  "synthetic_noops": 43
+}

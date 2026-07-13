@@ -858,6 +858,16 @@ Config: {{ "parameter_name": <value> }}"""
         if not history:
             return "No history available.", None
 
+        if self.replay_history_file:
+            source_gist = str((self.replay_history or {}).get("source_optimizer_gist") or "").strip()
+            summary = source_gist or "Optimization run completed under provider-free trace replay."
+            return summary, {
+                "mode": "trace-replay",
+                "provider_requests": 0,
+                "source_history": (self.replay_history or {}).get("source_history"),
+                "source_optimizer_gist_raw": (self.replay_history or {}).get("source_optimizer_gist_raw"),
+            }
+
         hide_reward = bool(
             getattr(self.config, "llm_additional_metrics_dump_only", False)
             or getattr(self.config, "llm_hide_primary_metric_value", False)

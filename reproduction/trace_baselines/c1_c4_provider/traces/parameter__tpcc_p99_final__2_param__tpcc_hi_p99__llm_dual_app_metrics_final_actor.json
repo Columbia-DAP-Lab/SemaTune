@@ -1,0 +1,1234 @@
+{
+  "benchmark": "tpcc",
+  "description": "Committed provider-backed C1-C4 response trace; workload measurements are not included and provider requests are forbidden.",
+  "history": [
+    {
+      "iteration": 0,
+      "responses": {
+        "quick": {
+          "confidence": 1.0,
+          "converged": null,
+          "justification": "Reducing both latency_ns and min_granularity_ns may decrease latency. This configuration explores a lower bound for these parameters while staying within a reasonable range to avoid excessive context switching.",
+          "parameters": {
+            "latency_ns": 12000000,
+            "min_granularity_ns": 1500000
+          },
+          "parameters_applied_in_source": true,
+          "recorded_response": true,
+          "response_time_seconds": 4.912186861038208,
+          "token_metrics": {
+            "api_total_tokens": 920,
+            "billable_output_tokens": 83,
+            "billable_total_tokens": 920,
+            "cached_content_token_count": 0,
+            "input_tokens": 837,
+            "output_tokens": 83,
+            "thinking_tokens": 0,
+            "thinking_tokens_inferred_from_api_total": 0
+          }
+        },
+        "reasoning": {
+          "confidence": 1.0,
+          "converged": null,
+          "justification": "To explore the impact on tail latency, we are reducing both the CFS scheduler latency and minimum granularity. This aims to increase scheduler responsiveness and potentially lower p99 latency by allowing tasks to preempt more frequently.",
+          "parameters": {
+            "latency_ns": 10000000,
+            "min_granularity_ns": 1000000
+          },
+          "parameters_applied_in_source": true,
+          "recorded_response": true,
+          "response_time_seconds": 4.724278450012207,
+          "token_metrics": {
+            "api_total_tokens": 1715,
+            "billable_output_tokens": 857,
+            "billable_total_tokens": 1715,
+            "cached_content_token_count": 0,
+            "input_tokens": 858,
+            "output_tokens": 87,
+            "thinking_tokens": 770,
+            "thinking_tokens_inferred_from_api_total": 0
+          }
+        }
+      }
+    },
+    {
+      "iteration": 1,
+      "responses": {
+        "quick": {
+          "confidence": 1.0,
+          "converged": null,
+          "justification": "Reducing both latency_ns and min_granularity_ns further in this exploration phase, as the previous iteration showed a positive trend in latency_p99. This aims to continue probing for lower latency, while being mindful of potential tradeoffs.",
+          "parameters": {
+            "latency_ns": 6000000,
+            "min_granularity_ns": 750000
+          },
+          "parameters_applied_in_source": true,
+          "recorded_response": true,
+          "response_time_seconds": 1.0183751583099365,
+          "token_metrics": {
+            "api_total_tokens": 1087,
+            "billable_output_tokens": 93,
+            "billable_total_tokens": 1087,
+            "cached_content_token_count": 0,
+            "input_tokens": 994,
+            "output_tokens": 93,
+            "thinking_tokens": 0,
+            "thinking_tokens_inferred_from_api_total": 0
+          }
+        },
+        "reasoning": {
+          "confidence": 1.0,
+          "converged": null,
+          "justification": "The previous reduction in CFS scheduler latency and minimum granularity improved latency_p99. This configuration further reduces both parameters to explore if a more aggressive scheduling policy continues to decrease tail latencies.",
+          "parameters": {
+            "latency_ns": 6000000,
+            "min_granularity_ns": 750000
+          },
+          "parameters_applied_in_source": true,
+          "recorded_response": true,
+          "response_time_seconds": 4.1002397537231445,
+          "token_metrics": {
+            "api_total_tokens": 1702,
+            "billable_output_tokens": 687,
+            "billable_total_tokens": 1702,
+            "cached_content_token_count": 0,
+            "input_tokens": 1015,
+            "output_tokens": 69,
+            "thinking_tokens": 618,
+            "thinking_tokens_inferred_from_api_total": 0
+          }
+        }
+      }
+    },
+    {
+      "iteration": 2,
+      "responses": {
+        "quick": {
+          "confidence": 1.0,
+          "converged": null,
+          "justification": "The previous iteration with significantly lower latency_ns and min_granularity_ns resulted in a substantial increase in latency_p99. Returning to a configuration closer to the best performing one from iteration 1, but slightly increasing latency_ns to explore a potentially smoother operating point.",
+          "parameters": {
+            "min_granularity_ns": 1500000
+          },
+          "parameters_applied_in_source": true,
+          "recorded_response": true,
+          "response_time_seconds": 0.9124963283538818,
+          "token_metrics": {
+            "api_total_tokens": 1231,
+            "billable_output_tokens": 86,
+            "billable_total_tokens": 1231,
+            "cached_content_token_count": 0,
+            "input_tokens": 1145,
+            "output_tokens": 86,
+            "thinking_tokens": 0,
+            "thinking_tokens_inferred_from_api_total": 0
+          }
+        },
+        "reasoning": {
+          "confidence": 1.0,
+          "converged": null,
+          "justification": "The previous iteration showed that decreasing both parameters too aggressively worsened latency significantly. The best result was found at intermediate values, suggesting an optimal region between the initial default and the lowest tested values. This configuration probes a higher, but still reduced, set of values compared to the current best to further explore the optimal range.",
+          "parameters": {
+            "latency_ns": 18000000,
+            "min_granularity_ns": 2250000
+          },
+          "parameters_applied_in_source": true,
+          "recorded_response": true,
+          "response_time_seconds": 6.105052471160889,
+          "token_metrics": {
+            "api_total_tokens": 2273,
+            "billable_output_tokens": 1107,
+            "billable_total_tokens": 2273,
+            "cached_content_token_count": 0,
+            "input_tokens": 1166,
+            "output_tokens": 108,
+            "thinking_tokens": 999,
+            "thinking_tokens_inferred_from_api_total": 0
+          }
+        }
+      }
+    },
+    {
+      "iteration": 3,
+      "responses": {
+        "quick": {
+          "confidence": 0.0,
+          "converged": false,
+          "justification": "No recorded response; replayed as a no-op.",
+          "parameters": {},
+          "parameters_applied_in_source": false,
+          "recorded_response": false,
+          "response_time_seconds": 0.0,
+          "token_metrics": null
+        },
+        "reasoning": {
+          "confidence": 1.0,
+          "converged": null,
+          "justification": "Analysis of past results indicates an optimal latency_p99 around the current best configuration. To continue exploring the region and confirm the lower boundary of optimal performance, we are probing values slightly below the current best, but above the settings that previously led to significant degradation.",
+          "parameters": {
+            "latency_ns": 9000000,
+            "min_granularity_ns": 1125000
+          },
+          "parameters_applied_in_source": true,
+          "recorded_response": true,
+          "response_time_seconds": 10.116904735565186,
+          "token_metrics": {
+            "api_total_tokens": 3175,
+            "billable_output_tokens": 1896,
+            "billable_total_tokens": 3175,
+            "cached_content_token_count": 0,
+            "input_tokens": 1279,
+            "output_tokens": 98,
+            "thinking_tokens": 1798,
+            "thinking_tokens_inferred_from_api_total": 0
+          }
+        }
+      }
+    },
+    {
+      "iteration": 4,
+      "responses": {
+        "quick": {
+          "confidence": 1.0,
+          "converged": null,
+          "justification": "The previous iteration with higher latency_ns and min_granularity_ns resulted in increased latency_p99. To explore values closer to the best performing configuration from Iter 1, we will slightly decrease latency_ns and maintain min_granularity_ns at a value that previously showed good results.",
+          "parameters": {
+            "latency_ns": 15000000,
+            "min_granularity_ns": 1500000
+          },
+          "parameters_applied_in_source": true,
+          "recorded_response": true,
+          "response_time_seconds": 1.0119380950927734,
+          "token_metrics": {
+            "api_total_tokens": 1472,
+            "billable_output_tokens": 110,
+            "billable_total_tokens": 1472,
+            "cached_content_token_count": 0,
+            "input_tokens": 1362,
+            "output_tokens": 108,
+            "thinking_tokens": 2,
+            "thinking_tokens_inferred_from_api_total": 0
+          }
+        },
+        "reasoning": {
+          "confidence": 0.0,
+          "converged": false,
+          "justification": "No recorded response; replayed as a no-op.",
+          "parameters": {},
+          "parameters_applied_in_source": false,
+          "recorded_response": false,
+          "response_time_seconds": 0.0,
+          "token_metrics": null
+        }
+      }
+    },
+    {
+      "iteration": 5,
+      "responses": {
+        "quick": {
+          "confidence": 1.0,
+          "converged": null,
+          "justification": "The previous iteration with lower latency_ns and min_granularity_ns showed a slight increase in p99 latency. We will slightly increase both parameters to explore a region between the best performing configuration (iter 1) and the current configuration, aiming for a balance between responsiveness and stability.",
+          "parameters": {
+            "min_granularity_ns": 1800000
+          },
+          "parameters_applied_in_source": true,
+          "recorded_response": true,
+          "response_time_seconds": 1.0133099555969238,
+          "token_metrics": {
+            "api_total_tokens": 1556,
+            "billable_output_tokens": 88,
+            "billable_total_tokens": 1556,
+            "cached_content_token_count": 0,
+            "input_tokens": 1468,
+            "output_tokens": 88,
+            "thinking_tokens": 0,
+            "thinking_tokens_inferred_from_api_total": 0
+          }
+        },
+        "reasoning": {
+          "confidence": 1.0,
+          "converged": null,
+          "justification": "The optimal latency_p99 values have been observed in a narrow range for latency_ns between 9,000,000 and 12,000,000, maintaining an 8:1 ratio with min_granularity_ns. This configuration explores the midpoint of this promising region to refine the search for the global optimum.",
+          "parameters": {
+            "latency_ns": 10500000,
+            "min_granularity_ns": 1312500
+          },
+          "parameters_applied_in_source": true,
+          "recorded_response": true,
+          "response_time_seconds": 10.301469802856445,
+          "token_metrics": {
+            "api_total_tokens": 3571,
+            "billable_output_tokens": 2081,
+            "billable_total_tokens": 3571,
+            "cached_content_token_count": 0,
+            "input_tokens": 1490,
+            "output_tokens": 122,
+            "thinking_tokens": 1959,
+            "thinking_tokens_inferred_from_api_total": 0
+          }
+        }
+      }
+    },
+    {
+      "iteration": 6,
+      "responses": {
+        "quick": {
+          "confidence": 1.0,
+          "converged": null,
+          "justification": "The previous iteration showed good results with latency_ns=9000000. We will slightly decrease latency_ns to 7000000 while keeping min_granularity_ns the same to see if we can further reduce p99 latency without significantly impacting throughput.",
+          "parameters": {
+            "latency_ns": 7000000,
+            "min_granularity_ns": 1800000
+          },
+          "parameters_applied_in_source": true,
+          "recorded_response": true,
+          "response_time_seconds": 0.8104016780853271,
+          "token_metrics": {
+            "api_total_tokens": 1677,
+            "billable_output_tokens": 106,
+            "billable_total_tokens": 1677,
+            "cached_content_token_count": 0,
+            "input_tokens": 1571,
+            "output_tokens": 106,
+            "thinking_tokens": 0,
+            "thinking_tokens_inferred_from_api_total": 0
+          }
+        },
+        "reasoning": {
+          "confidence": 0.0,
+          "converged": false,
+          "justification": "No recorded response; replayed as a no-op.",
+          "parameters": {},
+          "parameters_applied_in_source": false,
+          "recorded_response": false,
+          "response_time_seconds": 0.0,
+          "token_metrics": null
+        }
+      }
+    },
+    {
+      "iteration": 7,
+      "responses": {
+        "quick": {
+          "confidence": 0.0,
+          "converged": false,
+          "justification": "No recorded response; replayed as a no-op.",
+          "parameters": {},
+          "parameters_applied_in_source": false,
+          "recorded_response": false,
+          "response_time_seconds": 0.0,
+          "token_metrics": null
+        },
+        "reasoning": {
+          "confidence": 1.0,
+          "converged": null,
+          "justification": "Based on the observed top configurations, we are exploring a parameter combination with latency_ns between the best performing 9M and 12M, and a min_granularity_ns within the consistently good range of 1.125M to 1.8M to further refine the optimal region.",
+          "parameters": {
+            "latency_ns": 10000000,
+            "min_granularity_ns": 1600000
+          },
+          "parameters_applied_in_source": true,
+          "recorded_response": true,
+          "response_time_seconds": 9.424405813217163,
+          "token_metrics": {
+            "api_total_tokens": 3720,
+            "billable_output_tokens": 2017,
+            "billable_total_tokens": 3720,
+            "cached_content_token_count": 0,
+            "input_tokens": 1703,
+            "output_tokens": 110,
+            "thinking_tokens": 1907,
+            "thinking_tokens_inferred_from_api_total": 0
+          }
+        }
+      }
+    },
+    {
+      "iteration": 8,
+      "responses": {
+        "quick": {
+          "confidence": 1.0,
+          "converged": null,
+          "justification": "The previous iteration with higher latency_ns and lower min_granularity_ns resulted in increased latency_p99. We will slightly decrease latency_ns and increase min_granularity_ns from the current best configuration (Iter 6) to explore a potentially better trade-off between latency and throughput.",
+          "parameters": {
+            "latency_ns": 10000000,
+            "min_granularity_ns": 1600000
+          },
+          "parameters_applied_in_source": true,
+          "recorded_response": true,
+          "response_time_seconds": 0.9052367210388184,
+          "token_metrics": {
+            "api_total_tokens": 1894,
+            "billable_output_tokens": 109,
+            "billable_total_tokens": 1894,
+            "cached_content_token_count": 0,
+            "input_tokens": 1785,
+            "output_tokens": 109,
+            "thinking_tokens": 0,
+            "thinking_tokens_inferred_from_api_total": 0
+          }
+        },
+        "reasoning": {
+          "confidence": 0.0,
+          "converged": false,
+          "justification": "No recorded response; replayed as a no-op.",
+          "parameters": {},
+          "parameters_applied_in_source": false,
+          "recorded_response": false,
+          "response_time_seconds": 0.0,
+          "token_metrics": null
+        }
+      }
+    },
+    {
+      "iteration": 9,
+      "responses": {
+        "quick": {
+          "confidence": 1.0,
+          "converged": null,
+          "justification": "The previous best latency_p99 was achieved with latency_ns=9,000,000 and min_granularity_ns=1,800,000. We will explore a slightly lower latency_ns and a slightly lower min_granularity_ns to see if we can further reduce p99 latency.",
+          "parameters": {
+            "latency_ns": 11000000,
+            "min_granularity_ns": 1700000
+          },
+          "parameters_applied_in_source": true,
+          "recorded_response": true,
+          "response_time_seconds": 5.429822206497192,
+          "token_metrics": {
+            "api_total_tokens": 2016,
+            "billable_output_tokens": 119,
+            "billable_total_tokens": 2016,
+            "cached_content_token_count": 0,
+            "input_tokens": 1897,
+            "output_tokens": 119,
+            "thinking_tokens": 0,
+            "thinking_tokens_inferred_from_api_total": 0
+          }
+        },
+        "reasoning": {
+          "confidence": 1.0,
+          "converged": null,
+          "justification": "Based on previous results, configurations with min_granularity_ns around 1.5M-1.8M and latency_ns around 9M-12M show the best performance. This new configuration explores a slightly increased min_granularity_ns while maintaining the effective latency_ns from the current best performer, aiming to further reduce p99 latency.",
+          "parameters": {
+            "latency_ns": 9000000,
+            "min_granularity_ns": 2000000
+          },
+          "parameters_applied_in_source": true,
+          "recorded_response": true,
+          "response_time_seconds": 11.405395746231079,
+          "token_metrics": {
+            "api_total_tokens": 4359,
+            "billable_output_tokens": 2440,
+            "billable_total_tokens": 4359,
+            "cached_content_token_count": 844,
+            "input_tokens": 1919,
+            "output_tokens": 121,
+            "thinking_tokens": 2319,
+            "thinking_tokens_inferred_from_api_total": 0
+          }
+        }
+      }
+    },
+    {
+      "iteration": 10,
+      "responses": {
+        "quick": {
+          "confidence": 1.0,
+          "converged": null,
+          "justification": "The previous best configuration (iter 6) had latency_ns=9000000 and min_granularity_ns=1800000, achieving a p99 latency of 19.16. Iteration 10, with slightly adjusted parameters {min_granularity_ns=1700000, latency_ns=11000000}, resulted in a p99 latency of 20.00, which is slightly worse but still very competitive. To continue exploration while staying close to the observed good region, we will slightly decrease latency_ns and slightly increase min_granularity_ns, moving towards the promising area around iter 6's parameters.",
+          "parameters": {
+            "latency_ns": 10000000,
+            "min_granularity_ns": 1750000
+          },
+          "parameters_applied_in_source": true,
+          "recorded_response": true,
+          "response_time_seconds": 1.406912088394165,
+          "token_metrics": {
+            "api_total_tokens": 2211,
+            "billable_output_tokens": 204,
+            "billable_total_tokens": 2211,
+            "cached_content_token_count": 873,
+            "input_tokens": 2007,
+            "output_tokens": 202,
+            "thinking_tokens": 2,
+            "thinking_tokens_inferred_from_api_total": 0
+          }
+        },
+        "reasoning": {
+          "confidence": 0.0,
+          "converged": false,
+          "justification": "No recorded response; replayed as a no-op.",
+          "parameters": {},
+          "parameters_applied_in_source": false,
+          "recorded_response": false,
+          "response_time_seconds": 0.0,
+          "token_metrics": null
+        }
+      }
+    },
+    {
+      "iteration": 11,
+      "responses": {
+        "quick": {
+          "confidence": 0.0,
+          "converged": false,
+          "justification": "No recorded response; replayed as a no-op.",
+          "parameters": {},
+          "parameters_applied_in_source": false,
+          "recorded_response": false,
+          "response_time_seconds": 0.0,
+          "token_metrics": null
+        },
+        "reasoning": {
+          "confidence": 1.0,
+          "converged": null,
+          "justification": "The best results consistently appear within the range of latency_ns between 9M and 12M and min_granularity_ns between 1.5M and 1.8M. This configuration probes a central point within this promising region to further refine the optimal balance, avoiding the higher min_granularity_ns which led to degraded performance in the last iteration.",
+          "parameters": {
+            "latency_ns": 10000000,
+            "min_granularity_ns": 1750000
+          },
+          "parameters_applied_in_source": true,
+          "recorded_response": true,
+          "response_time_seconds": 9.44135570526123,
+          "token_metrics": {
+            "api_total_tokens": 3997,
+            "billable_output_tokens": 1966,
+            "billable_total_tokens": 3997,
+            "cached_content_token_count": 0,
+            "input_tokens": 2031,
+            "output_tokens": 123,
+            "thinking_tokens": 1843,
+            "thinking_tokens_inferred_from_api_total": 0
+          }
+        }
+      }
+    },
+    {
+      "iteration": 12,
+      "responses": {
+        "quick": {
+          "confidence": 0.0,
+          "converged": false,
+          "justification": "No recorded response; replayed as a no-op.",
+          "parameters": {},
+          "parameters_applied_in_source": false,
+          "recorded_response": false,
+          "response_time_seconds": 0.0,
+          "token_metrics": null
+        },
+        "reasoning": {
+          "confidence": 0.0,
+          "converged": false,
+          "justification": "No recorded response; replayed as a no-op.",
+          "parameters": {},
+          "parameters_applied_in_source": false,
+          "recorded_response": false,
+          "response_time_seconds": 0.0,
+          "token_metrics": null
+        }
+      }
+    },
+    {
+      "iteration": 13,
+      "responses": {
+        "quick": {
+          "confidence": 1.0,
+          "converged": null,
+          "justification": "The previous iteration with higher latency_ns (10M) showed increased p99 latency. We will slightly decrease latency_ns and explore a min_granularity_ns value between the best performing configurations (1.7M and 1.8M) to find a better balance.",
+          "parameters": {
+            "latency_ns": 9500000,
+            "min_granularity_ns": 1775000
+          },
+          "parameters_applied_in_source": true,
+          "recorded_response": true,
+          "response_time_seconds": 5.224047660827637,
+          "token_metrics": {
+            "api_total_tokens": 2110,
+            "billable_output_tokens": 105,
+            "billable_total_tokens": 2110,
+            "cached_content_token_count": 0,
+            "input_tokens": 2005,
+            "output_tokens": 105,
+            "thinking_tokens": 0,
+            "thinking_tokens_inferred_from_api_total": 0
+          }
+        },
+        "reasoning": {
+          "confidence": 1.0,
+          "converged": null,
+          "justification": "The best observed latency_p99 values are clustered around latency_ns of 9M-11M and min_granularity_ns of 1.7M-1.8M. This configuration probes a slightly lower latency_ns value closer to the current optimum of 9M, while keeping min_granularity_ns within a promising range to continue exploration.",
+          "parameters": {
+            "latency_ns": 9500000,
+            "min_granularity_ns": 1750000
+          },
+          "parameters_applied_in_source": true,
+          "recorded_response": true,
+          "response_time_seconds": 8.89098334312439,
+          "token_metrics": {
+            "api_total_tokens": 3932,
+            "billable_output_tokens": 1905,
+            "billable_total_tokens": 3932,
+            "cached_content_token_count": 0,
+            "input_tokens": 2027,
+            "output_tokens": 123,
+            "thinking_tokens": 1782,
+            "thinking_tokens_inferred_from_api_total": 0
+          }
+        }
+      }
+    },
+    {
+      "iteration": 14,
+      "responses": {
+        "quick": {
+          "confidence": 1.0,
+          "converged": null,
+          "justification": "The previous best result (iter 6) used latency_ns=9000000 and min_granularity_ns=1800000. While recent iterations have explored slightly different values, this configuration consistently shows strong performance and can be re-tested to confirm robustness against noise.",
+          "parameters": {
+            "latency_ns": 9000000,
+            "min_granularity_ns": 1800000
+          },
+          "parameters_applied_in_source": true,
+          "recorded_response": true,
+          "response_time_seconds": 0.9058849811553955,
+          "token_metrics": {
+            "api_total_tokens": 2222,
+            "billable_output_tokens": 111,
+            "billable_total_tokens": 2222,
+            "cached_content_token_count": 0,
+            "input_tokens": 2111,
+            "output_tokens": 109,
+            "thinking_tokens": 2,
+            "thinking_tokens_inferred_from_api_total": 0
+          }
+        },
+        "reasoning": {
+          "confidence": 0.0,
+          "converged": false,
+          "justification": "No recorded response; replayed as a no-op.",
+          "parameters": {},
+          "parameters_applied_in_source": false,
+          "recorded_response": false,
+          "response_time_seconds": 0.0,
+          "token_metrics": null
+        }
+      }
+    },
+    {
+      "iteration": 15,
+      "responses": {
+        "quick": {
+          "confidence": 1.0,
+          "converged": null,
+          "justification": "The recent trend shows good latency_p99 values in the vicinity of latency_ns=9.5M-10M and min_granularity_ns=1.7M-1.8M. This configuration probes a slight increase in latency_ns and a slight increase in min_granularity_ns, maintaining exploration in a promising region.",
+          "parameters": {
+            "latency_ns": 9750000,
+            "min_granularity_ns": 1775000
+          },
+          "parameters_applied_in_source": true,
+          "recorded_response": true,
+          "response_time_seconds": 1.0285613536834717,
+          "token_metrics": {
+            "api_total_tokens": 2128,
+            "billable_output_tokens": 121,
+            "billable_total_tokens": 2128,
+            "cached_content_token_count": 0,
+            "input_tokens": 2007,
+            "output_tokens": 119,
+            "thinking_tokens": 2,
+            "thinking_tokens_inferred_from_api_total": 0
+          }
+        },
+        "reasoning": {
+          "confidence": 1.0,
+          "converged": null,
+          "justification": "We are exploring a targeted variation near the current best performing configuration by slightly reducing min_granularity_ns while keeping latency_ns at its optimal value. This aims to confirm the robustness of the observed region and identify if a slightly finer granularity yields further latency improvements.",
+          "parameters": {
+            "latency_ns": 9000000,
+            "min_granularity_ns": 1775000
+          },
+          "parameters_applied_in_source": true,
+          "recorded_response": true,
+          "response_time_seconds": 13.716790199279785,
+          "token_metrics": {
+            "api_total_tokens": 4950,
+            "billable_output_tokens": 2921,
+            "billable_total_tokens": 4950,
+            "cached_content_token_count": 0,
+            "input_tokens": 2029,
+            "output_tokens": 85,
+            "thinking_tokens": 2836,
+            "thinking_tokens_inferred_from_api_total": 0
+          }
+        }
+      }
+    },
+    {
+      "iteration": 16,
+      "responses": {
+        "quick": {
+          "confidence": 1.0,
+          "converged": null,
+          "justification": "The previous iteration with higher latency_ns (9.75M) showed a significant increase in latency_p99. Iteration 6 and 15, which had lower latency_ns (9M and 9.5M respectively) and achieved the best latency_p99, are strong candidates. To explore this region further and potentially improve upon the best result, we will slightly increase min_granularity_ns from iteration 15's 1.75M to 1.8M while keeping latency_ns at 9.5M, similar to the best performing iteration.",
+          "parameters": {
+            "latency_ns": 9500000,
+            "min_granularity_ns": 1800000
+          },
+          "parameters_applied_in_source": true,
+          "recorded_response": true,
+          "response_time_seconds": 1.206484079360962,
+          "token_metrics": {
+            "api_total_tokens": 2286,
+            "billable_output_tokens": 172,
+            "billable_total_tokens": 2286,
+            "cached_content_token_count": 0,
+            "input_tokens": 2114,
+            "output_tokens": 172,
+            "thinking_tokens": 0,
+            "thinking_tokens_inferred_from_api_total": 0
+          }
+        },
+        "reasoning": {
+          "confidence": 0.0,
+          "converged": false,
+          "justification": "No recorded response; replayed as a no-op.",
+          "parameters": {},
+          "parameters_applied_in_source": false,
+          "recorded_response": false,
+          "response_time_seconds": 0.0,
+          "token_metrics": null
+        }
+      }
+    },
+    {
+      "iteration": 17,
+      "responses": {
+        "quick": {
+          "confidence": 0.0,
+          "converged": false,
+          "justification": "No recorded response; replayed as a no-op.",
+          "parameters": {},
+          "parameters_applied_in_source": false,
+          "recorded_response": false,
+          "response_time_seconds": 0.0,
+          "token_metrics": null
+        },
+        "reasoning": {
+          "confidence": 1.0,
+          "converged": null,
+          "justification": "Continuing exploration within the promising region, this configuration combines the latency_ns from the best performing iteration (iter 6) with a min_granularity_ns value from another strong contender (iter 10), aiming to refine the optimal balance between these parameters.",
+          "parameters": {
+            "latency_ns": 9000000,
+            "min_granularity_ns": 1700000
+          },
+          "parameters_applied_in_source": true,
+          "recorded_response": true,
+          "response_time_seconds": 9.915405750274658,
+          "token_metrics": {
+            "api_total_tokens": 4202,
+            "billable_output_tokens": 2171,
+            "billable_total_tokens": 4202,
+            "cached_content_token_count": 0,
+            "input_tokens": 2031,
+            "output_tokens": 85,
+            "thinking_tokens": 2086,
+            "thinking_tokens_inferred_from_api_total": 0
+          }
+        }
+      }
+    },
+    {
+      "iteration": 18,
+      "responses": {
+        "quick": {
+          "confidence": 1.0,
+          "converged": null,
+          "justification": "The previous two iterations (17 and 18) using latency_ns=9000000 showed good results, with iteration 18 achieving a latency_p99 of 20.38. Iteration 15, which had a similar latency_ns (9500000) and a close min_granularity_ns (1750000), achieved 19.24. This suggests that a latency_ns around 9-9.5 million and a min_granularity_ns around 1.75 million is a promising region. We will explore this region further by slightly adjusting min_granularity_ns to 1750000 while keeping latency_ns at 9000000, aiming to replicate and potentially improve upon the best performance seen.",
+          "parameters": {
+            "latency_ns": 9000000,
+            "min_granularity_ns": 1750000
+          },
+          "parameters_applied_in_source": true,
+          "recorded_response": true,
+          "response_time_seconds": 1.6121985912322998,
+          "token_metrics": {
+            "api_total_tokens": 2340,
+            "billable_output_tokens": 227,
+            "billable_total_tokens": 2340,
+            "cached_content_token_count": 0,
+            "input_tokens": 2113,
+            "output_tokens": 227,
+            "thinking_tokens": 0,
+            "thinking_tokens_inferred_from_api_total": 0
+          }
+        },
+        "reasoning": {
+          "confidence": 0.0,
+          "converged": false,
+          "justification": "No recorded response; replayed as a no-op.",
+          "parameters": {},
+          "parameters_applied_in_source": false,
+          "recorded_response": false,
+          "response_time_seconds": 0.0,
+          "token_metrics": null
+        }
+      }
+    },
+    {
+      "iteration": 19,
+      "responses": {
+        "quick": {
+          "confidence": 1.0,
+          "converged": null,
+          "justification": "The previous iteration with latency_ns=9500000 and min_granularity_ns=1750000 (iter 15) yielded a latency_p99 of 19.24, which is very close to the current best. Iteration 14 also explored a similar latency_ns of 9500000 with a slightly higher min_granularity_ns, resulting in a slightly worse p99. This suggests that a latency_ns around 9.5M and min_granularity_ns around 1.75M is a promising region. We will re-explore this region to confirm its robustness against noise.",
+          "parameters": {
+            "latency_ns": 9500000,
+            "min_granularity_ns": 1750000
+          },
+          "parameters_applied_in_source": true,
+          "recorded_response": true,
+          "response_time_seconds": 1.3206195831298828,
+          "token_metrics": {
+            "api_total_tokens": 2203,
+            "billable_output_tokens": 194,
+            "billable_total_tokens": 2203,
+            "cached_content_token_count": 0,
+            "input_tokens": 2009,
+            "output_tokens": 192,
+            "thinking_tokens": 2,
+            "thinking_tokens_inferred_from_api_total": 0
+          }
+        },
+        "reasoning": {
+          "confidence": 1.0,
+          "converged": null,
+          "justification": "The best observed p99 latencies are clustered around min_granularity_ns values between 1.75M and 1.8M, and latency_ns values between 9M and 9.5M. This configuration probes a new point within this promising region to further refine the optimal settings while still exploring.",
+          "parameters": {
+            "latency_ns": 9250000,
+            "min_granularity_ns": 1780000
+          },
+          "parameters_applied_in_source": true,
+          "recorded_response": true,
+          "response_time_seconds": 8.805161237716675,
+          "token_metrics": {
+            "api_total_tokens": 3959,
+            "billable_output_tokens": 1928,
+            "billable_total_tokens": 3959,
+            "cached_content_token_count": 0,
+            "input_tokens": 2031,
+            "output_tokens": 113,
+            "thinking_tokens": 1815,
+            "thinking_tokens_inferred_from_api_total": 0
+          }
+        }
+      }
+    },
+    {
+      "iteration": 20,
+      "responses": {
+        "quick": {
+          "confidence": 1.0,
+          "converged": null,
+          "justification": "The previous iteration with latency_ns=9500000 and min_granularity_ns=1750000 showed good results, but the latest iteration saw a significant increase in latency_p99. Exploring a slightly lower latency_ns and a similar min_granularity_ns is a safe bet to see if we can recover the lower latency trend.",
+          "parameters": {
+            "latency_ns": 10000000,
+            "min_granularity_ns": 1700000
+          },
+          "parameters_applied_in_source": true,
+          "recorded_response": true,
+          "response_time_seconds": 0.9104983806610107,
+          "token_metrics": {
+            "api_total_tokens": 2242,
+            "billable_output_tokens": 126,
+            "billable_total_tokens": 2242,
+            "cached_content_token_count": 0,
+            "input_tokens": 2116,
+            "output_tokens": 126,
+            "thinking_tokens": 0,
+            "thinking_tokens_inferred_from_api_total": 0
+          }
+        },
+        "reasoning": {
+          "confidence": 0.0,
+          "converged": false,
+          "justification": "No recorded response; replayed as a no-op.",
+          "parameters": {},
+          "parameters_applied_in_source": false,
+          "recorded_response": false,
+          "response_time_seconds": 0.0,
+          "token_metrics": null
+        }
+      }
+    },
+    {
+      "iteration": 21,
+      "responses": {
+        "quick": {
+          "confidence": 1.0,
+          "converged": null,
+          "justification": "The previous iteration showed a significant increase in latency. To explore a region close to the current best performing configurations while avoiding the exact parameters of the worst recent results, we will revert latency_ns to 9,000,000 and min_granularity_ns to 1,800,000, which previously yielded good results.",
+          "parameters": {
+            "latency_ns": 9000000,
+            "min_granularity_ns": 1800000
+          },
+          "parameters_applied_in_source": true,
+          "recorded_response": true,
+          "response_time_seconds": 4.822216749191284,
+          "token_metrics": {
+            "api_total_tokens": 2129,
+            "billable_output_tokens": 121,
+            "billable_total_tokens": 2129,
+            "cached_content_token_count": 0,
+            "input_tokens": 2008,
+            "output_tokens": 119,
+            "thinking_tokens": 2,
+            "thinking_tokens_inferred_from_api_total": 0
+          }
+        },
+        "reasoning": {
+          "confidence": 1.0,
+          "converged": null,
+          "justification": "Continuing to explore the promising region, this configuration probes a slightly lower min_granularity_ns while maintaining a robust latency_ns value to identify potential improvements in P99 latency.",
+          "parameters": {
+            "latency_ns": 9000000,
+            "min_granularity_ns": 1725000
+          },
+          "parameters_applied_in_source": true,
+          "recorded_response": true,
+          "response_time_seconds": 10.216251611709595,
+          "token_metrics": {
+            "api_total_tokens": 4193,
+            "billable_output_tokens": 2163,
+            "billable_total_tokens": 4193,
+            "cached_content_token_count": 0,
+            "input_tokens": 2030,
+            "output_tokens": 82,
+            "thinking_tokens": 2081,
+            "thinking_tokens_inferred_from_api_total": 0
+          }
+        }
+      }
+    },
+    {
+      "iteration": 22,
+      "responses": {
+        "quick": {
+          "confidence": 0.0,
+          "converged": false,
+          "justification": "No recorded response; replayed as a no-op.",
+          "parameters": {},
+          "parameters_applied_in_source": false,
+          "recorded_response": false,
+          "response_time_seconds": 0.0,
+          "token_metrics": null
+        },
+        "reasoning": {
+          "confidence": 0.0,
+          "converged": false,
+          "justification": "No recorded response; replayed as a no-op.",
+          "parameters": {},
+          "parameters_applied_in_source": false,
+          "recorded_response": false,
+          "response_time_seconds": 0.0,
+          "token_metrics": null
+        }
+      }
+    },
+    {
+      "iteration": 23,
+      "responses": {
+        "quick": {
+          "confidence": 0.0,
+          "converged": false,
+          "justification": "No recorded response; replayed as a no-op.",
+          "parameters": {},
+          "parameters_applied_in_source": false,
+          "recorded_response": false,
+          "response_time_seconds": 0.0,
+          "token_metrics": null
+        },
+        "reasoning": {
+          "confidence": 1.0,
+          "converged": null,
+          "justification": "Previous results indicate a strong performance region with min_granularity_ns between 1.75M and 1.8M and latency_ns between 9M and 9.5M. This configuration combines the best min_granularity_ns from the top result with the best latency_ns from the second top result, probing a promising untried blend within this optimal range.",
+          "parameters": {
+            "latency_ns": 9500000,
+            "min_granularity_ns": 1800000
+          },
+          "parameters_applied_in_source": true,
+          "recorded_response": true,
+          "response_time_seconds": 13.728525876998901,
+          "token_metrics": {
+            "api_total_tokens": 5102,
+            "billable_output_tokens": 3072,
+            "billable_total_tokens": 5102,
+            "cached_content_token_count": 0,
+            "input_tokens": 2030,
+            "output_tokens": 125,
+            "thinking_tokens": 2947,
+            "thinking_tokens_inferred_from_api_total": 0
+          }
+        }
+      }
+    },
+    {
+      "iteration": 24,
+      "responses": {
+        "quick": {
+          "confidence": 1.0,
+          "converged": null,
+          "justification": "Continuing exploration around the current best performing configurations, focusing on the latency_ns of 9,000,000ns which has shown good results. We will slightly decrease min_granularity_ns to explore if it yields further latency improvements.",
+          "parameters": {
+            "latency_ns": 9000000,
+            "min_granularity_ns": 1725000
+          },
+          "parameters_applied_in_source": true,
+          "recorded_response": true,
+          "response_time_seconds": 0.8102684020996094,
+          "token_metrics": {
+            "api_total_tokens": 2208,
+            "billable_output_tokens": 97,
+            "billable_total_tokens": 2208,
+            "cached_content_token_count": 0,
+            "input_tokens": 2111,
+            "output_tokens": 97,
+            "thinking_tokens": 0,
+            "thinking_tokens_inferred_from_api_total": 0
+          }
+        },
+        "reasoning": {
+          "confidence": 0.0,
+          "converged": false,
+          "justification": "No recorded response; replayed as a no-op.",
+          "parameters": {},
+          "parameters_applied_in_source": false,
+          "recorded_response": false,
+          "response_time_seconds": 0.0,
+          "token_metrics": null
+        }
+      }
+    },
+    {
+      "iteration": 25,
+      "responses": {
+        "quick": {
+          "confidence": 0.0,
+          "converged": false,
+          "justification": "No recorded response; replayed as a no-op.",
+          "parameters": {},
+          "parameters_applied_in_source": false,
+          "recorded_response": false,
+          "response_time_seconds": 0.0,
+          "token_metrics": null
+        },
+        "reasoning": {
+          "confidence": 1.0,
+          "converged": null,
+          "justification": "This configuration explores the midpoint of the most promising latency_ns and min_granularity_ns ranges identified from previous top-performing iterations to further refine the optimal settings for minimizing p99 latency.",
+          "parameters": {
+            "latency_ns": 9250000,
+            "min_granularity_ns": 1775000
+          },
+          "parameters_applied_in_source": true,
+          "recorded_response": true,
+          "response_time_seconds": 12.855662107467651,
+          "token_metrics": {
+            "api_total_tokens": 4835,
+            "billable_output_tokens": 2807,
+            "billable_total_tokens": 4835,
+            "cached_content_token_count": 0,
+            "input_tokens": 2028,
+            "output_tokens": 85,
+            "thinking_tokens": 2722,
+            "thinking_tokens_inferred_from_api_total": 0
+          }
+        }
+      }
+    },
+    {
+      "iteration": 26,
+      "responses": {
+        "quick": {
+          "confidence": 0.0,
+          "converged": false,
+          "justification": "No recorded response; replayed as a no-op.",
+          "parameters": {},
+          "parameters_applied_in_source": false,
+          "recorded_response": false,
+          "response_time_seconds": 0.0,
+          "token_metrics": null
+        },
+        "reasoning": {
+          "confidence": 0.0,
+          "converged": false,
+          "justification": "No recorded response; replayed as a no-op.",
+          "parameters": {},
+          "parameters_applied_in_source": false,
+          "recorded_response": false,
+          "response_time_seconds": 0.0,
+          "token_metrics": null
+        }
+      }
+    },
+    {
+      "iteration": 27,
+      "responses": {
+        "quick": {
+          "confidence": 1.0,
+          "converged": null,
+          "justification": "The best latency_p99 values are clustered around latency_ns=9000000 and min_granularity_ns values between 1.7M and 1.8M. Iteration 15 showed good results with latency_ns=9500000 and min_granularity_ns=1750000, so exploring a slight increase in latency_ns while keeping min_granularity_ns at 1.75M is a safe next step.",
+          "parameters": {
+            "latency_ns": 9000000,
+            "min_granularity_ns": 1750000
+          },
+          "parameters_applied_in_source": true,
+          "recorded_response": true,
+          "response_time_seconds": 1.2197537422180176,
+          "token_metrics": {
+            "api_total_tokens": 2156,
+            "billable_output_tokens": 156,
+            "billable_total_tokens": 2156,
+            "cached_content_token_count": 0,
+            "input_tokens": 2000,
+            "output_tokens": 154,
+            "thinking_tokens": 2,
+            "thinking_tokens_inferred_from_api_total": 0
+          }
+        },
+        "reasoning": {
+          "confidence": 0.0,
+          "converged": false,
+          "justification": "No recorded response; replayed as a no-op.",
+          "parameters": {},
+          "parameters_applied_in_source": false,
+          "recorded_response": false,
+          "response_time_seconds": 0.0,
+          "token_metrics": null
+        }
+      }
+    },
+    {
+      "iteration": 28,
+      "responses": {
+        "quick": {
+          "confidence": 0.0,
+          "converged": false,
+          "justification": "No recorded response; replayed as a no-op.",
+          "parameters": {},
+          "parameters_applied_in_source": false,
+          "recorded_response": false,
+          "response_time_seconds": 0.0,
+          "token_metrics": null
+        },
+        "reasoning": {
+          "confidence": 0.0,
+          "converged": false,
+          "justification": "No recorded response; replayed as a no-op.",
+          "parameters": {},
+          "parameters_applied_in_source": false,
+          "recorded_response": false,
+          "response_time_seconds": 0.0,
+          "token_metrics": null
+        }
+      }
+    },
+    {
+      "iteration": 29,
+      "responses": {
+        "quick": {
+          "confidence": 1.0,
+          "converged": null,
+          "justification": "The previous iterations around latency_ns=9000000 and min_granularity_ns=1.7-1.8M have shown good results. Iteration 27 with these parameters yielded low latency_p99. Iteration 28 showed a slight increase in latency_p99 but still within a reasonable range, and iteration 29 showed a significant jump, indicating potential instability or noise in that specific run. We will re-test a configuration close to the consistently good performing region.",
+          "parameters": {
+            "latency_ns": 9000000,
+            "min_granularity_ns": 1775000
+          },
+          "parameters_applied_in_source": true,
+          "recorded_response": true,
+          "response_time_seconds": 1.3130388259887695,
+          "token_metrics": {
+            "api_total_tokens": 2370,
+            "billable_output_tokens": 154,
+            "billable_total_tokens": 2370,
+            "cached_content_token_count": 0,
+            "input_tokens": 2216,
+            "output_tokens": 154,
+            "thinking_tokens": 0,
+            "thinking_tokens_inferred_from_api_total": 0
+          }
+        },
+        "reasoning": {
+          "confidence": 0.0,
+          "converged": false,
+          "justification": "No recorded response; replayed as a no-op.",
+          "parameters": {},
+          "parameters_applied_in_source": false,
+          "recorded_response": false,
+          "response_time_seconds": 0.0,
+          "token_metrics": null
+        }
+      }
+    },
+    {
+      "iteration": 30,
+      "responses": {
+        "reasoning_final": {
+          "confidence": 1.0,
+          "converged": null,
+          "justification": "This configuration delivered the lowest observed p99 latency of 19.16 ns and demonstrated robustness across multiple trials. The values aim to provide a good balance between task responsiveness and overall system throughput for latency-sensitive workloads.",
+          "parameters": {
+            "latency_ns": 9000000,
+            "min_granularity_ns": 1800000
+          },
+          "parameters_applied_in_source": true,
+          "recorded_response": true,
+          "response_time_seconds": 19.747899532318115,
+          "token_metrics": {
+            "api_total_tokens": 4017,
+            "billable_output_tokens": 1679,
+            "billable_total_tokens": 4017,
+            "cached_content_token_count": 1743,
+            "input_tokens": 2338,
+            "output_tokens": 91,
+            "thinking_tokens": 1588,
+            "thinking_tokens_inferred_from_api_total": 0
+          }
+        }
+      }
+    }
+  ],
+  "job_id": "parameter:tpcc_p99_final:2_param:tpcc_hi_p99:llm_dual_app_metrics_final_actor",
+  "provider_requests": 0,
+  "recorded_actions": 36,
+  "recorded_noops": 0,
+  "recorded_responses": 36,
+  "schema_version": 1,
+  "source_history": "provider-run/parameter:tpcc_p99_final:2_param:tpcc_hi_p99:llm_dual_app_metrics_final_actor/dual_loop_actor_speculator_tpcc_20260713_051043.json",
+  "source_history_sha256": "f23405167c9a6e188c7f00dd2ff267d7df1b2ba8fa4a7c9f1aeb9b4c4c02d3fb",
+  "source_optimizer_gist": "SUMMARY:\nThis Linux kernel tuning run focused on optimizing `min_granularity_ns` and `latency_ns` to minimize `latency_p99` (represented as 'Reward').\n\n**Key Patterns:**\n*   Extreme values for both parameters (e.g., `min_granularity_ns=750000`, `latency_ns=6000000` or `min_granularity_ns=3000000`, `latency_ns=24000000`) consistently led to significantly higher `latency_p99` and lower throughput.\n*   A \"sweet spot\" for optimal performance was observed where `min_granularity_ns` was between `1.7M` and `1.8M` ns, and `latency_ns` was between `9M` and `9.5M` ns.\n*   Notably, there was significant run-to-run variability in `latency_p99` even with identical parameter configurations, suggesting potential measurement noise or other uncontrolled factors.\n\n**Biggest Impact Parameters:**\nBoth `min_granularity_ns` and `latency_ns` had a substantial impact on performance. Deviating from the identified sweet spot for either parameter led to notable degradation in `latency_p99` and throughput.\n\n**Optimal Configuration:**\nThe most optimal configuration found was **`{min_granularity_ns=1800000, latency_ns=9000000}`** (Iter 6), which achieved the lowest `latency_p99` of `19.165` ns and the highest throughput of `4,371.85`. A close second was `{min_granularity_ns=1750000, latency_ns=9500000}` (Iter 15) with a `latency_p99` of `19.237` ns.\n\n**Takeaways for Future Runs to Improve Efficiency:**\n*   **Narrower Parameter Ranges**: Future tuning should focus `min_granularity_ns` within the range of `1.6M` to `2.0M` ns, and `latency_ns` within `8.5M` to `11.0M` ns.\n*   **Fixed Parameters**: Values outside these narrower ranges, particularly the initial extreme low and high values, consistently performed poorly and can be largely excluded from future exploration.\n*   **Starting Configuration**: A highly effective starting point for future runs would be **`{min_granularity_ns=1800000, latency_ns=9000000}`**. Given the observed variability, evaluating candidate configurations multiple times may be beneficial to ensure robustness.",
+  "source_optimizer_gist_raw": {
+    "backend": "gemini",
+    "model": "gemini-2.5-flash",
+    "response_model": "gemini-2.5-flash",
+    "text": "SUMMARY:\nThis Linux kernel tuning run focused on optimizing `min_granularity_ns` and `latency_ns` to minimize `latency_p99` (represented as 'Reward').\n\n**Key Patterns:**\n*   Extreme values for both parameters (e.g., `min_granularity_ns=750000`, `latency_ns=6000000` or `min_granularity_ns=3000000`, `latency_ns=24000000`) consistently led to significantly higher `latency_p99` and lower throughput.\n*   A \"sweet spot\" for optimal performance was observed where `min_granularity_ns` was between `1.7M` and `1.8M` ns, and `latency_ns` was between `9M` and `9.5M` ns.\n*   Notably, there was significant run-to-run variability in `latency_p99` even with identical parameter configurations, suggesting potential measurement noise or other uncontrolled factors.\n\n**Biggest Impact Parameters:**\nBoth `min_granularity_ns` and `latency_ns` had a substantial impact on performance. Deviating from the identified sweet spot for either parameter led to notable degradation in `latency_p99` and throughput.\n\n**Optimal Configuration:**\nThe most optimal configuration found was **`{min_granularity_ns=1800000, latency_ns=9000000}`** (Iter 6), which achieved the lowest `latency_p99` of `19.165` ns and the highest throughput of `4,371.85`. A close second was `{min_granularity_ns=1750000, latency_ns=9500000}` (Iter 15) with a `latency_p99` of `19.237` ns.\n\n**Takeaways for Future Runs to Improve Efficiency:**\n*   **Narrower Parameter Ranges**: Future tuning should focus `min_granularity_ns` within the range of `1.6M` to `2.0M` ns, and `latency_ns` within `8.5M` to `11.0M` ns.\n*   **Fixed Parameters**: Values outside these narrower ranges, particularly the initial extreme low and high values, consistently performed poorly and can be largely excluded from future exploration.\n*   **Starting Configuration**: A highly effective starting point for future runs would be **`{min_granularity_ns=1800000, latency_ns=9000000}`**. Given the observed variability, evaluating candidate configurations multiple times may be beneficial to ensure robustness.",
+    "token_usage": {
+      "api_total_tokens": 9912,
+      "billable_output_tokens": 4541,
+      "billable_total_tokens": 9912,
+      "cached_content_token_count": 0,
+      "input_tokens": 5371,
+      "output_tokens": 599,
+      "thinking_tokens": 3942,
+      "thinking_tokens_inferred_from_api_total": 0
+    },
+    "usage_metadata": {
+      "cached_content_token_count": null,
+      "candidates_token_count": 599,
+      "prompt_token_count": 5371,
+      "thoughts_token_count": 3942,
+      "total_token_count": 9912
+    }
+  },
+  "synthetic_noops": 25
+}

@@ -16,12 +16,14 @@ usage() {
   printf '%s\n' \
     'Usage:' \
     '  reproduction/reproduce_claims.sh --dry-run [--full]' \
-    '  reproduction/reproduce_claims.sh --archived-only --output-dir DIR' \
-    '  reproduction/reproduce_claims.sh --run --output-dir DIR [--full] [--keep-going] [--rerun-existing]' \
+    '  reproduction/reproduce_claims.sh --dry-run --trace-replay-from DIR' \
+    '  reproduction/reproduce_claims.sh --dry-run --trace-replay-bundle DIR' \
+    '  reproduction/reproduce_claims.sh --archived-only --output-dir DIR [--clean]' \
+    '  reproduction/reproduce_claims.sh --run --output-dir DIR [--clean] [--trace-replay-from DIR|--trace-replay-bundle DIR] [--full] [--keep-going] [--rerun-existing]' \
     '' \
     'The live workflow regenerates archived C1-C4 evidence first, then performs one fresh' \
     'repetition over Silo, TPC-C, and Sysbench. --full uses all paper Plot 1/2/5 inputs.' \
-    'Live execution requires GEMINI_API_KEY.'
+    'Live provider execution requires GEMINI_API_KEY; trace replay forbids provider calls.'
 }
 
 MODE=""
@@ -29,6 +31,9 @@ OUTPUT_DIR="$REPO_ROOT/results/reproduced_core"
 KEEP_GOING=0
 RERUN_EXISTING=0
 FULL=0
+CLEAN=0
+TRACE_REPLAY_FROM=""
+TRACE_REPLAY_BUNDLE=""
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --dry-run|--archived-only|--run)
@@ -40,11 +45,37 @@ while [[ $# -gt 0 ]]; do
     --keep-going) KEEP_GOING=1; shift ;;
     --rerun-existing) RERUN_EXISTING=1; shift ;;
     --full) FULL=1; shift ;;
+    --clean) CLEAN=1; shift ;;
+    --trace-replay-from) TRACE_REPLAY_FROM="${2:-}"; shift 2 ;;
+    --trace-replay-bundle) TRACE_REPLAY_BUNDLE="${2:-}"; shift 2 ;;
     -h|--help) usage; exit 0 ;;
     *) echo "Unknown option: $1" >&2; usage >&2; exit 2 ;;
   esac
 done
 [[ -n "$MODE" ]] || { usage >&2; exit 2; }
+if [[ "$MODE" == "dry-run" && "$CLEAN" -eq 1 ]]; then
+  echo '--clean cannot be combined with --dry-run because a dry run is read-only.' >&2
+  exit 2
+fi
+if [[ -n "$TRACE_REPLAY_FROM" && -n "$TRACE_REPLAY_BUNDLE" ]]; then
+  echo 'Select only one trace source: --trace-replay-from or --trace-replay-bundle.' >&2
+  exit 2
+fi
+if [[ -n "$TRACE_REPLAY_FROM$TRACE_REPLAY_BUNDLE" && "$MODE" == "archived-only" ]]; then
+  echo 'Trace replay is only valid with --dry-run or --run.' >&2
+  exit 2
+fi
+if [[ -n "$TRACE_REPLAY_FROM$TRACE_REPLAY_BUNDLE" && "$FULL" -eq 1 ]]; then
+  echo 'Trace replay currently supports only the scoped C1-C4 manifest, not --full.' >&2
+  exit 2
+fi
+if [[ -n "$TRACE_REPLAY_BUNDLE" ]]; then
+  TRACE_REPLAY_BUNDLE="$(realpath -m "$TRACE_REPLAY_BUNDLE")"
+fi
+if [[ -n "$TRACE_REPLAY_FROM" ]]; then
+  TRACE_REPLAY_FROM="$(realpath -m "$TRACE_REPLAY_FROM")"
+  TRACE_REPLAY_RAW="$TRACE_REPLAY_FROM/fresh/raw"
+fi
 
 if [[ "$FULL" -eq 1 ]]; then
   "$PYTHON" "$SCRIPT_DIR/suite.py" validate
@@ -58,10 +89,19 @@ if [[ "$MODE" == "dry-run" ]]; then
       'FULL CLAIM WORKFLOW: 232 unique configurations and 13430 benchmark windows.' \
       'Nominal benchmark-window time is 18.65 hours; allow one to several days overall.'
   else
-    "$PYTHON" "$SCRIPT_DIR/suite.py" --manifest "$MANIFEST" run --dry-run --output-dir "$OUTPUT_DIR"
-    printf '%s\n' \
-      'Nominal benchmark time: 1050 windows x 5 seconds = 1.46 hours.' \
-      'Allow additional time for workload startup, resets, and hosted-model calls; the target is under 10 hours.'
+    DRY_ARGS=(--manifest "$MANIFEST" run --dry-run --output-dir "$OUTPUT_DIR")
+    [[ -n "$TRACE_REPLAY_FROM" ]] && DRY_ARGS+=(--replay-from "$TRACE_REPLAY_RAW")
+    [[ -n "$TRACE_REPLAY_BUNDLE" ]] && DRY_ARGS+=(--replay-bundle "$TRACE_REPLAY_BUNDLE")
+    "$PYTHON" "$SCRIPT_DIR/suite.py" "${DRY_ARGS[@]}"
+    if [[ -n "$TRACE_REPLAY_FROM$TRACE_REPLAY_BUNDLE" ]]; then
+      printf '%s\n' \
+        'Nominal benchmark time: 1050 windows x 5 seconds = 1.46 hours.' \
+        'Recorded response delays are preserved, but no hosted-model calls or API credentials are used.'
+    else
+      printf '%s\n' \
+        'Nominal benchmark time: 1050 windows x 5 seconds = 1.46 hours.' \
+        'Allow additional time for workload startup, resets, and hosted-model calls; the target is under 10 hours.'
+    fi
   fi
   exit 0
 fi
@@ -73,6 +113,54 @@ case "$OUTPUT_DIR/" in
     exit 2
     ;;
 esac
+if [[ -n "$TRACE_REPLAY_FROM" && "$TRACE_REPLAY_FROM" == "$OUTPUT_DIR" && "$CLEAN" -ne 1 ]]; then
+  echo 'When replay source and output are identical, --clean is required to archive the source first.' >&2
+  exit 2
+fi
+
+if [[ "$MODE" == "run" ]]; then
+  SITE_ENV="$REPO_ROOT/functional_example/site.env"
+  [[ -f "$SITE_ENV" ]] || { echo "Missing $SITE_ENV; run scripts/setup.sh --base." >&2; exit 2; }
+  # shellcheck disable=SC1090
+  source "$SITE_ENV"
+  if [[ "$FULL" -eq 1 ]]; then
+    "$PYTHON" "$SCRIPT_DIR/suite.py" preflight --plots 1,2,5
+  else
+    PREFLIGHT_ARGS=(--manifest "$MANIFEST" preflight)
+    [[ -n "$TRACE_REPLAY_FROM" ]] && PREFLIGHT_ARGS+=(--replay-from "$TRACE_REPLAY_RAW")
+    [[ -n "$TRACE_REPLAY_BUNDLE" ]] && PREFLIGHT_ARGS+=(--replay-bundle "$TRACE_REPLAY_BUNDLE")
+    "$PYTHON" "$SCRIPT_DIR/suite.py" "${PREFLIGHT_ARGS[@]}"
+  fi
+fi
+
+if [[ "$CLEAN" -eq 1 && -e "$OUTPUT_DIR" ]]; then
+  case "$OUTPUT_DIR/" in
+    "$REPO_ROOT/results/archive/"*)
+      echo "Refusing to clean an archive path: $OUTPUT_DIR" >&2
+      exit 2
+      ;;
+    "$REPO_ROOT/results/"?*) ;;
+    *)
+      echo "--clean requires --output-dir to be below $REPO_ROOT/results: $OUTPUT_DIR" >&2
+      exit 2
+      ;;
+  esac
+  ARCHIVE_ROOT="$REPO_ROOT/results/archive"
+  ARCHIVE_STAMP="$(date -u +%Y%m%dT%H%M%SZ)"
+  ARCHIVE_DEST="$ARCHIVE_ROOT/$(basename "$OUTPUT_DIR")-$ARCHIVE_STAMP"
+  [[ ! -e "$ARCHIVE_DEST" ]] || { echo "Archive destination already exists: $ARCHIVE_DEST" >&2; exit 2; }
+  mkdir -p "$ARCHIVE_ROOT"
+  mv -- "$OUTPUT_DIR" "$ARCHIVE_DEST"
+  echo "CLEAN_ARCHIVE: $ARCHIVE_DEST"
+  if [[ -n "$TRACE_REPLAY_FROM" ]]; then
+    case "$TRACE_REPLAY_FROM/" in
+      "$OUTPUT_DIR/"*)
+        TRACE_REPLAY_FROM="$ARCHIVE_DEST${TRACE_REPLAY_FROM#"$OUTPUT_DIR"}"
+        TRACE_REPLAY_RAW="$TRACE_REPLAY_FROM/fresh/raw"
+        ;;
+    esac
+  fi
+fi
 
 mkdir -p "$OUTPUT_DIR/archived/plots"
 "$SCRIPT_DIR/plot_all.sh" \
@@ -140,6 +228,8 @@ RESTORE_NEEDED=1
 RUN_ARGS=(--manifest "$MANIFEST" run --output-dir "$FRESH_DIR")
 [[ "$KEEP_GOING" -eq 1 ]] && RUN_ARGS+=(--keep-going)
 [[ "$RERUN_EXISTING" -eq 1 ]] && RUN_ARGS+=(--rerun-existing)
+[[ -n "$TRACE_REPLAY_FROM" ]] && RUN_ARGS+=(--replay-from "$TRACE_REPLAY_RAW")
+[[ -n "$TRACE_REPLAY_BUNDLE" ]] && RUN_ARGS+=(--replay-bundle "$TRACE_REPLAY_BUNDLE")
 "$PYTHON" "$SCRIPT_DIR/suite.py" "${RUN_ARGS[@]}"
 
 restore_host
@@ -151,6 +241,18 @@ trap - EXIT INT TERM
   --report-dir "$OUTPUT_DIR" \
   --archived-plots-dir "$OUTPUT_DIR/archived/plots" \
   --manifest "$MANIFEST"
+
+if [[ -n "$TRACE_REPLAY_FROM" ]]; then
+  "$PYTHON" "$SCRIPT_DIR/compare_replay.py" \
+    --original-dir "$TRACE_REPLAY_FROM" \
+    --replay-dir "$OUTPUT_DIR" \
+    --manifest "$MANIFEST"
+elif [[ -n "$TRACE_REPLAY_BUNDLE" ]]; then
+  "$PYTHON" "$SCRIPT_DIR/compare_replay.py" \
+    --baseline-bundle "$TRACE_REPLAY_BUNDLE" \
+    --replay-dir "$OUTPUT_DIR" \
+    --manifest "$MANIFEST"
+fi
 
 printf '%s\n' \
   "REPRODUCE_CLAIMS: PASS ($OUTPUT_DIR)" \
