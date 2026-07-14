@@ -9,7 +9,7 @@ if [[ -z "${SEMATUNE_SPARKBENCH_DATA_ROOT:-}" && -f "$REPO_ROOT/config/sparkbenc
   # shellcheck disable=SC1091
   source "$REPO_ROOT/config/sparkbench.env"
 fi
-DATA_ROOT="${SEMATUNE_SPARKBENCH_DATA_ROOT:-/mydata/SemaTune-sparkbench}"
+DATA_ROOT="${SEMATUNE_SPARKBENCH_DATA_ROOT:-/mydata/TuxBot-sparkbench}"
 OUTPUT_DIR="$REPO_ROOT/results/sparkbench_smoke"
 TIMEOUT_SECONDS="${SEMATUNE_SPARKBENCH_SMOKE_TIMEOUT_SECONDS:-3600}"
 PYTHON="$REPO_ROOT/.venv-functional/bin/python"
@@ -73,7 +73,7 @@ if [[ "$(id -u)" -ne 0 ]]; then
 fi
 LOCK_FILE="/tmp/sematune-functional-sysbench-$(id -u).lock"
 exec 9>"$LOCK_FILE"
-flock -n 9 || { echo "Another SemaTune suite owns $LOCK_FILE" >&2; exit 1; }
+flock -n 9 || { echo "Another TuxBot suite owns $LOCK_FILE" >&2; exit 1; }
 
 RESTORE_NEEDED=0
 ACTIVE_PGID=''

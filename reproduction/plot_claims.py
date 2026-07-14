@@ -26,7 +26,7 @@ WORKLOAD_LABELS = {
     "tpcc_hi_p99": "TPC-C",
     "sysbench_oltp_rw_hi_p99": "Sysbench OLTP-RW",
 }
-SEMATUNE_COLOR = "#0072B2"
+TUXBOT_COLOR = "#0072B2"
 MLOS_COLOR = "#E69F00"
 SYSTEM_COLOR = "#56B4E9"
 NOTE = "* One fresh repetition on three workloads; paper results use five repetitions on 13 workloads."
@@ -186,14 +186,14 @@ def build_claims(
         scaling.append(row)
 
     claim_values = [
-        ("C1", app["stable"], app["stable"] > 1.0, "SemaTune App / Default Parameters"),
-        ("C2", app["stable"] / mlos["stable"], app["stable"] > mlos["stable"], "SemaTune App / MLOS App"),
-        ("C3", system["stable"] / mlos["stable"], system["stable"] > mlos["stable"], "SemaTune System / MLOS App"),
+        ("C1", app["stable"], app["stable"] > 1.0, "TuxBot App / Default Parameters"),
+        ("C2", app["stable"] / mlos["stable"], app["stable"] > mlos["stable"], "TuxBot App / MLOS App"),
+        ("C3", system["stable"] / mlos["stable"], system["stable"] > mlos["stable"], "TuxBot System / MLOS App"),
         (
             "C4",
             next(row["stable_factor"] for row in scaling if row["knob_count"] == 41),
             next(row["stable_factor"] for row in scaling if row["knob_count"] == 41) > 1.0,
-            "41-knob SemaTune / Default Parameters",
+            "41-knob TuxBot / Default Parameters",
         ),
     ]
     claims = [
@@ -239,24 +239,24 @@ def make_plots(output: Path, claims: list[dict[str, Any]], scaling: list[dict[st
     values = lambda method, knobs: [
         (aggregate(factors, workloads, method, knobs, phase) - 1.0) * 100.0 for phase in ("tuning", "stable")
     ]
-    grouped_plot(output / "c1_sematune_vs_default.pdf", "C1 — SemaTune vs. Default", [("SemaTune", values("sematune_app", 8), SEMATUNE_COLOR)])
+    grouped_plot(output / "c1_tuxbot_vs_default.pdf", "C1 — TuxBot vs. Default", [("TuxBot", values("sematune_app", 8), TUXBOT_COLOR)])
     grouped_plot(
-        output / "c2_sematune_vs_mlos.pdf",
-        "C2 — SemaTune vs. MLOS",
-        [("SemaTune", values("sematune_app", 8), SEMATUNE_COLOR), ("MLOS", values("mlos_app", None), MLOS_COLOR)],
+        output / "c2_tuxbot_vs_mlos.pdf",
+        "C2 — TuxBot vs. MLOS",
+        [("TuxBot", values("sematune_app", 8), TUXBOT_COLOR), ("MLOS", values("mlos_app", None), MLOS_COLOR)],
     )
     grouped_plot(
         output / "c3_system_vs_mlos.pdf",
-        "C3 — System-metric SemaTune vs. MLOS",
-        [("SemaTune System", values("sematune_system", None), SYSTEM_COLOR), ("MLOS App", values("mlos_app", None), MLOS_COLOR)],
+        "C3 — System-metric TuxBot vs. MLOS",
+        [("TuxBot System", values("sematune_system", None), SYSTEM_COLOR), ("MLOS App", values("mlos_app", None), MLOS_COLOR)],
     )
 
     fig, ax = plt.subplots(figsize=(6.6, 3.2))
     counts = [int(row["knob_count"]) for row in scaling]
     tuning = [float(row["tuning_pct"]) for row in scaling]
     stable = [float(row["stable_pct"]) for row in scaling]
-    ax.plot(counts, tuning, color=SEMATUNE_COLOR, marker="s", markerfacecolor="white", linestyle="--", linewidth=2.2, label="Tuning")
-    ax.plot(counts, stable, color=SEMATUNE_COLOR, marker="s", linewidth=2.6, label="Stable")
+    ax.plot(counts, tuning, color=TUXBOT_COLOR, marker="s", markerfacecolor="white", linestyle="--", linewidth=2.2, label="Tuning")
+    ax.plot(counts, stable, color=TUXBOT_COLOR, marker="s", linewidth=2.6, label="Stable")
     ax.axhline(0.0, color="#777777", linestyle=(0, (3, 2)), linewidth=0.9)
     ax.set_xticks(counts, [str(count) for count in counts])
     ax.set_xlabel("Number of tuned parameters")

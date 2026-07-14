@@ -142,10 +142,15 @@ def port_is_free(address: str, port: int) -> bool:
 
 def preflight(server_ip: str, client_ip: str, control_port: int, real_llm: bool) -> int:
     errors: list[str] = []
-    for command in ("ip", "memcached", "perf", "ping", "setsid", "taskset", "timeout"):
+    warnings: list[str] = []
+    for command in ("ip", "memcached", "ping", "setsid", "taskset", "timeout"):
         if shutil.which(command) is None:
             errors.append(f"missing command: {command} (run scripts/setup.sh --memcached-server)")
-    if shutil.which("perf") is not None:
+    if shutil.which("perf") is None:
+        warnings.append(
+            "perf is unavailable; continuing without hardware-counter samples"
+        )
+    else:
         perf = subprocess.run(
             ["perf", "--version"],
             stdout=subprocess.DEVNULL,
@@ -153,7 +158,10 @@ def preflight(server_ip: str, client_ip: str, control_port: int, real_llm: bool)
             check=False,
         )
         if perf.returncode != 0:
-            errors.append("perf is installed but unusable for the running kernel (rerun server setup)")
+            warnings.append(
+                "perf is unusable for the running kernel; continuing without "
+                "hardware-counter samples"
+            )
     if server_ip not in assigned_ipv4():
         errors.append(f"server IP {server_ip} is not assigned to this host")
     affinity = os.sched_getaffinity(0) if hasattr(os, "sched_getaffinity") else set()
@@ -174,6 +182,8 @@ def preflight(server_ip: str, client_ip: str, control_port: int, real_llm: bool)
     for port in (11211, control_port):
         if server_ip in assigned_ipv4() and not port_is_free(server_ip, port):
             errors.append(f"server port {server_ip}:{port} is already in use")
+    for warning in warnings:
+        print(f"MUTILATE_FUNCTIONAL_PREFLIGHT_WARNING: {warning}")
     if errors:
         raise ValueError("; ".join(errors))
     print(

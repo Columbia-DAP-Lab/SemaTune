@@ -96,7 +96,7 @@ def parse_args() -> argparse.Namespace:
         default="",
         help=(
             "Optional comma-separated LABEL:DIRNAME list for exact tuner columns, "
-            'e.g. "Tuxbot-App:llm_dual_app_metrics_final_actor,MLOS:mlos_50_tuning_only". '
+            'e.g. "TuxBot-App:llm_dual_app_metrics_final_actor,MLOS:mlos_50_tuning_only". '
             "When set, this overrides --tuners."
         ),
     )

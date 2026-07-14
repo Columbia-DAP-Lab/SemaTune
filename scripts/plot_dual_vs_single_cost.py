@@ -6,7 +6,7 @@ Two-panel figure:
   Panel B – Pareto scatter: x = total session cost (USD), y = stable geomean improvement.
 
 Methods compared:
-  Tuxbot App Dual       (llm_dual_app_metrics_final_actor)
+  TuxBot App Dual       (llm_dual_app_metrics_final_actor)
   Single-Loop Reasoning (llm_reasoning_app_metrics_final_actor)
   Single-Loop Flash-Lite(llm_app_metrics_final_actor)
   MLOS                  (mlos_50_tuning_only | mlos)
@@ -222,7 +222,7 @@ def _compute_25pct_axis_bounds(values: Sequence[float], errors: Sequence[Optiona
 
 
 def parse_args() -> argparse.Namespace:
-    p = argparse.ArgumentParser(description="Plot 5.4: dual vs single loop + cost Pareto.")
+    p = argparse.ArgumentParser(description="Paper Plot 8: dual vs single loop + cost Pareto.")
     p.add_argument("--result-paths", nargs="+", required=True,
                    help="Retry result roots.")
     p.add_argument("--fallback-fixed-paths", nargs="+", required=True,

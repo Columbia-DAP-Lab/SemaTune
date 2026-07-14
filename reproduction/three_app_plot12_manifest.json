@@ -1,0 +1,114 @@
+{
+  "schema_version": 1,
+  "workflow": "three-application-paper-plots-6-7-live-provider",
+  "selection_label": "plot",
+  "base_manifest": "experiment_manifest.json",
+  "reruns_per_configuration": 1,
+  "claims": ["C1", "C2", "C3"],
+  "workloads": [
+    "silo_hi_p99",
+    "tpcc_hi_p99",
+    "sysbench_oltp_rw_hi_p99"
+  ],
+  "workload_labels": {
+    "silo_hi_p99": "Silo",
+    "tpcc_hi_p99": "TPC-C",
+    "sysbench_oltp_rw_hi_p99": "Sysbench OLTP-RW"
+  },
+  "optimization_goals": {
+    "silo_hi_p99": "minimize",
+    "tpcc_hi_p99": "minimize",
+    "sysbench_oltp_rw_hi_p99": "minimize"
+  },
+  "plots": {
+    "6": {
+      "claim": "Compare TuxBot App, TuxBot-Trim App, and MLOS App over Fixed.",
+      "paper_plot": 6,
+      "jobs": [
+        "common:silo_hi_p99:fixed",
+        "common:silo_hi_p99:sematune_app",
+        "common:silo_hi_p99:sematune_trim_app",
+        "common:silo_hi_p99:mlos_app",
+        "common:tpcc_hi_p99:fixed",
+        "common:tpcc_hi_p99:sematune_app",
+        "common:tpcc_hi_p99:sematune_trim_app",
+        "common:tpcc_hi_p99:mlos_app",
+        "common:sysbench_oltp_rw_hi_p99:fixed",
+        "common:sysbench_oltp_rw_hi_p99:sematune_app",
+        "common:sysbench_oltp_rw_hi_p99:sematune_trim_app",
+        "common:sysbench_oltp_rw_hi_p99:mlos_app"
+      ]
+    },
+    "7": {
+      "claim": "Compare App, System, IPC, and cache signal variants.",
+      "paper_plot": 7,
+      "jobs": [
+        "common:silo_hi_p99:fixed",
+        "common:silo_hi_p99:sematune_app",
+        "common:silo_hi_p99:sematune_system",
+        "common:silo_hi_p99:sematune_ipc",
+        "common:silo_hi_p99:sematune_trim_app",
+        "common:silo_hi_p99:sematune_trim_ipc",
+        "common:silo_hi_p99:sematune_trim_cache",
+        "common:silo_hi_p99:mlos_app",
+        "common:silo_hi_p99:mlos_ipc",
+        "common:silo_hi_p99:mlos_cache",
+        "common:tpcc_hi_p99:fixed",
+        "common:tpcc_hi_p99:sematune_app",
+        "common:tpcc_hi_p99:sematune_system",
+        "common:tpcc_hi_p99:sematune_ipc",
+        "common:tpcc_hi_p99:sematune_trim_app",
+        "common:tpcc_hi_p99:sematune_trim_ipc",
+        "common:tpcc_hi_p99:sematune_trim_cache",
+        "common:tpcc_hi_p99:mlos_app",
+        "common:tpcc_hi_p99:mlos_ipc",
+        "common:tpcc_hi_p99:mlos_cache",
+        "common:sysbench_oltp_rw_hi_p99:fixed",
+        "common:sysbench_oltp_rw_hi_p99:sematune_app",
+        "common:sysbench_oltp_rw_hi_p99:sematune_system",
+        "common:sysbench_oltp_rw_hi_p99:sematune_ipc",
+        "common:sysbench_oltp_rw_hi_p99:sematune_trim_app",
+        "common:sysbench_oltp_rw_hi_p99:sematune_trim_ipc",
+        "common:sysbench_oltp_rw_hi_p99:sematune_trim_cache",
+        "common:sysbench_oltp_rw_hi_p99:mlos_app",
+        "common:sysbench_oltp_rw_hi_p99:mlos_ipc",
+        "common:sysbench_oltp_rw_hi_p99:mlos_cache"
+      ]
+    }
+  },
+  "jobs": [
+    {"id": "common:silo_hi_p99:fixed", "plots": [6, 7], "runtime_overrides": {"max_iterations": 30, "post_tuning_windows": 20}, "completion": {"measurement_windows": 50, "tuning_windows": 30, "post_tuning_windows": 20, "optimization_metric": "latency_p99", "allow_iteration_zero": true}},
+    {"id": "common:silo_hi_p99:sematune_app", "plots": [6, 7], "completion": {"measurement_windows": 50, "tuning_windows": 30, "post_tuning_windows": 20, "optimization_metric": "latency_p99", "allow_iteration_zero": true, "required_mode": "actor-speculator", "require_optimizer_gist": true}},
+    {"id": "common:silo_hi_p99:sematune_system", "plots": [7], "completion": {"measurement_windows": 50, "tuning_windows": 30, "post_tuning_windows": 20, "optimization_metric": "latency_p99", "allow_iteration_zero": true, "required_mode": "actor-speculator", "require_optimizer_gist": true}},
+    {"id": "common:silo_hi_p99:sematune_ipc", "plots": [7], "completion": {"measurement_windows": 50, "tuning_windows": 30, "post_tuning_windows": 20, "optimization_metric": "instructions_per_cycle", "allow_iteration_zero": true, "required_mode": "actor-speculator", "require_optimizer_gist": true}},
+    {"id": "common:silo_hi_p99:sematune_trim_app", "plots": [6, 7], "completion": {"measurement_windows": 50, "tuning_windows": 50, "post_tuning_windows": 0, "optimization_metric": "latency_p99", "allow_iteration_zero": true}},
+    {"id": "common:silo_hi_p99:sematune_trim_ipc", "plots": [7], "completion": {"measurement_windows": 50, "tuning_windows": 50, "post_tuning_windows": 0, "optimization_metric": "instructions_per_cycle", "allow_iteration_zero": true}},
+    {"id": "common:silo_hi_p99:sematune_trim_cache", "plots": [7], "completion": {"measurement_windows": 50, "tuning_windows": 50, "post_tuning_windows": 0, "optimization_metric": "cache_misses", "allow_iteration_zero": true}},
+    {"id": "common:silo_hi_p99:mlos_app", "plots": [6, 7], "completion": {"measurement_windows": 50, "tuning_windows": 50, "post_tuning_windows": 0, "optimization_metric": "latency_p99", "allow_iteration_zero": true}},
+    {"id": "common:silo_hi_p99:mlos_ipc", "plots": [7], "completion": {"measurement_windows": 50, "tuning_windows": 50, "post_tuning_windows": 0, "optimization_metric": "instructions_per_cycle", "allow_iteration_zero": true}},
+    {"id": "common:silo_hi_p99:mlos_cache", "plots": [7], "completion": {"measurement_windows": 50, "tuning_windows": 50, "post_tuning_windows": 0, "optimization_metric": "cache_misses", "allow_iteration_zero": true}},
+
+    {"id": "common:tpcc_hi_p99:fixed", "plots": [6, 7], "runtime_overrides": {"max_iterations": 30, "post_tuning_windows": 20}, "completion": {"measurement_windows": 50, "tuning_windows": 30, "post_tuning_windows": 20, "optimization_metric": "latency_p99", "allow_iteration_zero": true}},
+    {"id": "common:tpcc_hi_p99:sematune_app", "plots": [6, 7], "completion": {"measurement_windows": 50, "tuning_windows": 30, "post_tuning_windows": 20, "optimization_metric": "latency_p99", "allow_iteration_zero": true, "required_mode": "actor-speculator", "require_optimizer_gist": true}},
+    {"id": "common:tpcc_hi_p99:sematune_system", "plots": [7], "completion": {"measurement_windows": 50, "tuning_windows": 30, "post_tuning_windows": 20, "optimization_metric": "latency_p99", "allow_iteration_zero": true, "required_mode": "actor-speculator", "require_optimizer_gist": true}},
+    {"id": "common:tpcc_hi_p99:sematune_ipc", "plots": [7], "completion": {"measurement_windows": 50, "tuning_windows": 30, "post_tuning_windows": 20, "optimization_metric": "instructions_per_cycle", "allow_iteration_zero": true, "required_mode": "actor-speculator", "require_optimizer_gist": true}},
+    {"id": "common:tpcc_hi_p99:sematune_trim_app", "plots": [6, 7], "completion": {"measurement_windows": 50, "tuning_windows": 50, "post_tuning_windows": 0, "optimization_metric": "latency_p99", "allow_iteration_zero": true}},
+    {"id": "common:tpcc_hi_p99:sematune_trim_ipc", "plots": [7], "completion": {"measurement_windows": 50, "tuning_windows": 50, "post_tuning_windows": 0, "optimization_metric": "instructions_per_cycle", "allow_iteration_zero": true}},
+    {"id": "common:tpcc_hi_p99:sematune_trim_cache", "plots": [7], "completion": {"measurement_windows": 50, "tuning_windows": 50, "post_tuning_windows": 0, "optimization_metric": "cache_misses", "allow_iteration_zero": true}},
+    {"id": "common:tpcc_hi_p99:mlos_app", "plots": [6, 7], "completion": {"measurement_windows": 50, "tuning_windows": 50, "post_tuning_windows": 0, "optimization_metric": "latency_p99", "allow_iteration_zero": true}},
+    {"id": "common:tpcc_hi_p99:mlos_ipc", "plots": [7], "completion": {"measurement_windows": 50, "tuning_windows": 50, "post_tuning_windows": 0, "optimization_metric": "instructions_per_cycle", "allow_iteration_zero": true}},
+    {"id": "common:tpcc_hi_p99:mlos_cache", "plots": [7], "completion": {"measurement_windows": 50, "tuning_windows": 50, "post_tuning_windows": 0, "optimization_metric": "cache_misses", "allow_iteration_zero": true}},
+
+    {"id": "common:sysbench_oltp_rw_hi_p99:fixed", "plots": [6, 7], "runtime_overrides": {"max_iterations": 30, "post_tuning_windows": 20}, "completion": {"measurement_windows": 50, "tuning_windows": 30, "post_tuning_windows": 20, "optimization_metric": "latency_p99", "allow_iteration_zero": true}},
+    {"id": "common:sysbench_oltp_rw_hi_p99:sematune_app", "plots": [6, 7], "completion": {"measurement_windows": 50, "tuning_windows": 30, "post_tuning_windows": 20, "optimization_metric": "latency_p99", "allow_iteration_zero": true, "required_mode": "actor-speculator", "require_optimizer_gist": true}},
+    {"id": "common:sysbench_oltp_rw_hi_p99:sematune_system", "plots": [7], "completion": {"measurement_windows": 50, "tuning_windows": 30, "post_tuning_windows": 20, "optimization_metric": "latency_p99", "allow_iteration_zero": true, "required_mode": "actor-speculator", "require_optimizer_gist": true}},
+    {"id": "common:sysbench_oltp_rw_hi_p99:sematune_ipc", "plots": [7], "completion": {"measurement_windows": 50, "tuning_windows": 30, "post_tuning_windows": 20, "optimization_metric": "instructions_per_cycle", "allow_iteration_zero": true, "required_mode": "actor-speculator", "require_optimizer_gist": true}},
+    {"id": "common:sysbench_oltp_rw_hi_p99:sematune_trim_app", "plots": [6, 7], "completion": {"measurement_windows": 50, "tuning_windows": 50, "post_tuning_windows": 0, "optimization_metric": "latency_p99", "allow_iteration_zero": true}},
+    {"id": "common:sysbench_oltp_rw_hi_p99:sematune_trim_ipc", "plots": [7], "completion": {"measurement_windows": 50, "tuning_windows": 50, "post_tuning_windows": 0, "optimization_metric": "instructions_per_cycle", "allow_iteration_zero": true}},
+    {"id": "common:sysbench_oltp_rw_hi_p99:sematune_trim_cache", "plots": [7], "completion": {"measurement_windows": 50, "tuning_windows": 50, "post_tuning_windows": 0, "optimization_metric": "cache_misses", "allow_iteration_zero": true}},
+    {"id": "common:sysbench_oltp_rw_hi_p99:mlos_app", "plots": [6, 7], "completion": {"measurement_windows": 50, "tuning_windows": 50, "post_tuning_windows": 0, "optimization_metric": "latency_p99", "allow_iteration_zero": true}},
+    {"id": "common:sysbench_oltp_rw_hi_p99:mlos_ipc", "plots": [7], "completion": {"measurement_windows": 50, "tuning_windows": 50, "post_tuning_windows": 0, "optimization_metric": "instructions_per_cycle", "allow_iteration_zero": true}},
+    {"id": "common:sysbench_oltp_rw_hi_p99:mlos_cache", "plots": [7], "completion": {"measurement_windows": 50, "tuning_windows": 50, "post_tuning_windows": 0, "optimization_metric": "cache_misses", "allow_iteration_zero": true}}
+  ],
+  "aliases": []
+}

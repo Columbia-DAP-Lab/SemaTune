@@ -207,7 +207,7 @@ def summarize_and_plot(results_dir: Path, output_dir: Path) -> int:
         writer.writeheader(); writer.writerows(rows)
     dump(output_dir / "sysbench_improvement_over_fixed.json", {
         "schema_version": 1,
-        "plot_1_improvement_formula": "(fixed_p99_ms / candidate_p99_ms - 1) * 100",
+        "plot_6_improvement_formula": "(fixed_p99_ms / candidate_p99_ms - 1) * 100",
         "latency_reduction_formula": "(fixed_p99_ms - candidate_p99_ms) / fixed_p99_ms * 100",
         "rows": rows,
     })
@@ -396,10 +396,10 @@ def plot_real_replay(real_dir: Path, replay_dir: Path, output_dir: Path) -> int:
     import matplotlib.pyplot as plt
 
     methods = [
-        ("sematune_single", "SemaTune Single", False),
-        ("sematune_app", "SemaTune App", True),
-        ("sematune_system", "SemaTune Sys", True),
-        ("sematune_ipc", "SemaTune IPC", True),
+        ("sematune_single", "TuxBot Single", False),
+        ("sematune_app", "TuxBot App", True),
+        ("sematune_system", "TuxBot Sys", True),
+        ("sematune_ipc", "TuxBot IPC", True),
     ]
     _, fixed_payload = completed_history(real_dir / "raw" / "fixed")
     phases = {"Tuning (1-30)": (1, 30), "Stable (31-50)": (31, 50)}

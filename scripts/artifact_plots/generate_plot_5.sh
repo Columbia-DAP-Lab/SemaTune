@@ -25,4 +25,4 @@ python3 "$REPO_ROOT/scripts/plot_ablation_param_aggregate.py" \
   --csv-output "$output_dir/ablation_param_geomean.csv" \
   --per-workload-csv-output "$output_dir/ablation_param_geomean_per_workload.csv"
 
-validate_plot "$output_dir" 5
+validate_plot "$output_dir" 10

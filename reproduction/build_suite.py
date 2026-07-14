@@ -96,13 +96,13 @@ RAG_MEMORY_METHODS = {
 }
 
 PLOT_INFO = {
-    "1": {"claim": "end-to-end performance and catastrophic-region avoidance", "wrapper": "scripts/artifact_plots/generate_plot_1.sh"},
-    "2": {"claim": "application metrics versus indirect system signals", "wrapper": "scripts/artifact_plots/generate_plot_2.sh"},
-    "3": {"claim": "dual-loop versus single-loop quality and cost", "wrapper": "scripts/artifact_plots/generate_plot_3.sh"},
-    "4": {"claim": "tuning-phase robustness", "wrapper": "scripts/artifact_plots/generate_plot_4.sh"},
-    "5": {"claim": "parameter-count scaling", "wrapper": "scripts/artifact_plots/generate_plot_5.sh"},
-    "6": {"claim": "cross-run memory on unseen workloads", "wrapper": "scripts/artifact_plots/generate_plot_6.sh"},
-    "7": {"claim": "motivation examples", "wrapper": "scripts/artifact_plots/generate_plot_7.sh"},
+    "6": {"claim": "end-to-end performance and catastrophic-region avoidance", "wrapper": "scripts/artifact_plots/generate_plot_1.sh"},
+    "7": {"claim": "application metrics versus indirect system signals", "wrapper": "scripts/artifact_plots/generate_plot_2.sh"},
+    "8": {"claim": "dual-loop versus single-loop quality and cost", "wrapper": "scripts/artifact_plots/generate_plot_3.sh"},
+    "9": {"claim": "tuning-phase robustness", "wrapper": "scripts/artifact_plots/generate_plot_4.sh"},
+    "10": {"claim": "parameter-count scaling", "wrapper": "scripts/artifact_plots/generate_plot_5.sh"},
+    "11": {"claim": "cross-run memory on unseen workloads", "wrapper": "scripts/artifact_plots/generate_plot_6.sh"},
+    "12": {"claim": "motivation examples", "wrapper": "scripts/artifact_plots/generate_plot_7.sh"},
 }
 
 
@@ -197,6 +197,9 @@ def add_job(
     config_path: str,
     kind: str,
 ) -> None:
+    # The construction rules retain their original zero-context evaluation
+    # indices (1-7); the public manifest uses the paper's Plot 6-12 numbering.
+    plots = {plot + 5 for plot in plots}
     if job_id in jobs:
         jobs[job_id]["plots"] = sorted(set(jobs[job_id]["plots"]) | plots)
         return
@@ -269,7 +272,7 @@ def add_common_jobs(jobs: dict[str, dict[str, Any]]) -> dict[tuple[str, str], st
             )
             lookup[(workload, method)] = job_id
 
-    # Plot 6's System/No-Memory series is a distinct indirect-all configuration.
+    # Plot 11's System/No-Memory series is a distinct indirect-all configuration.
     for workload in sorted(PARAM_WORKLOADS):
         method = "sematune_indirect_all"
         source_dir = find_method_dir(workload, ["llm_dual_indirect_all_mode3_final_actor"])
@@ -326,24 +329,24 @@ def add_memory_jobs_and_aliases(
                 {
                     "target_results_dir": f"results_rag/{rag_name}/fixed",
                     "source_job": common[(workload, "fixed")],
-                    "reason": "Plot 6 reuses the regular Fixed run.",
+                    "reason": "Plot 11 reuses the regular Fixed run.",
                 },
                 {
                     "target_results_dir": f"results_rag/{rag_name}/llm_dual_app_metrics_final_actor",
                     "source_job": common[(workload, "sematune_app")],
-                    "reason": "Plot 6 reuses the regular App/No-Memory run.",
+                    "reason": "Plot 11 reuses the regular App/No-Memory run.",
                 },
                 {
                     "target_results_dir": f"results_rag/{rag_name}/llm_dual_indirect_all_mode3_final_actor",
                     "source_job": common[(workload, "sematune_indirect_all")],
-                    "reason": "Plot 6 reuses the regular System/No-Memory run.",
+                    "reason": "Plot 11 reuses the regular System/No-Memory run.",
                 },
             ]
         )
         for method in sorted(RAG_MEMORY_METHODS):
             source_dir = base / method
             if not source_dir.is_dir():
-                raise RuntimeError(f"missing Plot 6 memory directory: {source_dir}")
+                raise RuntimeError(f"missing Plot 11 memory directory: {source_dir}")
             target = source_dir.relative_to(ARCHIVE_ROOT).as_posix()
             job_id = f"memory:{rag_name}:{method}"
             add_job(
@@ -370,7 +373,7 @@ def build() -> dict[str, Any]:
     plot_map: dict[str, dict[str, Any]] = {}
     for plot, info in PLOT_INFO.items():
         plot_jobs = sorted(job_id for job_id, job in jobs.items() if int(plot) in job["plots"])
-        plot_aliases = [alias["target_results_dir"] for alias in aliases if int(plot) == 6]
+        plot_aliases = [alias["target_results_dir"] for alias in aliases if int(plot) == 11]
         plot_map[plot] = {**info, "jobs": plot_jobs, "reused_result_aliases": plot_aliases}
 
     manifest = {
@@ -383,12 +386,12 @@ def build() -> dict[str, Any]:
         "aliases": aliases,
         "archived_reuse": [
             {
-                "plots": [3],
+                "plots": [8],
                 "path": "artifact/reference_data/dual_vs_single_costs.csv",
                 "reason": "The sampled-session cost CSV was not retained; the accepted-paper displayed costs are used.",
             },
             {
-                "plots": [5],
+                "plots": [10],
                 "path": "paper_evaluation_plots/latency_by_params.csv",
                 "reason": "Provider latency is time-varying and the submitted latency table is explicitly reused.",
             },

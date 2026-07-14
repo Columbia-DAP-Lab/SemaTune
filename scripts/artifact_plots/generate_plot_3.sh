@@ -18,4 +18,4 @@ python3 "$REPO_ROOT/scripts/plot_dual_vs_single_cost.py" \
   --plot-output "$output_dir/dual_vs_single_cost_geomean_error_bars.pdf" \
   --csv-output "$output_dir/dual_vs_single_cost_geomean_error_bars.csv"
 
-validate_plot "$output_dir" 3
+validate_plot "$output_dir" 8

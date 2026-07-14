@@ -5,7 +5,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 TAILBENCH_DIR="$REPO_ROOT/deps/Tailbench"
 SUITE_DIR="$TAILBENCH_DIR/tailbench"
-DEFAULT_DATA_ROOT="${SEMATUNE_TAILBENCH_DATA_ROOT:-/mydata/SemaTune-tailbench/tailbench.inputs}"
+DEFAULT_DATA_ROOT="${SEMATUNE_TAILBENCH_DATA_ROOT:-/mydata/TuxBot-tailbench/tailbench.inputs}"
 DATA_ROOT="$DEFAULT_DATA_ROOT"
 DATA_ROOT_EXPLICIT=0
 WITH_INPUTS=1
@@ -19,9 +19,9 @@ Usage:
   scripts/setup_tailbench.sh [--data-root DIR]
   scripts/setup_tailbench.sh --without-inputs
 
-Build the pinned TailBench harness and the four SemaTune paper workloads:
+Build the pinned TailBench harness and the four TuxBot paper workloads:
 Masstree, Silo, Sphinx, and Xapian. By default, missing runtime inputs are
-downloaded and safely extracted under /mydata/SemaTune-tailbench/tailbench.inputs.
+downloaded and safely extracted under /mydata/TuxBot-tailbench/tailbench.inputs.
 
 Options:
   --with-inputs                 Install inputs (default; retained for compatibility).

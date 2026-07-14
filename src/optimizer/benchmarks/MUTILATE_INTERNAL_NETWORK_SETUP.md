@@ -5,7 +5,7 @@ current two-node allocation:
 
 | Role | Address | Processes |
 | --- | --- | --- |
-| SemaTune server | `10.10.1.2` | optimizer, memcached, control listener |
+| TuxBot server | `10.10.1.2` | optimizer, memcached, control listener |
 | Load generator | `10.10.1.3` | managed Mutilate client |
 
 ## Commands

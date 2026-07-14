@@ -22,6 +22,8 @@ def test_unified_setup_entrypoint_is_self_contained():
     assert "libssl-dev" in source
     assert "liblz4-dev" in source
     assert "uuid-dev" in source
+    assert "SETUP: WARNING: continuing without perf hardware-counter samples." in source
+    assert "perf remains unusable" not in source
 
 
 def test_obsolete_functional_installers_are_removed():

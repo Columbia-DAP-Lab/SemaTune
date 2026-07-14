@@ -225,6 +225,15 @@ IMPORTANT:
                                 "type": "boolean",
                                 "description": get_parameter_description(param_name)
                             }
+                        elif all(
+                            isinstance(v, int) and not isinstance(v, bool)
+                            for v in param_range
+                        ):
+                            properties[param_name] = {
+                                "type": "integer",
+                                "enum": param_range,
+                                "description": get_parameter_description(param_name)
+                            }
                         elif all(isinstance(v, str) for v in param_range):
                             properties[param_name] = {
                                 "type": "string",
@@ -256,6 +265,17 @@ IMPORTANT:
                         }
                     }
                 elif isinstance(param_range, list):
+                    if all(isinstance(v, bool) for v in param_range):
+                        item_schema = {"type": "boolean"}
+                    elif all(
+                        isinstance(v, int) and not isinstance(v, bool)
+                        for v in param_range
+                    ):
+                        item_schema = {"type": "integer", "enum": param_range}
+                    elif all(isinstance(v, str) for v in param_range):
+                        item_schema = {"type": "string", "enum": param_range}
+                    else:
+                        item_schema = {"type": "string"}
                     range_properties[param_name] = {
                         "type": "object",
                         "description": f"New values for {param_name} (current: {param_range})",
@@ -263,7 +283,7 @@ IMPORTANT:
                             "values": {
                                 "type": "array",
                                 "description": "Subset of valid values to keep",
-                                "items": {"type": "string"}
+                                "items": item_schema
                             }
                         }
                     }
@@ -358,6 +378,26 @@ IMPORTANT:
 
         # Extract eliminated_params before parent parsing
         eliminated_params = params_dict.pop("eliminated_params", None)
+
+        # Some structured-output providers have returned integer categorical
+        # values as JSON strings despite an integer schema.  Coerce only exact
+        # allowed integer spellings; all other values still follow the normal
+        # validation and rejection path below.
+        for param_name, allowed in self.effective_ranges.items():
+            value = params_dict.get(param_name)
+            if not (
+                isinstance(allowed, list)
+                and allowed
+                and all(isinstance(item, int) and not isinstance(item, bool) for item in allowed)
+                and isinstance(value, str)
+            ):
+                continue
+            try:
+                integer_value = int(value)
+            except ValueError:
+                continue
+            if str(integer_value) == value.strip() and integer_value in allowed:
+                params_dict[param_name] = integer_value
 
         # Parse and validate the candidate before mutating the effective search space.
         result, justification, warnings = super()._parse_structured_response(params_dict)

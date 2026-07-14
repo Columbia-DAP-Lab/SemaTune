@@ -1,12 +1,12 @@
 # Mutilate benchmark setup and usage
 
-Mutilate is a two-node benchmark. The **server** runs SemaTune and a memcached
+Mutilate is a two-node benchmark. The **server** runs TuxBot and a memcached
 process whose operating-system controls are tuned. The **client** runs the
 pinned Mutilate load generator and returns measured latency and throughput over
 an internal control connection.
 
 Both hosts must be Ubuntu 22.04 x86-64 machines with non-interactive sudo and
-the same SemaTune revision. Live tuning is intended only for dedicated or
+the same TuxBot revision. Live tuning is intended only for dedicated or
 disposable bare-metal hosts.
 
 ## Automated role setup
@@ -24,7 +24,7 @@ scripts/setup.sh --memcached-client \
   --server-ip 10.10.1.2 --client-ip 10.10.1.3
 ```
 
-The server mode includes the normal base SemaTune installation and installs
+The server mode includes the normal base TuxBot installation and installs
 memcached, but leaves the distribution service disabled because the benchmark
 adapter starts and stops its own instance. The client mode installs only the
 pinned Mutilate build closure and creates
@@ -79,7 +79,7 @@ functional_example/run_mutilate.sh --quick --real-llm \
 ```
 
 The runner materializes a deployment-specific copy of the canonical Mutilate
-SemaTune-App configuration. It uses one default baseline, three tuning, and two
+TuxBot-App configuration. It uses one default baseline, three tuning, and two
 stable five-second windows. Actor and Speculator both use Gemini 2.5
 Flash-Lite. The canonical reproduction JSON is not modified.
 

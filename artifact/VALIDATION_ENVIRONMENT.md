@@ -45,8 +45,11 @@ The dependency source commits are:
 
 At capture time, the generic `perf` dispatcher warned that its tools did not
 match kernel `5.15.0-177-generic`; the read-only Functional dry run still
-passed. `scripts/setup.sh --base` installs the matching `linux-tools` package.
-Rerun that setup after a kernel upgrade and before any live evaluator run.
+passed. `scripts/setup.sh --base` attempts both the generic and matching
+`linux-tools-$(uname -r)` packages, but an unavailable package is warning-only.
+The workflows remain executable without counters; IPC/cache variants then
+validate orchestration only and are not quantitatively comparable. Install the
+matching tools before using those signals for performance claims.
 
 ## Compare another machine
 

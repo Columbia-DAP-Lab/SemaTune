@@ -43,7 +43,7 @@ def test_legacy_tailbench_builds_are_serialized_and_use_host_automake():
 def test_inputs_default_under_mydata_with_explicit_software_only_mode():
     setup = (ROOT / "scripts/setup_tailbench.sh").read_text(encoding="utf-8")
     installer = (ROOT / "scripts/install_tailbench_inputs.py").read_text(encoding="utf-8")
-    assert "/mydata/SemaTune-tailbench/tailbench.inputs" in setup
+    assert "/mydata/TuxBot-tailbench/tailbench.inputs" in setup
     assert "--without-inputs" in setup
     assert "already installed" in setup
     assert 'config_data_path="$TAILBENCH_DIR/tailbench.inputs"' in setup

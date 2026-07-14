@@ -1,12 +1,8 @@
-# SemaTune paper claims and artifact evidence map
+# TuxBot paper claims and artifact evidence map
 
-This file maps the empirical claims in the accepted manuscript to the archived results, plot
-programs, evaluator commands, and submitted-paper reference plots. It is an
-optional map for researchers and a Results-Reproduced evaluation. The minimal
-Artifact Functional starting point is `functional_example/`. Plot generation
-from archived results takes minutes; it does **not** rerun tuning. Repeating the
-full 13-workload, five-rerun evaluation can take days and requires the machines
-and model access described in the artifact README.
+This is the authoritative map from C1–C4 to archived evidence, fresh evaluator
+workflows, and paper Plots 6, 7, and 10. Artifact Functional starts under
+`functional_example/`; it is separate from performance-claim validation.
 
 ## Evaluator workflow
 
@@ -14,19 +10,26 @@ From the repository root:
 
 ```bash
 reproduction/reproduce_claims.sh --dry-run
-reproduction/reproduce_claims.sh --archived-only --output-dir results/reproduced_core
-reproduction/reproduce_claims.sh --run --clean --output-dir results/reproduced_core
+reproduction/reproduce_claims.sh --dry-run --extended
+reproduction/reproduce_claims.sh --dry-run --full
+
+# Run one tier; add exactly one of --extended or --full when desired.
+reproduction/reproduce_claims.sh --run --clean \
+  --output-dir results/reproduced_core
 ```
 
-`reproduction/claim_manifest.json` maps the scoped C1–C4 evaluation to 21 unique
-configs. The live command performs one fresh repetition on three workloads and
-reuses shared results; the archived phase regenerates the corresponding paper
-presentations from the checksummed five-repeat evidence. See
-`reproduction/README.md` for counts, runtimes, resume behavior, and validation
-profiles.
+The default selects 21 configurations for the smallest three-workload C1–C4
+direction check. `--extended` selects 60 configurations and fully populates
+Plots 6, 7, and 10 on Silo, TPC-C, and Sysbench OLTP-RW. `--full` selects 164
+configurations, expands the Plot 6/7 matrix to all 11 selected workloads, and
+keeps Plot 10 on the three-workload set. The full command warns that execution
+can take several days and consume substantial hosted-model quota. All tiers
+run once and resume only strictly complete histories.
 
-The unscoped `reproduction/reproduce_all.sh` workflow remains available for all
-seven paper plots, but can take several days.
+For fresh Plot 10, TuxBot uses 2/8/16/41 knobs and TuxBot-Trim/MLOS use
+2/8/16. No fresh tier schedules 4 knobs. Trim/MLOS at 41 are omitted because
+their high-dimensional optimizer iterations stall beyond the reviewer budget.
+See `reproduction/README.md` for exact matrices, trace fallback, and outputs.
 
 Each `generate_plot_N.sh` can also be run separately and accepts an output
 directory as its first argument. `SEMATUNE_RESULTS_ROOT` can point at a different
@@ -38,50 +41,58 @@ Current archive status (audited 2026-07-10): **the paper-era inputs are now
 isolated under `all_results/paper_evaluation/`. All seven plots regenerate and
 pass the `measured` validation profile. The optional strict `paper` profile
 intentionally flags the documented accepted-paper versus measured-history
-differences in Plots 3 and 4. Plot 2 uses all five recovered March 13 measured
+differences in Plots 8 and 9. Plot 7 uses all five recovered March 13 measured
 Twitter/System histories rather than the paper-era synthetic IPC-plus-five-
-percentage-point substitution. Plot 6 computes Top-1/Top-3 from archived histories and sources the missing
+percentage-point substitution. Plot 11 computes Top-1/Top-3 from archived histories and sources the missing
 Sysbench App/No-Memory series from the regular App-only paper run. The latency
 table reuses its submitted CSV.**
 
-## Headline claims
+## C1–C4 claim map
 
-| ID | Paper claim | Evidence and calculation | Required plots |
-|---|---|---|---|
-| C1 | SemaTune improves stable-phase performance by 72.49% over Default Parameters over 13 workloads. | Stable aggregate factor 1.7249. | Plot 1 |
-| C2 | SemaTune improves performance by 153.3% over MLOS. | Stable factors: `(1.7249 / 0.6809 - 1) * 100 = 153.33%`. This is improvement relative to MLOS, not percentage points over Default Parameters. | Plot 1 |
-| C3 | With only system metrics, SemaTune still outperforms MLOS with app metrics by 93.7% in the submitted plot. | Submitted factors: `(1.3189 / 0.6809 - 1) * 100 = 93.70%`. The measured regeneration gives a 1.3631 System factor and preserves the conclusion. | Plots 1 and 2 |
-| C4 | SemaTune remains effective as the action space grows to 41 knobs. | Stable improvement stays positive from 1 to 41 knobs and is 155.9% at 41. | Plot 5 and latency table |
+| ID | Accepted-paper observation | Fresh pass condition | Latest one-repeat observation | Required plot |
+|---|---|---|---|---|
+| C1 | TuxBot improves stable performance by 72.49% over Default Parameters across 13 workloads. | Stable TuxBot/Default aggregate is above 1.0. | 11-workload extension: **1.4580× (+45.80%), consistent**. | Plot 6 |
+| C2 | TuxBot improves performance by 153.3% relative to application-metric MLOS. | Stable TuxBot/MLOS aggregate is above 1.0. | 11-workload extension: **2.3334× (+133.34%), consistent**. | Plot 6 |
+| C3 | System-metric TuxBot outperforms application-metric MLOS by 93.7%. | Stable System-TuxBot/MLOS-App aggregate is above 1.0. | 11-workload extension: **2.3761× (+137.61%), consistent**. | Plot 7 |
+| C4 | TuxBot remains effective at 41 knobs; the paper reports +155.9%. | The measured 41-knob stable TuxBot/Default aggregate is finite and above 1.0. | Three workloads: **1.1952× (+19.52%), consistent**. | Plot 10 |
+
+The fresh values above were audited on 2026-07-14. They are stochastic
+one-repeat observations, not substitutions for the accepted-paper values.
+`c123_family_report.{md,json}` and `c4_method_report.{md,json}` are the
+machine-generated sources of truth. C1 and C2 share Plot 6; C3 uses Plot 7;
+C4 uses Plot 10—there is intentionally not one PDF per claim.
 
 The dual-versus-single cost, tuning robustness, and cross-run memory analyses
 remain documented below and are reproducible through the complete workflow;
 they are outside the time-bounded C1–C4 badge request.
 
-## Plot 1 — end-to-end performance and catastrophic-region avoidance
+## Plot 6 — end-to-end performance and catastrophic-region avoidance
 
 - Paper label: `fig:retry_aggregate_improvement`
 - Wrapper: `scripts/artifact_plots/generate_plot_1.sh`
+- Fresh wrapper: `reproduction/reproduce_claims.sh --extended`
 - Plot program: `scripts/plot_retry_aggregate_improvement.py`
 - Reference: `paper_evaluation_plots/retry_aggregate_improvement_geomean_with_and_without_xapian.pdf`
 - Result roots:
-  - SemaTune reruns: `all_results/paper_evaluation/results_config_full_param_*_retry`
+  - TuxBot reruns: `all_results/paper_evaluation/results_config_full_param_*_retry`
   - fixed/classical fallbacks: `all_results/paper_evaluation/results_config_full_param_*_new`
-- Expected full-set stable values: SemaTune +72.49%, SemaTune-Trim -26.14%,
+- Expected full-set stable values: TuxBot +72.49%, TuxBot-Trim -26.14%,
   MLOS -31.91%, Bayesian -37.46%, DQN -44.49%, Q-learning -58.49%.
 - Expected non-catastrophic stable values (11 workloads, excluding Xapian and
-  Memcached): SemaTune +87.22%, SemaTune-Trim +63.93%, MLOS +50.52%.
+  Memcached): TuxBot +87.22%, TuxBot-Trim +63.93%, MLOS +50.52%.
 - Current status: **PASS**. The wrapper uses canonical lowercase
   `sibench_hi_p99`, requires 13/11 workloads, and regenerates +58.93%/+73.01%
-  for SemaTune versus +59.36%/+72.49% in the paper. The measured
+  for TuxBot versus +59.36%/+72.49% in the paper. The measured
   non-catastrophic stable value is +88.07% versus the submitted +87.22%.
 
-## Plot 2 — direct application metrics versus indirect system signals
+## Plot 7 — direct application metrics versus indirect system signals
 
 - Paper label: `fig:retry_indirect_aggregate_improvement`
 - Wrapper: `scripts/artifact_plots/generate_plot_2.sh`
+- Fresh wrapper: `reproduction/reproduce_claims.sh --extended`
 - Plot program: `scripts/plot_retry_aggregate_improvement.py`
 - Reference: `paper_evaluation_plots/retry_indirect_aggregate_improvement_geomean_with_and_without_xapian.pdf`
-- Result roots: the same retry/fallback roots as Plot 1.
+- Result roots: the same retry/fallback roots as Plot 6.
 - Required tuner subdirectories include:
   - `llm_dual_app_metrics_final_actor`
   - `llm_dual_system_metrics_plain_final_actor`
@@ -89,7 +100,7 @@ they are outside the time-bounded C1–C4 badge request.
   - `mlos_trimming_aggressive[_ipc|_cache_misses_max]` (or the documented aliases)
   - `mlos_50_tuning_only`, `mlos_ipc_50_tuning_only`, and
     `mlos_cache_misses_50_tuning_only` (or aliases)
-- Expected stable values on the full set: SemaTune App +72.49%, System +31.89%,
+- Expected stable values on the full set: TuxBot App +72.49%, System +31.89%,
   IPC +16.19%; MLOS App -31.91%, IPC -67.76%, Cache -64.66%.
 - Expected non-catastrophic stable values: App +87.22%, System +64.04%, IPC
   +47.21%; MLOS App +50.52%, IPC -24.09%, Cache -22.77%.
@@ -112,13 +123,13 @@ they are outside the time-bounded C1–C4 badge request.
   close to the submitted +21.74%/+31.89%; the artifact reports the measured
   regeneration rather than silently forcing the paper values.
 
-## Plot 3 — dual-loop versus single-loop quality and cost
+## Plot 8 — dual-loop versus single-loop quality and cost
 
 - Paper label: `fig:dual_vs_single`
 - Wrapper: `scripts/artifact_plots/generate_plot_3.sh`
 - Plot program: `scripts/plot_dual_vs_single_cost.py`
 - Reference: `paper_evaluation_plots/dual_vs_single_cost_geomean_error_bars.pdf`
-- Result roots: the same retry/fallback roots as Plot 1.
+- Result roots: the same retry/fallback roots as Plot 6.
 - Required tuner subdirectories: `llm_dual_app_metrics_final_actor`,
   `llm_reasoning_app_metrics_final_actor`, `llm_app_metrics_final_actor`,
   `mlos_trimming_aggressive`/`mlos_trimming`, and `mlos_50_tuning_only`/`mlos`.
@@ -130,32 +141,32 @@ they are outside the time-bounded C1–C4 badge request.
   script.
 - Current status: **REGENERATES; documented numerical drift**. All method families are retained and the generated
   performance values match the paper at displayed precision except the same
-  small full-set SemaTune drift as Plot 1 and the measured non-catastrophic
-  SemaTune value (+88.07% versus +87.2%). The original sampled-session cost CSV
+  small full-set TuxBot drift as Plot 6 and the measured non-catastrophic
+  TuxBot value (+88.07% versus +87.2%). The original sampled-session cost CSV
   is absent; `artifact/reference_data/dual_vs_single_costs.csv` reconstructs its
   displayed totals from the accepted manuscript and labels that provenance explicitly.
 - Historical cross-check: with the full `origin/sosp` roots and corrected
   SIbench case, every paper value agrees at displayed precision except full-set
-  SemaTune (58.7%/72.3% regenerated versus 59.4%/72.5% stated). The scatter
+  TuxBot (58.7%/72.3% regenerated versus 59.4%/72.5% stated). The scatter
   positions are reproduced by hard-coded per-session costs, but summed-history
   costs and cost/action are wrong without the missing sampled-session CSV.
 
-## Plot 4 — tuning-phase robustness
+## Plot 9 — tuning-phase robustness
 
 - Paper label: `fig:retry_robustness`
 - Wrapper: `scripts/artifact_plots/generate_plot_4.sh`
 - Plot program: `scripts/plot_retry_robustness_aggregate_single.py`
 - Reference:
   `paper_evaluation_plots/retry_robustness_memory_tuxbot_mlos_1_30_aggregate.pdf`
-- Result roots: retry/fallback roots from Plot 1; this plot requires SemaTune,
-  SemaTune-Trim, and MLOS to coexist for every included workload.
+- Result roots: retry/fallback roots from Plot 6; this plot requires TuxBot,
+  TuxBot-Trim, and MLOS to coexist for every included workload.
 - Current status: **REGENERATES; documented numerical drift**. After removal of
   stale result copies, the 12-workload command regenerates 18.0%/11.9%/11.3%
-  for SemaTune, 33.0%/32.8%/92.0% for SemaTune-Trim, and
+  for TuxBot, 33.0%/32.8%/92.0% for TuxBot-Trim, and
   33.2%/30.9%/103.1% for MLOS.
 - Numerical inconsistency requiring a paper decision:
-  - The LaTeX command summary and reference CSV report SemaTune
-    19.3% P50, 11.7% P10, 11.0% variability; SemaTune-Trim 33.0%, 32.8%,
+  - The LaTeX command summary and reference CSV report TuxBot
+    19.3% P50, 11.7% P10, 11.0% variability; TuxBot-Trim 33.0%, 32.8%,
     92.0%; MLOS 33.2%, 30.9%, 103.1% (12 workloads).
   - The active prose instead states 16.9%/12.0%/11.1%,
     29.7%/29.6%/24.7%, and 28.8%/26.3%/25.1%, and then discusses 13 workloads
@@ -169,33 +180,41 @@ they are outside the time-bounded C1–C4 badge request.
   active prose values exactly. The reference PDF is the Xapian-included version,
   so this is a paper/figure choice rather than numerical noise.
 
-## Plot 5 — parameter-count scaling
+## Plot 10 — parameter-count scaling
 
 - Paper label: `fig:param_ablation`
 - Wrapper: `scripts/artifact_plots/generate_plot_5.sh`
+- Fresh wrapper: `reproduction/reproduce_claims.sh --extended`
 - Plot program: `scripts/plot_ablation_param_aggregate.py`
 - Reference: `paper_evaluation_plots/ablation_param_geomean.pdf`
 - Expected layout under each source root:
   `.../ablation_params/<N>_param/<workload>/<tuner>/*.json`, for N in
   1, 2, 4, 8, 16, 32, and 41 and workloads Silo, TPC-C, and Sysbench OLTP-RW.
+  This is the archived paper layout; fresh reviewer tiers intentionally select
+  only the counts documented below and never schedule 4 knobs.
 - Historical roots are
   `results_params/{silo_hi_p99_final,tpcc_p99_final,sysbench_oltp_rw_final}`;
   they are retained under `all_results/paper_evaluation/results_params/`.
 - Fixed roots and 8-knob fallback roots are named explicitly in the wrapper.
 - Current status: **PASS**. All 42 displayed values regenerate from the isolated
   paper roots. The restored paper script contains three non-data
-  adjustments: fixed +5%/+7% SemaTune-Trim points at 1/2 knobs, a -20 percentage
+  adjustments: fixed +5%/+7% TuxBot-Trim points at 1/2 knobs, a -20 percentage
   point adjustment to 41-knob Silo trimming, and a +3 point TPC-C trimming
   fallback. Evaluators must be told why these are justified or, preferably, the
   underlying raw runs should replace them.
-- Expected SemaTune stable series: -4.5, +15.7, +314.1, +216.7, +213.4,
+- Fresh scoped status: **CONSISTENT**. TuxBot's 41-knob stable aggregate is
+  +19.52% over Default across Silo, TPC-C, and Sysbench OLTP-RW. TuxBot-Trim
+  and MLOS at 41 knobs are intentionally empty because their high-dimensional
+  iterations exceed the scoped reviewer budget; both methods are measured at
+  2, 8, and 16 knobs.
+- Expected TuxBot stable series: -4.5, +15.7, +314.1, +216.7, +213.4,
   +105.2, +155.9%. Expected MLOS stable series: +3.2, +12.5, +119.3, +76.3,
   +19.6, +28.3, +13.0%.
 - Historical cross-check: the full paper-era inputs reproduce all 42 displayed
   values and the reference PDF's data streams, subject to the manual adjustments
   above. The neighboring checked-in CSV is stale and is not a valid oracle.
 
-### Response-latency table associated with Plot 5
+### Response-latency table associated with Plot 10
 
 - Paper label: `tab:latency_by_params`
 - Measurement program: `scripts/measure_replayed_tuner_latency_by_params.py`
@@ -210,7 +229,7 @@ they are outside the time-bounded C1–C4 badge request.
   workflow reuses the submitted CSV and validates every table cell; live replay
   is optional.
 
-## Plot 6 — cross-run memory on unseen workloads
+## Plot 11 — cross-run memory on unseen workloads
 
 - Paper label: `fig:memory_subsection_combined`
 - Wrapper: `scripts/artifact_plots/generate_plot_6.sh`
@@ -223,15 +242,15 @@ they are outside the time-bounded C1–C4 badge request.
   bars are computed from the retained Silo, TPC-C, and Sysbench OLTP histories.
   The memory-specific Sysbench directory lacks only
   `llm_dual_app_metrics_final_actor`, so the wrapper uses the same regular
-  Sysbench App-only history and fixed baseline as Plot 1 and writes
-  `PLOT_6_REGULAR_BASELINE.txt`. No memory values are imputed or replaced by
+  Sysbench App-only history and fixed baseline as Plot 6 and writes
+  `PLOT_11_REGULAR_BASELINE.txt`. No memory values are imputed or replaced by
   constants. The validator checks all 12 aggregate values, all three workload
   counts, and the regenerated PDF/CSV.
 - With the regular Sysbench baseline, App No Memory recomputes to
   +87.62%/+145.39% rather than the paper's +86.30%/+144.67%; the four Top-1/Top-3
   memory series still match the paper exactly.
 
-## Plot 7 — motivation examples
+## Plot 12 — motivation examples
 
 - Paper label: `fig:mlos_motivation_examples`
 - Wrapper: `scripts/artifact_plots/generate_plot_7.sh`
@@ -244,7 +263,7 @@ they are outside the time-bounded C1–C4 badge request.
   - Wikipedia root with `fixed`, `mlos_50_tuning_only`,
     `mlos_ipc_50_tuning_only`, and `mlos_cache_misses_50_tuning_only`.
   - TPC-C fixed root and 1/2/8/32-knob MLOS result roots under the parameter
-    hierarchy described for Plot 5.
+    hierarchy described for Plot 10.
 - Current status: **PASS**. The Wikipedia and TPC-C histories are retained under
   `all_results/paper_evaluation/`; the validator checks all seven plotted means.
 - Historical cross-check: the full `origin/sosp` roots reproduce the plotted
@@ -275,9 +294,9 @@ then visual against the PDF. Do not treat a visually similar PDF or a stale CSV
 as claim validation.
 
 The parallel validation used the complete paper-era roots extracted from
-`origin/sosp` into `all_results/paper_evaluation/`. Plot 5 matched the reference data
-streams; Plot 4 matched the active reference data geometry; Plot 7 matched the
-reference geometry with a color-only difference. Plots 1--3 and 6 were compared
+`origin/sosp` into `all_results/paper_evaluation/`. Plot 10 matched the reference data
+streams; Plot 9 matched the active reference data geometry; Plot 12 matched the
+reference geometry with a color-only difference. Plots 6–8 and 11 were compared
 numerically because their adjacent CSVs are stale or missing. Exact PDF hashes
 are not suitable AE checks because metadata and Matplotlib layout can change.
 
@@ -285,11 +304,11 @@ are not suitable AE checks because metadata and Matplotlib layout can change.
 
 - The artifact reports the five recovered measured Twitter/System histories
   instead of the submitted plot's synthetic IPC-plus-five-point proxy.
-- Plot 4 retains the active reference figure's 12-workload calculation; its
+- Plot 9 retains the active reference figure's 12-workload calculation; its
   Xapian-excluded prose values are documented above as a paper/figure discrepancy.
-- Plot 3's displayed cost totals are reconstructed from the accepted manuscript
+- Plot 8's displayed cost totals are reconstructed from the accepted manuscript
   because the original sampled-session CSV was not retained.
-- Plot 5 preserves and discloses the paper script's manual adjustments. The raw
+- Plot 10 preserves and discloses the paper script's manual adjustments. The raw
   histories remain available so evaluators do not have to infer them.
 - Full multi-day reruns are optional extended experiments and are not part of
   the Functional workflow.

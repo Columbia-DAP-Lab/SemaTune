@@ -18,7 +18,7 @@ def test_dataset_download_is_explicit_and_pinned():
     verifier = (ROOT / "scripts" / "verify_spark_dataset.py").read_text(encoding="utf-8")
     assert "--with-dataset" in spark
     assert "--data-root" in spark
-    assert "/mydata/SemaTune-sparkbench" in spark
+    assert "/mydata/TuxBot-sparkbench" in spark
     assert "afbc2c250aebb0c18e65a685f2b5e454e7d0c03b" in spark
     assert 'OBJECTS = 979' in verifier
     assert 'BYTES = 109486252337' in verifier

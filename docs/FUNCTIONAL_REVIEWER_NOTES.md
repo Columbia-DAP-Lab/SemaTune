@@ -54,7 +54,7 @@ requirements so reviewers are not given a fabricated peak measurement.
 | Provider quota, rate-limit, model-access, or availability error | External service failure. Resume the same output directory or use the documented trace-replay fallback. |
 | A reproduced claim is marked `DIVERGENT` | The fresh stochastic aggregate differed from the paper direction. Inspect workload rows/logs; the artifact reports rather than hides it. |
 | Mutilate client repeatedly waits or reconnects | Expected when no server experiment is active. Inspect its systemd status only if the server run cannot connect. |
-| `perf` asks for tools matching the running kernel | Usually follows a kernel upgrade. Rerun `scripts/setup.sh --base` before a live experiment. |
+| `perf` is missing or asks for tools matching the running kernel | Setup and preflight warn but continue. The Functional paths remain executable; hardware-counter files may be empty, so IPC/cache signal values are operational checks only and must not be used for performance comparison. Install matching `linux-tools-$(uname -r)` before evaluating those signal results quantitatively. |
 | `HOST_STATE_RESTORE: PASS` and `HOST_STATE_VERIFY: PASS` | Required success messages. A missing or failed verification is an artifact failure even if measurements were produced. |
 | Restoration takes several seconds after interruption | Expected while the complete benchmark process group is terminated before controls are restored. |
 

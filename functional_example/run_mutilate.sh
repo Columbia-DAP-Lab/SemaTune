@@ -17,7 +17,7 @@ Usage:
   functional_example/run_mutilate.sh --dry-run
   functional_example/run_mutilate.sh --quick --real-llm [--output-dir DIR]
 
-Runs one reduced SemaTune App experiment: one default baseline, three tuning
+Runs one reduced TuxBot App experiment: one default baseline, three tuning
 windows, and two stable windows against a remote Mutilate load generator.
 EOF
 }
@@ -58,7 +58,7 @@ if [[ "$DRY_RUN" -eq 1 ]]; then
     'DRY_RUN: PASS (read-only; no root, provider, benchmark, output, or kernel writes)' \
     "  Server: ${SEMATUNE_MUTILATE_SERVER_IP}:11211" \
     "  Load generator: ${SEMATUNE_MUTILATE_CLIENT_IP}" \
-    '  Method: SemaTune App (Flash-Lite Actor + Flash-Lite Speculator)' \
+    '  Method: TuxBot App (Flash-Lite Actor + Flash-Lite Speculator)' \
     '  Schedule: 1 default baseline + 3 tuning + 2 stable windows, 5 s/window' \
     '  Acceptance: every window must contain 2+ positive Mutilate samples'
   exit 0
@@ -77,7 +77,7 @@ fi
 
 LOCK_FILE="/tmp/sematune-functional-sysbench-$(id -u).lock"
 exec 9>"$LOCK_FILE"
-flock -n 9 || { echo "Another SemaTune Functional run owns $LOCK_FILE" >&2; exit 1; }
+flock -n 9 || { echo "Another TuxBot Functional run owns $LOCK_FILE" >&2; exit 1; }
 
 OUTPUT_DIR="$(realpath -m "$OUTPUT_DIR")"
 case "$OUTPUT_DIR/" in
@@ -141,7 +141,7 @@ trap 'exit 143' TERM HUP
 
 "${ROOT[@]}" "$PYTHON" "$SCRIPT_DIR/host_state_guard.py" capture --output "$SNAPSHOT"
 RESTORE_NEEDED=1
-echo 'RUNNING: Mutilate SemaTune App (1 baseline + 3 tuning + 2 stable; real Gemini)'
+echo 'RUNNING: Mutilate TuxBot App (1 baseline + 3 tuning + 2 stable; real Gemini)'
 PGID_FILE="$OUTPUT_DIR/.mutilate.pgid"
 "${ROOT[@]}" setsid --wait sh -c \
   'printf "%s\n" "$$" > "$1"; shift; exec timeout --foreground --signal=TERM --kill-after=20s "$@"' \

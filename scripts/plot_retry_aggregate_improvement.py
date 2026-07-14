@@ -34,22 +34,22 @@ from generate_full_performance_table import (
 
 
 DEFAULT_COLUMNS = (
-    "Tuxbot App Metrics Dual Loop:llm_dual_app_metrics_final_actor,"
-    "MLOS + Tuxbot:mlos_trimming_aggressive|mlos_trimming,"
+    "TuxBot App Metrics Dual Loop:llm_dual_app_metrics_final_actor,"
+    "MLOS + TuxBot:mlos_trimming_aggressive|mlos_trimming,"
     "MLOS:mlos_50_tuning_only|mlos"
 )
 
 DISPLAY_LABEL_MAP = {
-    "Tuxbot App Metrics Dual Loop": "TuxBot",
+    "TuxBot App Metrics Dual Loop": "TuxBot",
     "MLOS": "MLOS",
-    "MLOS + Tuxbot": "TuxBot-trim",
+    "MLOS + TuxBot": "TuxBot-trim",
     "Bayesian": "Bayes",
     "DQN": "DQN",
     "Q-Learning": "Q-Learning",
-    "Tuxbot App Only Dual": "TuxBot App",
-    "Tuxbot Indirect All Dual": "TuxBot Indirect",
-    "Tuxbot Indirect Dump Dual": "TuxBot Indirect System",
-    "Tuxbot IPC Dual": "TuxBot IPC",
+    "TuxBot App Only Dual": "TuxBot App",
+    "TuxBot Indirect All Dual": "TuxBot Indirect",
+    "TuxBot Indirect Dump Dual": "TuxBot Indirect System",
+    "TuxBot IPC Dual": "TuxBot IPC",
     "MLOS App Metrics": "MLOS",
     "MLOS IPC": "MLOS IPC",
     "MLOS Cache Misses": "MLOS Cache",
@@ -66,16 +66,16 @@ LATEX_NEGATIVE_COLOR = "red!70!black"
 LATEX_NEUTRAL_COLOR = "yellow!50!black"
 
 METHOD_COLORS = {
-    "Tuxbot App Metrics Dual Loop": "#0072B2",
-    "MLOS + Tuxbot": "#009E73",
+    "TuxBot App Metrics Dual Loop": "#0072B2",
+    "MLOS + TuxBot": "#009E73",
     "MLOS": "#E69F00",
     "Bayesian": "#CC79A7",
     "DQN": "#D55E00",
     "Q-Learning": "#F0E442",
-    "Tuxbot App Only Dual": "#0072B2",
-    "Tuxbot Indirect All Dual": "#0072B2",
-    "Tuxbot Indirect Dump Dual": "#0072B2",
-    "Tuxbot IPC Dual": "#0072B2",
+    "TuxBot App Only Dual": "#0072B2",
+    "TuxBot Indirect All Dual": "#0072B2",
+    "TuxBot Indirect Dump Dual": "#0072B2",
+    "TuxBot IPC Dual": "#0072B2",
     "MLOS App Metrics": "#E69F00",
     "MLOS IPC": "#E69F00",
     "MLOS Cache Misses": "#E69F00",
@@ -371,6 +371,27 @@ def parse_args() -> argparse.Namespace:
         type=float,
         default=RIGHT_TRIM_PTS,
         help="Trim this many points from the right edge of the saved tight bbox (default: 3).",
+    )
+    p.add_argument(
+        "--preserve-empty-methods",
+        action="store_true",
+        help=(
+            "Keep every --custom-columns method slot even when its tuner history is "
+            "missing. Missing values are rendered as empty bars, preserving the paper "
+            "plot's column order and bar geometry."
+        ),
+    )
+    p.add_argument(
+        "--output-width-pts",
+        type=float,
+        default=None,
+        help="Optional exact output PDF width in points.",
+    )
+    p.add_argument(
+        "--output-height-pts",
+        type=float,
+        default=None,
+        help="Optional minimum output PDF height in points; expands when content needs more room.",
     )
     p.add_argument(
         "--no-catastrophic-extra-exclude",
@@ -812,6 +833,8 @@ def plot_summary(
     x_font_delta_map: Optional[Dict[str, float]] = None,
     right_trim_pts: float = RIGHT_TRIM_PTS,
     footer_text: str = "",
+    output_width_pts: Optional[float] = None,
+    output_height_pts: Optional[float] = None,
 ) -> None:
     labels = [label for label, _ in columns]
     base_labels: List[str] = []
@@ -918,8 +941,8 @@ def plot_summary(
     x_group_shift_map = x_group_shift_map or {}
     x_font_delta_map = x_font_delta_map or {}
     emphasized_x_label_deltas = {
-        "Tuxbot App Metrics Dual Loop": 1.0,
-        "MLOS + Tuxbot": 1.0,
+        "TuxBot App Metrics Dual Loop": 1.0,
+        "MLOS + TuxBot": 1.0,
         "MLOS": 1.0,
     }
     display_labels = [x_label_map.get(base, _display_label(base)) for base in base_labels]
@@ -927,7 +950,11 @@ def plot_summary(
     for base, tick in zip(base_labels, ax.get_xticklabels()):
         label = tick.get_text()
         x_offset_pts = 0.0
-        y_offset_pts = lowered_x_label_shift_pts if label in lowered_x_labels else 0.0
+        y_offset_pts = (
+            lowered_x_label_shift_pts
+            if label in lowered_x_labels and not x_group_map
+            else 0.0
+        )
         tick.set_fontsize(
             FS + 1 + emphasized_x_label_deltas.get(base, 0.0) + x_font_delta_map.get(base, 0.0)
         )
@@ -942,6 +969,7 @@ def plot_summary(
                 + ScaledTranslation(x_offset_pts / 72.0, -y_offset_pts / 72.0, fig.dpi_scale_trans)
             )
 
+    group_artists = []
     if x_group_map:
         groups: List[Tuple[int, int, str]] = []
         current_group: Optional[str] = None
@@ -963,7 +991,7 @@ def plot_summary(
             if not group_label:
                 continue
             center = float(np.mean(x[start : end + 1]))
-            ax.text(
+            group_artist = ax.text(
                 center,
                 -0.16,
                 group_label,
@@ -973,7 +1001,10 @@ def plot_summary(
                 fontsize=FS + 1,
                 fontweight="medium",
                 clip_on=False,
-            ).set_transform(
+            )
+            group_artist.set_in_layout(False)
+            group_artists.append(group_artist)
+            group_artist.set_transform(
                 ax.get_xaxis_transform()
                 + ScaledTranslation(
                     x_group_shift_map.get(group_label, 0.0) / 72.0,
@@ -1034,6 +1065,13 @@ def plot_summary(
     ax.spines["top"].set_visible(False)
     ax.spines["right"].set_visible(False)
     ax.margins(x=0.04, y=0.16)
+    # NaN-only methods intentionally render as empty paper slots.  Matplotlib
+    # excludes their bars from data limits, so derive the horizontal range from
+    # the complete declared grid instead of allowing margins() to drop them.
+    if base_labels:
+        data_span = max(0, len(base_labels) - 1) + 2.0 * width
+        x_padding = 0.04 * data_span
+        ax.set_xlim(-width - x_padding, (len(base_labels) - 1) + width + x_padding)
     bottom_rect = 0.08 if x_group_map else 0.0
     if footer_text:
         bottom_rect = max(bottom_rect, 0.16 if x_group_map else 0.10)
@@ -1048,6 +1086,11 @@ def plot_summary(
         )
     fig.tight_layout(pad=0.35, rect=(0.0, bottom_rect, 1.0, 0.88))
     output_path.parent.mkdir(parents=True, exist_ok=True)
+    # Keep the axes geometry stable during tight_layout, then include the
+    # second-row group labels in the saved bounding box. This lets the canvas
+    # grow to fit them instead of clipping them or shrinking the plot area.
+    for group_artist in group_artists:
+        group_artist.set_in_layout(True)
     fig.canvas.draw()
     tight_bbox = fig.get_tightbbox(fig.canvas.get_renderer())
     trimmed_bbox = Bbox.from_extents(
@@ -1056,6 +1099,25 @@ def plot_summary(
         tight_bbox.x1 - right_trim_pts / 72.0,
         tight_bbox.y1,
     )
+    if output_width_pts is not None:
+        if output_width_pts <= 0:
+            raise SystemExit("--output-width-pts must be positive.")
+        trimmed_bbox = Bbox.from_extents(
+            trimmed_bbox.x0,
+            trimmed_bbox.y0,
+            trimmed_bbox.x0 + output_width_pts / 72.0,
+            trimmed_bbox.y1,
+        )
+    if output_height_pts is not None:
+        if output_height_pts <= 0:
+            raise SystemExit("--output-height-pts must be positive.")
+        output_height_inches = max(trimmed_bbox.height, output_height_pts / 72.0)
+        trimmed_bbox = Bbox.from_extents(
+            trimmed_bbox.x0,
+            trimmed_bbox.y1 - output_height_inches,
+            trimmed_bbox.x1,
+            trimmed_bbox.y1,
+        )
     fig.savefig(output_path, bbox_inches=trimmed_bbox, pad_inches=0.02)
     plt.close(fig)
 
@@ -1630,9 +1692,10 @@ def main() -> None:
         tuning_window=tuning_window,
         stable_window=stable_window,
     )
-    columns = filter_columns_present_in_series(columns, workload_phase_series)
-    if not columns:
-        raise SystemExit("No requested methods were found in the available workload series.")
+    if not args.preserve_empty_methods:
+        columns = filter_columns_present_in_series(columns, workload_phase_series)
+        if not columns:
+            raise SystemExit("No requested methods were found in the available workload series.")
     summary_rows = build_summary_rows(
         workload_phase_series=workload_phase_series,
         columns=columns,
@@ -1642,9 +1705,10 @@ def main() -> None:
         same_threshold_pct=args.same_threshold_pct,
         aggregate_excluded_workloads=aggregate_excluded_workloads,
     )
-    columns, summary_rows = filter_columns_with_data(columns, summary_rows)
-    if not columns:
-        raise SystemExit("No methods with data remained after filtering missing methods.")
+    if not args.preserve_empty_methods:
+        columns, summary_rows = filter_columns_with_data(columns, summary_rows)
+        if not columns:
+            raise SystemExit("No methods with data remained after filtering missing methods.")
 
     plot_summary(
         summary_rows=summary_rows,
@@ -1666,6 +1730,8 @@ def main() -> None:
         x_group_y_shift_pts=args.x_group_y_shift_pts,
         x_font_delta_map=parse_float_map(args.x_font_delta_map),
         right_trim_pts=args.right_trim_pts,
+        output_width_pts=args.output_width_pts,
+        output_height_pts=args.output_height_pts,
     )
 
     if args.csv_output:

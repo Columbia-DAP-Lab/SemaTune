@@ -9,7 +9,7 @@ usage() {
     'Usage: reproduction/plot_all.sh --results-dir DIR --output-dir DIR [options]' \
     '' \
     'Options:' \
-    '  --plots all|1,2,...       Plots to generate (default: all)' \
+    '  --plots all|6,7,...,12    Paper plots to generate (default: all)' \
     '  --validation MODE         fresh, measured, or paper (default: fresh)' \
     '' \
     'Use measured for the checked-in archived histories and fresh for a one-rerun suite.'
@@ -44,28 +44,29 @@ esac
 mkdir -p "$OUTPUT_DIR"
 
 if [[ "$PLOTS" == "all" ]]; then
-  SELECTED=(1 2 3 4 5 6 7)
+  SELECTED=(6 7 8 9 10 11 12)
 else
   IFS=',' read -r -a SELECTED <<< "$PLOTS"
 fi
 for plot in "${SELECTED[@]}"; do
-  [[ "$plot" =~ ^[1-7]$ ]] || { echo "Invalid plot number: $plot" >&2; exit 2; }
+  [[ "$plot" =~ ^(6|7|8|9|10|11|12)$ ]] || { echo "Invalid paper plot number: $plot" >&2; exit 2; }
 done
 
 export SEMATUNE_RESULTS_ROOT="$RESULTS_DIR"
 export SEMATUNE_VALIDATION_MODE="$VALIDATION"
 for plot in "${SELECTED[@]}"; do
-  echo "=== Plot $plot ==="
-  "$REPO_ROOT/scripts/artifact_plots/generate_plot_${plot}.sh" "$OUTPUT_DIR"
+  legacy_plot=$((plot - 5))
+  echo "=== Paper Plot $plot ==="
+  "$REPO_ROOT/scripts/artifact_plots/generate_plot_${legacy_plot}.sh" "$OUTPUT_DIR"
 done
 
-if [[ " ${SELECTED[*]} " == *" 5 "* ]]; then
+if [[ " ${SELECTED[*]} " == *" 10 "* ]]; then
   "$REPO_ROOT/scripts/artifact_plots/reuse_latency_table.sh" "$OUTPUT_DIR"
 fi
 
 printf '%s\n' \
   "PLOT_ALL: PASS" \
   "  results: $RESULTS_DIR" \
-  "  plots: ${SELECTED[*]}" \
+  "  paper plots: ${SELECTED[*]}" \
   "  validation: $VALIDATION" \
   "  output: $OUTPUT_DIR"

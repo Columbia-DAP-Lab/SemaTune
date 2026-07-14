@@ -27,7 +27,7 @@ command -v java >/dev/null || { echo 'Java is required; run scripts/setup.sh --b
 
 LOCK_FILE="/tmp/sematune-functional-sysbench-$(id -u).lock"
 exec 9>"$LOCK_FILE"
-flock -n 9 || { echo "Another SemaTune suite owns $LOCK_FILE" >&2; exit 1; }
+flock -n 9 || { echo "Another TuxBot suite owns $LOCK_FILE" >&2; exit 1; }
 OUTPUT_DIR="$(realpath -m "$OUTPUT_DIR")"
 mkdir -p "$OUTPUT_DIR/raw" "$OUTPUT_DIR/configs" "$OUTPUT_DIR/logs" "$OUTPUT_DIR/state"
 for workload in wikipedia twitter ycsb; do

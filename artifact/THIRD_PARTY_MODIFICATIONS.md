@@ -1,14 +1,14 @@
 # Third-party source boundaries and modifications
 
-All SemaTune-authored implementation is under `src/`. The `deps/` entries are
+All TuxBot-authored implementation is under `src/`. The `deps/` entries are
 pinned Git submodules retained as complete, indivisible third-party snapshots
 so their source, build files, history, and license notices stay together. Some
 upstream applications in those snapshots are not executed by the artifact;
-they are dependency source, not SemaTune artifact components.
+they are dependency source, not TuxBot artifact components.
 
 ## Exact revisions
 
-| Dependency | Pinned revision | Upstream base | SemaTune delta at the pinned revision |
+| Dependency | Pinned revision | Upstream base | TuxBot delta at the pinned revision |
 | --- | --- | --- | --- |
 | BenchBase | `54d30feb1f9c8b88cca7715fc19de1622cfd1b82` | Same commit in `cmu-db/benchbase` | None. The configured fork has later development commits, but they are not in the pinned artifact revision. |
 | TailBench | `2f3098b539a9a3413086fc77e29637937bafd116` | `c3bf142d25224af8a74d06b91c1a84b0e5b5e1d4` | One mode-only change: `tailbench-setup.sh` is executable (`100644` to `100755`). |

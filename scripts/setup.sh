@@ -21,7 +21,7 @@ Usage:
   scripts/setup.sh --memcached-server --server-ip IP --client-ip IP
   scripts/setup.sh --memcached-client --server-ip IP --client-ip IP
 
-Set up SemaTune on Ubuntu 22.04. The default is --base.
+Set up TuxBot on Ubuntu 22.04. The default is --base.
 
   --base               Install the complete Sysbench Functional environment:
                        the hash-locked Python environment, Sysbench, PostgreSQL
@@ -33,7 +33,7 @@ Set up SemaTune on Ubuntu 22.04. The default is --base.
                        generate the two-node server configuration.
   --memcached-client   Install only the pinned Mutilate load generator and a
                        restartable client service on the load-generator node.
-  --server-ip IP       Internal IPv4 address of the memcached/SemaTune server.
+  --server-ip IP       Internal IPv4 address of the memcached/TuxBot server.
   --client-ip IP       Internal IPv4 address of the Mutilate load-generator node.
   -h, --help
 
@@ -90,7 +90,7 @@ case "$MODE" in
 esac
 
 if [[ "$(uname -s)" != Linux ]]; then
-  echo 'SETUP: FAIL: SemaTune requires Linux bare metal.' >&2
+  echo 'SETUP: FAIL: TuxBot requires Linux bare metal.' >&2
   exit 1
 fi
 if [[ "$(dpkg --print-architecture)" != amd64 ]]; then
@@ -206,7 +206,7 @@ write_mutilate_env() {
 
 install_base() {
   apt_install \
-    ca-certificates ethtool git jq linux-tools-common linux-tools-generic numactl \
+    ca-certificates ethtool git jq numactl \
     openssl pciutils postgresql postgresql-client python3.10 python3.10-venv \
     python3-pip sysbench unzip util-linux build-essential openjdk-21-jdk-headless
 
@@ -218,19 +218,22 @@ install_base() {
   "${ROOT[@]}" update-alternatives --set java "$java21_home/bin/java"
   "${ROOT[@]}" update-alternatives --set javac "$java21_home/bin/javac"
 
-  # linux-tools-generic may be newer than the running kernel after unattended
-  # upgrades.  The /usr/bin/perf dispatcher exists in that case but cannot run,
-  # so exercise it before deciding that the matching tools are installed.
+  # Hardware-counter collection is useful for IPC/cache signal variants, but it
+  # is not required to install or execute the artifact. Try both the generic and
+  # running-kernel packages, then continue with an explicit comparability warning
+  # if the cloud image does not publish matching tools.
+  if ! perf --version >/dev/null 2>&1; then
+    apt_install linux-tools-common linux-tools-generic || true
+  fi
   if ! perf --version >/dev/null 2>&1; then
     local kernel_tools="linux-tools-$(uname -r)"
     if ! apt_install "$kernel_tools"; then
-      echo "SETUP: FAIL: perf is unavailable and $kernel_tools could not be installed." >&2
-      exit 1
+      echo "SETUP: WARNING: perf is unavailable and $kernel_tools could not be installed." >&2
     fi
-    perf --version >/dev/null 2>&1 || {
-      echo "SETUP: FAIL: perf remains unusable after installing $kernel_tools." >&2
-      exit 1
-    }
+  fi
+  if ! perf --version >/dev/null 2>&1; then
+    echo 'SETUP: WARNING: continuing without perf hardware-counter samples.' >&2
+    echo 'SETUP: WARNING: IPC/cache signal results are operational only, not performance-comparable.' >&2
   fi
 
   if [[ ! -x "$VENV/bin/python" ]]; then
@@ -383,7 +386,7 @@ configure_memcached_client() {
   temporary="$(mktemp)"
   cat > "$temporary" <<EOF
 [Unit]
-Description=SemaTune Mutilate load-generator client
+Description=TuxBot Mutilate load-generator client
 After=network-online.target
 Wants=network-online.target
 
@@ -449,7 +452,7 @@ case "$MODE" in
   full) [[ -z "$SERVER_IP" ]] || validate_network_role "$SERVER_IP" "$CLIENT_IP" server ;;
 esac
 
-echo "Setting up SemaTune ($MODE)..."
+echo "Setting up TuxBot ($MODE)..."
 "${ROOT[@]}" apt-get update
 
 case "$MODE" in

@@ -1,26 +1,22 @@
-# SemaTune Artifact
+# TuxBot Artifact
 
-This artifact accompanies **“SemaTune: Semantic-Aware Online OS Tuning with
+This artifact accompanies **“TuxBot: Semantic-Aware Online OS Tuning with
 Large Language Models,”** accepted at the ACM SIGOPS 32nd Symposium on
 Operating Systems Principles (SOSP ’26).
 
-## Artifact Available checklist (< 5 minutes)
+## Artifact Available (< 5 minutes)
 
 ### TL;DR for Artifact Reviewers
 
-1. Open the public
+1. Open the reviewer-shared
    [GitHub artifact snapshot](https://github.com/nebula-cu/os-param-tuning/tree/sosp-ae).
 2. Confirm the permissive [MIT license](LICENSE).
 3. Confirm that the paper title and venue appear above.
 
-The Zenodo DOI `10.5281/zenodo.21285693` is reserved and will be assigned to
-the public archive when artifact evaluation is complete.
+The Zenodo DOI `10.5281/zenodo.21285693` is reserved and will be
+assigned to the public archive after artifact evaluation is complete.
 
-- **Accessible:** the GitHub snapshot is public without authentication.
-- **Reusable:** `LICENSE` permits use, modification, and redistribution.
-- **Identified:** this README names the paper and SOSP ’26 venue.
-
-## Artifact Functional checklist
+## Artifact Functional (< 40 minutes)
 
 ### TL;DR for Artifact Reviewers
 
@@ -29,18 +25,14 @@ The expected Artifact Functional run uses the real hosted LLM for every
 LLM-based method. It demonstrates that all 14 selected tuner and signal paths
 operate end to end; it is not paper-performance validation.
 
-1. **SSH into the supplied host and enter the repository** (about 1 minute).
-
-   ```bash
-   cd /mydata/SemaTune-ae
-   ```
+1. **SSH into the supplied host and open a shell at the repository root**
+   (about 1 minute). All commands below are run from the repository root.
 
    The host, database, dependencies, and bare-metal controls are already
    prepared. Read the [safety requirements](#environment-and-safety) before
    using another machine.
 
-2. **Validate the complete Functional configuration without changing the
-   host** (less than 1 minute).
+2. **Validate the complete Functional configuration without changing the host** (less than 1 minute).
 
    ```bash
    functional_example/run.sh --dry-run
@@ -50,25 +42,18 @@ operate end to end; it is not paper-performance validation.
    `DRY_RUN: PASS`. This makes no provider request and writes no result or host
    control.
 
-3. **Run the real-LLM Functional workflow in a guaranteed-new directory**
-   (approximately 35 minutes elapsed; a measured run took 34 minutes 35
-   seconds).
+3. **Run the real-LLM Functional workflow in a guaranteed-new directory** (approximately 35 minutes).
 
    ```bash
-   export GEMINI_API_KEY='<provided-key>'
    mkdir -p results
    FUNCTIONAL_DIR="$(mktemp -d -p "$PWD/results" functional_sysbench_real_XXXXXXXX)"
 
    functional_example/run.sh --quick --real-llm \
      --output-dir "$FUNCTIONAL_DIR"
-
-   echo "Results: $FUNCTIONAL_DIR"
    ```
 
-   The key is supplied for evaluators on the provided CloudLab machine. The
-   runner reads it only from the environment. A complete run restores and
-   byte-verifies host state, creates summaries, and plots automatically. If it
-   is interrupted, resume the same directory:
+   The API key is supplied on the provided host and is read only from the
+   environment. If interrupted, resume the same directory:
 
    ```bash
    functional_example/run.sh --quick --real-llm --resume \
@@ -79,514 +64,148 @@ operate end to end; it is not paper-performance validation.
 
    ```bash
    jq '.methods | length' "$FUNCTIONAL_DIR/sysbench_summary.json"  # expect 14
-   column -s, -t < "$FUNCTIONAL_DIR/sysbench_summary.csv" | less -S
    jq . "$FUNCTIONAL_DIR/restoration_report.json"                 # expect PASS/PASS
-   find "$FUNCTIONAL_DIR/raw" -mindepth 1 -maxdepth 1 -type d | sort
    ls -lh "$FUNCTIONAL_DIR/plots"
    ```
 
-   The terminal should end with `HOST_STATE_RESTORE: PASS`,
-   `HOST_STATE_VERIFY: PASS`, and `FUNCTIONAL_SYSBENCH_RUN: PASS`. Confirm that
-   all 14 method directories and their tuning/stable rows are populated.
+   Success ends with `HOST_STATE_RESTORE: PASS`, `HOST_STATE_VERIFY: PASS`,
+   and `FUNCTIONAL_SYSBENCH_RUN: PASS`. Generated performance is host-dependent
+   and is not used to validate the paper claims.
 
-5. **Open the generated plots** (about 1 minute).
+For detailed commands, trace replay, resume modes, fresh-host setup, and
+troubleshooting, go to [INSTRUCTIONS.md](INSTRUCTIONS.md). Method/output details
+are in [functional_example/README.md](functional_example/README.md); environment,
+safety, and resources are in [artifact/VALIDATION_ENVIRONMENT.md](artifact/VALIDATION_ENVIRONMENT.md)
+and [docs/FUNCTIONAL_REVIEWER_NOTES.md](docs/FUNCTIONAL_REVIEWER_NOTES.md).
 
-   ```bash
-   ls -lh \
-     "$FUNCTIONAL_DIR/plots/sysbench_tuning_vs_stable.pdf" \
-     "$FUNCTIONAL_DIR/plots/functional_figure_6_equivalent.pdf" \
-     "$FUNCTIONAL_DIR/plots/functional_figure_7_equivalent.pdf" \
-     "$FUNCTIONAL_DIR/plots/functional_figure_8_equivalent.pdf" \
-     "$FUNCTIONAL_DIR/plots/functional_figure_9_equivalent.pdf"
-   ```
+## Results Reproduced (<10 hours)
 
-   These plots demonstrate operational paths only. Their host-dependent values
-   are not used to validate the paper claims in the Results Reproduced section.
+The recommended base run validates the **direction of C1–C4** once on Silo,
+TPC-C, and Sysbench OLTP-RW. These workloads cover the three evaluator-ready
+benchmark families while keeping the run below ten hours. Repeating the full
+paper matrix would take several days and substantially more hosted-model quota;
+therefore, the reviewer workflow intentionally uses this time-bounded subset.
+Results should preserve each claim's direction, but are not expected to match
+the exact five-repeat paper percentages.
 
-Detailed pointers:
+### Claim map
 
-- [Functional reviewer instructions](INSTRUCTIONS.md#artifact-functional-evaluator-instructions): expected terminal output, manual checks, resume, and fresh-host procedure.
-- [Functional example reference](functional_example/README.md): all methods, schedules, model choices, configurations, and output schema.
-- [Validation environment](artifact/VALIDATION_ENVIRONMENT.md): exact hardware, OS, software, storage, NICs, and dependency commits.
-- [Functional reviewer notes](docs/FUNCTIONAL_REVIEWER_NOTES.md): database safety, resource planning, and expected messages.
-- [Component and source map](docs/COMPONENTS.md): implementation directories and retained source files.
-- [Installation guide](docs/FULL_INSTALL.md): base setup plus optional TailBench, SparkBench, and Mutilate dependencies.
-- [Plot generation](docs/PLOTTING.md): Functional plot programs and paper-plot wrappers.
+| Claim | Accepted-paper observation | Paper plot |
+|---|---|---|
+| C1 | TuxBot improves stable performance over Default Parameters (+72.49%). | Plot 6 |
+| C2 | TuxBot outperforms application-metric MLOS (+153.3%). | Plot 6 |
+| C3 | System-metric TuxBot outperforms application-metric MLOS (+93.7%). | Plot 7 |
+| C4 | TuxBot remains effective at 41 knobs (+155.9%). | Plot 10 |
 
-Recorded trace replay remains available as an optional provider-free diagnostic,
-as described in the Functional reference. It does not replace the expected
-real-LLM Artifact Functional run above.
+A prior one-repeat validation preserved every direction: C1 +45.80%, C2
++133.34%, C3 +137.61% over 11 workloads, and C4 +19.52% at 41 knobs over the
+three-workload sweep. These are stochastic observations, not replacement paper
+values.
 
-## Results Reproduced checklist
-
-### TL;DR for Artifact Reviewers
-
-The goal is to validate the **observations behind claims C1–C4**, not to obtain
-bit-for-bit or percentage-for-percentage equality. The paper aggregates five
-runs over 13 workloads; this time-bounded workflow performs one fresh,
-real-LLM run over Silo, TPC-C, and Sysbench OLTP-RW. LLM choices and system measurements
-are noisy, so similar conclusions, not the exact submitted percentages, are the
-expected outcome.
-
-The scoped validation has 1,050 configured windows (1.46 nominal benchmark
-hours) and is intended to finish within 10 hours including workload startup,
-database resets, and provider latency. Budget several dollars for real-LLM API
-usage; the exact amount depends on generated token counts and provider pricing.
-
-The complete paper set contains SparkBench, Masstree, Mutilate, SIbench, Silo,
-Sphinx, Sysbench CPU, Sysbench OLTP-RW, TPC-C, Twitter, Wikipedia, Xapian, and
-YCSB. A single fresh full-workload C1–C4 workflow has 13,430 configured windows
-(18.65 nominal benchmark hours) and can take several days after overhead.
-Repeating that workflow five times, as in the paper methodology, exceeds 93
-nominal benchmark hours before setup and provider delays and incurs additional
-real-LLM cost. This is why the default reviewer workflow uses the representative
-three-workload subset.
-
-#### Quick claim map
-
-All fresh comparisons use the geometric mean across Silo, TPC-C, and Sysbench
-OLTP-RW. The stable phase is windows 31–50; C4 also plots tuning windows 1–30.
-
-| Claim | Fresh comparison | Required configurations | Generated plot |
-|---|---|---:|---|
-| C1 | 8-knob SemaTune App vs. Default Parameters | 6 | `fresh/plots/c1_sematune_vs_default.pdf` |
-| C2 | 8-knob SemaTune App vs. application-metric MLOS | 9 | `fresh/plots/c2_sematune_vs_mlos.pdf` |
-| C3 | System-metric SemaTune vs. application-metric MLOS | 9 | `fresh/plots/c3_system_vs_mlos.pdf` |
-| C4 | SemaTune App vs. Default at 2, 8, 16, and 41 knobs | 15 | `fresh/plots/c4_parameter_scaling.pdf` |
-
-Configurations shared between claims are run once, so the union is 21 jobs
-rather than the sum of the per-claim counts. `claim_report.md` records each
-claim as `COMPLETE` or incomplete and its fresh direction as `CONSISTENT` or
-`DIVERGENT`.
-
-1. **SSH into the supplied preconfigured CloudLab host** (about 1 minute).
-
-   ```bash
-   cd /mydata/SemaTune-ae
-   ```
-
-   This host is strongly recommended because the databases, workload inputs,
-   dependencies, API access, and bare-metal controls are prepared. Live runs
-   change scheduler, network, VM, P-state, and C-state controls; the runner
-   restores and byte-verifies them afterward.
-
-2. **Inspect and validate the execution plan without changing the host** (less
-   than 1 minute).
-
-   ```bash
-   reproduction/reproduce_claims.sh --dry-run
-   ```
-
-   Expect 21 unique configurations, 15 LLM configurations, three workloads,
-   and 1,050 benchmark windows. The eight-knob SemaTune runs are shared across
-   claims rather than repeated.
-
-3. **Run the scoped claims workflow with the real hosted LLM** (nominal window
-   time 1.46 hours; allow up to 10 hours for workload startup, database resets,
-   and provider latency).
-
-   ```bash
-   export GEMINI_API_KEY='<provided-key>'
-   mkdir -p results
-   RUN_DIR="$PWD/results/reproduced_core"
-
-   reproduction/reproduce_claims.sh --run --clean --output-dir "$RUN_DIR"
-
-   echo "Results: $RUN_DIR"
-   ```
-
-   The key is supplied on the evaluator CloudLab machine. The command first
-   regenerates Plots 1, 2, and 5 from the archived five-repeat evidence, then
-   runs one fresh repetition. This real-provider path is the primary Results
-   Reproduced workflow. If interrupted, invoke the same command with the same
-   `RUN_DIR` but omit `--clean`; only structurally complete 50-window histories
-   are skipped. `--clean` preserves an older result tree under
-   `results/archive/` and prints its exact destination. If a valid API key is
-   temporarily unusable because of provider availability, quota, rate limits,
-   or model access, use the trace-replay fallback below. Replay reruns the real
-   workloads but does not retest generation of new decisions by the provider.
-
-4. **Regenerate the fresh C1–C4 plots if desired** (less than 1 minute after the
-   runs finish). A successful complete run already performs this step.
-
-   ```bash
-   .venv-functional/bin/python reproduction/plot_claims.py \
-     --results-dir "$RUN_DIR/fresh/raw" \
-     --output-dir "$RUN_DIR/fresh" \
-     --report-dir "$RUN_DIR" \
-     --archived-plots-dir "$RUN_DIR/archived/plots" \
-     --manifest reproduction/claim_manifest.json
-   ```
-
-   This writes `c1_sematune_vs_default.pdf`, `c2_sematune_vs_mlos.pdf`,
-   `c3_system_vs_mlos.pdf`, and `c4_parameter_scaling.pdf` under
-   `$RUN_DIR/fresh/plots/`, with their source values under `fresh/tables/`.
-
-5. **Inspect the report, tables, restoration evidence, and plots** (about 3–5
-   minutes).
-
-   ```bash
-   cat "$RUN_DIR/claim_report.md"
-   jq '.fresh_claims' "$RUN_DIR/claim_report.json"
-   jq '.failures, .elapsed_seconds_this_invocation' "$RUN_DIR/fresh/run_status.json"
-   jq . "$RUN_DIR/fresh/restoration_report.json"
-   column -s, -t < "$RUN_DIR/fresh/tables/claim_summary.csv"
-   ls -lh "$RUN_DIR/fresh/plots" "$RUN_DIR/archived/plots"
-   ```
-
-   The expected qualitative observations are:
-
-   - **C1:** SemaTune has a positive stable aggregate relative to Default
-     Parameters and is normally materially better.
-   - **C2:** SemaTune App is significantly better than application-metric MLOS
-     in the stable aggregate.
-   - **C3:** SemaTune using only system metrics still outperforms
-     application-metric MLOS.
-   - **C4:** SemaTune remains operational and effective as the action space
-     grows through the tested 2, 8, 16, and 41 parameters, including a finite
-     and normally positive 41-parameter aggregate.
-
-   `COMPLETE` means all required evidence is structurally valid. `CONSISTENT`
-   means the fresh aggregate has the expected direction. A stochastic
-   `DIVERGENT` result is reported rather than hidden; reviewers should inspect
-   its workload rows and logs instead of requiring the exact paper percentage.
-
-#### Optional live C1–C3 family extension
-
-To extend the provider-backed observation to every paper workload implemented
-through BenchBase, Sysbench, and TailBench—without running the C4 knob sweep—use:
+The API key is assumed to already be exported. Validate the plan, then run the
+base tier:
 
 ```bash
-reproduction/reproduce_c123_families.sh --dry-run
-reproduction/reproduce_c123_families.sh --run \
-  --output-dir results/reproduced_core --keep-going
+reproduction/reproduce_claims.sh --dry-run
+RUN_DIR="$PWD/results/reproduced_core"
+reproduction/reproduce_claims.sh --run --clean --output-dir "$RUN_DIR"
 ```
 
-Add `--clean` when a completely new 44-configuration run is desired. The
-existing output is moved under `results/archive/` before the canonical result
-directory is recreated, so the plotting paths never mix old and new histories.
-`--clean` and `--seed-live-from` are intentionally mutually exclusive.
+The base tier selects 21 configurations and 1,050 windows. `--clean` moves an
+older result tree under `results/archive/`; omit it when resuming.
 
-The plan contains 44 configurations and 2,200 windows across Masstree, Silo,
-Sphinx, Xapian, SIbench, TPC-C, Twitter, Wikipedia, YCSB, Sysbench CPU, and
-Sysbench OLTP-RW. When the three-workload provider run is already present, 12
-configurations resume and only the 32 missing configurations execute. Reinvoke
-the same command after an interruption; valid 50-window histories are never
-repeated. The complete plan has 3.06 nominal benchmark-window hours; extending
-the saved three-workload provider run adds 2.22 nominal hours. Allow additional
-time for database creation, JVM/process startup, hosted-model responses, and
-the bounded BenchBase window retry.
-
-If `results/reproduced_core` currently contains a trace replay, first seed the
-extension from the safely archived provider-backed result. The wrapper verifies
-that the seed contains no replay configuration, archives the current output,
-and restores the provider result before running anything:
+If evaluation time permits, populate the complete paper Plot 6/7 method grid
+and compare TuxBot, TuxBot-Trim, and MLOS throughout Plot 10 with the
+60-configuration three-workload tier instead:
 
 ```bash
-reproduction/reproduce_c123_families.sh --run \
-  --output-dir results/reproduced_core \
-  --seed-live-from results/archive/PROVIDER_RUN_DIRECTORY \
-  --keep-going
+reproduction/reproduce_claims.sh --dry-run --extended
+reproduction/reproduce_claims.sh --run --extended --clean \
+  --output-dir "$RUN_DIR"
 ```
 
-The resulting [`c123_family_report.md`](results/reproduced_core/c123_family_report.md)
-reports C1–C3 separately for all 11 workloads and for the 10-workload aggregate
-excluding Xapian, matching the original with/without-Xapian convention. Exact
-per-workload factors are in `fresh/tables/c123_improvement_factors.csv`. The
-shared `fresh/run_status.json` can also retain completed provider-baseline jobs
-outside this extension; the C1–C3 report and `c123_*.csv` files are scoped to
-exactly the manifest's 44 configurations. This workflow requires live provider
-access and deliberately has no trace-replay.
-Its two PDFs reproduce evaluation Plots 1 and 2 rather than creating one plot
-per claim. They retain the paper's complete method order, page dimensions, bar
-widths, labels, colors, typography, and with/without-Xapian layout. Methods not
-selected by this scoped run remain as empty bar positions.
+All tiers write the paper-layout plots under `$RUN_DIR/fresh/plots/`:
 
-#### Queued C4 method comparison
+| Paper plot | PDF |
+|---|---|
+| Plot 6 (C1/C2) | `retry_aggregate_improvement_geomean_with_and_without_xapian.pdf` |
+| Plot 7 (C3) | `retry_indirect_aggregate_improvement_geomean_with_and_without_xapian.pdf` |
+| Plot 10 (C4) | `ablation_param_geomean.pdf` |
 
-C4 remains scoped to Silo, TPC-C, and Sysbench OLTP-RW; the additional C1–C3
-workloads do not receive a knob sweep. After the C1–C3 family run validates,
-compare SemaTune and TuxBot-Trim at 2, 8, 16, and 41 knobs, with MLOS at 2, 8,
-and 16 knobs, using:
+The fast base tier fills its measured method positions and preserves all
+unavailable paper-grid positions as empty. `--extended` fills the requested
+three-workload method matrix when the evaluator has more time.
 
-```bash
-reproduction/reproduce_c4_methods.sh --dry-run
-reproduction/reproduce_c4_methods.sh --run \
-  --output-dir results/reproduced_core --keep-going
-```
+Legacy internal identifiers beginning with `sematune_*` refer to the same
+system now named TuxBot and are retained for result compatibility.
 
-To queue it behind a C1–C3 process that is already running, use its wrapper PID:
+The reports are `claim_report.md`, `three_app_plots_6_7_report.md`, and
+`c4_method_report.md`. Matching CSVs are under `fresh/plots/` and `fresh/tables/`.
+The relevant reports must show complete evidence and `CONSISTENT`; also verify
+`fresh/restoration_report.json` reports successful host restoration.
 
-```bash
-nohup reproduction/queue_c4_methods.sh \
-  --wait-for-pid "$C123_PID" \
-  --output-dir results/reproduced_core --keep-going \
-  > results/reproduced_core/c4_methods_queue.log 2>&1 &
-```
-
-The queue refuses to start C4 unless the final C1–C3 report, histories, tables,
-and plots pass strict validation. The C4 plan has 36 configurations and 1,800
-windows. It resumes 18 completed Fixed/SemaTune/MLOS configurations from the
-provider baseline and measures the 18 missing MLOS and TuxBot-Trim
-configurations (900 windows). MLOS is provider-free; each TuxBot-Trim run
-uses ten Gemini-assisted search-space trimming cycles before/in conjunction
-with its MLOS optimization windows.
-The output uses the actual paper Plot 5 implementation and exact style. Its
-fresh mode disables the submitted figure's historical Trim overrides and proxy
-fallbacks, so every populated value is measured. MLOS@41 is intentionally not
-scheduled and remains empty in the plot and CSV. Results are written to
-`c4_method_report.{md,json}`, `fresh/plots/ablation_param_geomean.pdf`, and
-disaggregated `fresh/tables/ablation_param_geomean*.csv` files.
-
-#### Exact three-application Plots 1 and 2
-
-To reproduce the paper Plot 1/2 method matrix on the same Silo, TPC-C, and
-Sysbench OLTP-RW applications, run this after the C4 command:
-
-```bash
-reproduction/reproduce_three_app_plot12.sh --dry-run
-reproduction/reproduce_three_app_plot12.sh --run \
-  --output-dir results/reproduced_core --keep-going
-```
-
-The 30-configuration manifest contains Fixed plus TuxBot App/System/IPC,
-TuxBot-Trim App/IPC/Cache, and MLOS App/IPC/Cache for each application. After
-the C4 workflow, 15 strict 50-window histories resume and the 15 signal jobs
-that C4 does not cover execute once. Plot 1 uses TuxBot App, TuxBot-Trim App,
-and MLOS App; Plot 2 uses every requested signal variant. Bayesian, DQN, and
-Q-Learning are outside this scoped run and retain empty Plot 1 slots so the
-paper bar widths and layout do not change.
-
-The outputs replace the canonical paper-equivalent Plot 1/2 PDFs only after
-all 30 histories pass strict completion checks. Exact page dimensions, method
-order, bar geometry, labels, colors, and typography come from the paper plot
-program. See `three_app_plot12_report.{md,json}` and the two
-`fresh/plots/retry_*.csv` files for claim and disaggregated aggregate values.
-
-#### Provider-free trace replay
-
-Hosted-model availability is external to the artifact: a supplied API key can
-occasionally fail because the service, quota, rate limit, model, or account is
-temporarily unavailable. Reviewers should try the real-provider command first.
-If provider access prevents it from completing, the recommended fallback is to
-rerun the system from the
-[committed provider-response baseline](reproduction/trace_baselines/c1_c4_provider/).
-The runner validates every baseline checksum before changing any output.
-
-Trace replay runs all 21 configurations and all 1,050 workload windows again:
-the 15 SemaTune jobs consume role-aware Actor/Speculator responses extracted
-from the completed histories, while Fixed and MLOS run normally. It does not
-copy workload measurements. Recorded response delays are preserved so
-asynchronous action timing remains comparable, and hosted-model requests are
-forbidden.
-
-The packaged fallback is intentionally two short commands:
+If the provider is unavailable, run the committed base trace fallback:
 
 ```bash
 reproduction/replay_claims.sh --dry-run
 reproduction/replay_claims.sh --run
 ```
 
-The wrapper removes Gemini and OpenRouter keys from the child environment and
-uses `reproduction/trace_baselines/c1_c4_provider` directly. `--run` archives an
-older `results/reproduced_core` tree before starting. If replay itself is
-interrupted, resume its structurally complete jobs without archiving them:
+Replay executes the base workload windows with zero API calls but does not
+retest provider generation. Detailed validation, resume, extended/full modes,
+and exact output names are in [INSTRUCTIONS.md](INSTRUCTIONS.md).
 
-```bash
-reproduction/replay_claims.sh --run --resume
-```
-
-The committed bundle contains the 15 provider-backed Actor/Speculator response
-streams plus checksummed baseline claim and per-workload factor files. It does
-not contain replay measurements: Fixed, MLOS, and every SemaTune configuration
-still execute on the machine. A maintainer may also replay a different
-completed live result tree with the lower-level `--trace-replay-from` option,
-but reviewers do not need a timestamped archive for the packaged fallback.
-
-Reviewer-facing aggregate and disaggregated evidence is laid out as follows:
-
-| Path | Audit purpose |
-|---|---|
-| [`reproduction/trace_baselines/c1_c4_provider/manifest.json`](reproduction/trace_baselines/c1_c4_provider/manifest.json) | Committed job-to-trace map, checksums, provider models, and baseline scope |
-| [`reproduction/trace_baselines/c1_c4_provider/traces/`](reproduction/trace_baselines/c1_c4_provider/traces/) | The 15 committed provider-response traces used by the fallback |
-| [`replay_comparison.md`](results/reproduced_core/replay_comparison.md) | Concise live-versus-replay C1–C4 conclusion |
-| [`replay_comparison.csv`](results/reproduced_core/replay_comparison.csv) | Claim rows plus every workload/method/knob-count/phase factor |
-| [`replay_comparison.json`](results/reproduced_core/replay_comparison.json) | Per-job action matching, source hashes, and machine-readable totals |
-| [`fresh/tables/phase_metrics.csv`](results/reproduced_core/fresh/tables/phase_metrics.csv) | Mean metric for every job and tuning/stable phase, with its history path |
-| [`fresh/tables/improvement_factors.csv`](results/reproduced_core/fresh/tables/improvement_factors.csv) | Disaggregated per-workload improvement factors |
-| [`fresh/tables/claim_summary.csv`](results/reproduced_core/fresh/tables/claim_summary.csv) | Inputs to the four aggregate claim observations |
-| [`fresh/tables/parameter_scaling.csv`](results/reproduced_core/fresh/tables/parameter_scaling.csv) | C4 values at 2, 8, 16, and 41 knobs |
-| [`fresh/replay_traces/`](results/reproduced_core/fresh/replay_traces/) | One hashed, provider-free trace for each of the 15 SemaTune jobs |
-| [`fresh/raw/`](results/reproduced_core/fresh/raw/) | Newly measured per-window optimization histories and metrics |
-| [`fresh/logs/`](results/reproduced_core/fresh/logs/) and [`fresh/run_configs/`](results/reproduced_core/fresh/run_configs/) | One execution log and exact materialized configuration per job |
-| [`fresh/run_status.json`](results/reproduced_core/fresh/run_status.json) | All 21 job outcomes, replay mode, and zero-provider-request contract |
-| [`fresh/restoration_report.json`](results/reproduced_core/fresh/restoration_report.json) | Host-control restoration and byte-verification evidence |
-
-The optional full-workload C1–C4 command is
-`reproduction/reproduce_claims.sh --run --full --output-dir DIR`. It selects
-232 configurations and 13,430 windows (18.65 nominal window-hours) and can take
-one to several days.
-
-Detailed pointers:
-
-- [Results Reproduced evaluator instructions](INSTRUCTIONS.md#results-reproduced-tldr): concise commands and output checks.
-- [Claims workflow reference](reproduction/README.md): C1–C4 calculations, schedules, strict resume rules, full mode, and output layout.
-- [Paper evidence map](artifact/PAPER_CLAIMS_AND_PLOTS.md): archived inputs, provenance, wrappers, and submitted references.
-- [Plot generation](docs/PLOTTING.md): fresh claim plotter and canonical paper-plot commands.
-- [Full installation](docs/FULL_INSTALL.md): fresh-host TailBench, BenchBase, Sysbench, and other workload preparation.
-
-Other paper experiments remain available but are outside this time-bounded
-C1–C4 workflow.
-
-### What is in the artifact?
-
-- `src/optimizer/`: optimization runtime, workload adapters, memory, and tuners.
-- `functional_example/`: reduced Sysbench workflow, configs, traces, and plots.
-- `reproduction/`: full experiment configurations and rerun orchestration.
-- `all_results/paper_evaluation/`: archived paper-result histories.
-- `scripts/artifact_plots/`: paper-plot wrappers and validators.
-- `deps/`: complete pinned third-party source snapshots, separate from authored
-  code and retained intact with their build files and license notices.
-
-See the concise [component and source map](docs/COMPONENTS.md) for every
-retained file under `src/optimizer/`. Third-party versions and relationships
-are in [`deps/README.md`](deps/README.md); exact upstream bases and fork deltas
-are in the [third-party modification map](artifact/THIRD_PARTY_MODIFICATIONS.md).
+## Artifact reference
 
 ### Environment and safety
 
-The paper platform used x86-64 CloudLab bare metal with 2 × Intel Xeon Silver
-4114, 192 GiB RAM, Ubuntu 22.04.2 LTS, and kernel `5.15.0-160-generic`. The
-recorded Functional run used Ubuntu 22.04.2, kernel `5.15.0-177-generic`, 40
-logical CPUs, and the same CPU family.
+The paper machine is x86-64 CloudLab `c220` bare metal: 2 × Intel Xeon Silver
+4114, 192 GiB RAM, Ubuntu 22.04.2, kernel `5.15.0-160-generic`. Live runs change
+scheduler, network, VM, P-state, C-state, and IRQ controls and recreate test
+database tables. Use only a dedicated/disposable host and database. Every
+runner snapshots, restores, and byte-verifies host state.
 
-> **Safety warning:** live experiments change scheduler, busy-poll, Intel
-> P-state, CPU-idle, and IRQ-affinity controls. Use only a dedicated/disposable
-> bare-metal host with administrator access. The runner restores and
-> byte-verifies the captured settings on exit.
-
-> **Database warning:** setup creates or updates the local `admin` role and
-> `benchdb`; workload preparation may recreate test tables or disposable smoke
-> databases. Never point the artifact at a valuable or shared database. See
-> the [complete safety notes](docs/FUNCTIONAL_REVIEWER_NOTES.md#safety-and-destructive-operations).
-
-Evaluators already have a configured host. Otherwise instantiate the
-[parameterized CloudLab `small-lan` profile](https://www.cloudlab.us/p/PortalProfiles/small-lan&rerun_paramset=77c05171-9bff-4316-8832-cc0b265f4bdb)
-on a Wisconsin `c220`. One node is sufficient for this Functional check; full
-distributed experiments need two.
-
-### Installation
-
-On a fresh Ubuntu 22.04 x86-64 host:
+Install the minimal environment on Ubuntu 22.04 x86-64 with:
 
 ```bash
 scripts/setup.sh --base
 ```
 
-This installs the locked Python environment, Sysbench, PostgreSQL and its local
-database, Java 21, and BenchBase. Exact Python dependencies are in
-`requirements.txt` and `requirements-bootstrap.lock`; OS inputs are in
-`artifact/apt-packages.in.json`. Setup generates the ignored, mode-600
-`functional_example/site.env`; no manual database address or disk path is
-needed for the minimal workflow.
+Setup uses locked Python requirements, package-managed OS dependencies, and
+generated site configuration. Missing matching `perf` tools produce a warning,
+not a setup failure; IPC/cache variants are then operational checks only and
+must not be interpreted quantitatively.
 
-For TailBench, SparkBench, the local Mutilate build, storage requirements, and
-component commands, see [full dependency installation](docs/FULL_INSTALL.md).
-Reviewer time, RAM, and disk planning is summarized in the
-[Functional resource table](docs/FUNCTIONAL_REVIEWER_NOTES.md#resource-planning).
+Expected time, RAM, disk use, destructive-operation warnings, and unusual
+messages are listed in [Functional reviewer notes](docs/FUNCTIONAL_REVIEWER_NOTES.md).
 
-### Two-node Mutilate Functional check
+### Components and provenance
 
-Mutilate uses a memcached/SemaTune server and a separate load generator. From
-the same repository revision on both Ubuntu 22.04 nodes, pass allocation
-addresses explicitly; no address is compiled into the client or benchmark:
+| Path | Role |
+|---|---|
+| `README.md`, `INSTRUCTIONS.md` | Short and detailed evaluator entry points |
+| `src/optimizer/` | Tuning runtime, tuners, system controls, and workload adapters |
+| `functional_example/` | Minimal Sysbench example, configurations, traces, and plots |
+| `reproduction/reproduce_claims.sh` | Unified base, extended, and full C1–C4 runner |
+| `reproduction/{claim,extended_claim,full_claim}_manifest.json` | Exact one-repeat tier selections and completion contracts |
+| `reproduction/trace_baselines/` | Checksummed provider-response fallback and disaggregated baseline evidence |
+| `reproduction/configs/` | Materialized paper-derived experiment configurations |
+| `reproduction/{suite.py,plot_claims.py,plot_three_app_paper.py,plot_c4_methods.py}` | Fresh validation, resume, plotting, and report generation |
+| `all_results/paper_evaluation/` | Curated archived paper histories |
+| `paper_evaluation_plots/` | Submitted reference PDFs and latency table |
+| `scripts/setup*.sh`, `scripts/fetch_artifact_inputs.py` | Dependency installation and locked external-input retrieval |
+| `scripts/artifact_plots/` | Archived-paper plot wrappers and numerical validators |
+| `config/benchbase/postgres/` | Retained BenchBase workload inputs |
+| `deps/` | Pinned third-party source snapshots, kept separate from authored code |
+| `artifact/` | Environment locks, checksums, provenance, and modification records |
+| `tests/` | Functional, setup, trace, manifest, and reproduction checks |
+| `tools/maintenance/` | Maintainer-only derivation and trace-extraction utilities |
+| `requirements*.{in,txt,lock}` | Python dependency inputs and locked environments |
 
-```bash
-# SemaTune + memcached server (10.10.1.2)
-scripts/setup.sh --memcached-server \
-  --server-ip 10.10.1.2 --client-ip 10.10.1.3
-
-# Mutilate load generator (10.10.1.3)
-scripts/setup.sh --memcached-client \
-  --server-ip 10.10.1.2 --client-ip 10.10.1.3
-```
-
-The client command builds the pinned Mutilate revision and enables the
-`sematune-mutilate-client.service` system service. It may run first: the
-service waits and reconnects whenever there is no active server experiment.
-Inspect it with `systemctl status sematune-mutilate-client` or
-`journalctl -u sematune-mutilate-client -f` on the load generator.
-
-On the server, validate the generated deployment and then perform one short
-real-provider run:
-
-```bash
-functional_example/run_mutilate.sh --dry-run
-
-export GEMINI_API_KEY='<provided-key>'
-functional_example/run_mutilate.sh --quick --real-llm \
-  --output-dir results/functional_mutilate_real
-```
-
-This runs one default baseline, three tuning windows, and two frozen stable
-windows at five seconds each. Both LLM roles use Gemini 2.5 Flash-Lite. Success
-requires real Actor and Speculator API evidence, byte-verified host restoration,
-and at least two finite, positive Mutilate samples—including throughput and
-average/p95/p99 latency—in every window. Per-window values are written to
-`mutilate_summary.{json,csv}` and printed at completion.
-
-`--memcached-server` is standalone and includes the base SemaTune environment;
-`--memcached-client` installs only the load-generator closure. `--base` remains
-unchanged. `--full --server-ip IP --client-ip IP` performs the same server
-configuration after the broader full installation; without the addresses,
-`--full` retains its software-only behavior.
-
-### What does the Functional run do?
-
-It runs Sysbench OLTP read/write with Fixed; MLOS App/IPC/Cache; Bayesian; DQN;
-Q-learning; SemaTune Single; SemaTune App/System/IPC; and SemaTune-Trim
-App/IPC/Cache. Each method uses 5 tuning plus 5 stable 10-second windows over
-the eight OS parameters used in paper Figures 6–8. The paper configuration is
-30 tuning plus 20 stable windows and evaluates broader parameter spaces.
-
-All Functional LLM roles deliberately use Gemini 2.5 Flash-Lite to reduce API
-cost. This degraded model and reduced schedule prove that the selected paths
-are operational; their performance is host-dependent and is **not** used to
-validate paper results.
-
-No API key is required for recorded-response replay:
-
-```bash
-functional_example/run.sh --quick --trace-replay \
-  --output-dir results/functional_sysbench_trace
-```
-
-The runner automatically selects the committed trace for each LLM method.
-`--resume` preserves completed methods. DQN/Q-learning messages reducing the
-grid from 10 to 2 points are expected and cap their action spaces at 1,000.
-
-The measured 14-method real-provider run took 34 minutes 35 seconds. Its result
-directory contained 3.5 MB of files (4.6 MB allocated); the Python environment
-used 1.6 GB allocated.
-
-### Short reference links
-
-- [Reviewer execution and inspection](INSTRUCTIONS.md)
-- [Component/file map](docs/COMPONENTS.md)
-- [Full TailBench, SparkBench, and Mutilate installation](docs/FULL_INSTALL.md)
-- [Defining and running a custom Sysbench workload](docs/CUSTOM_SYSBENCH.md)
-- [Functional and paper plot generation](docs/PLOTTING.md)
-- [Paper claims, exact inputs, and provenance](artifact/PAPER_CLAIMS_AND_PLOTS.md)
-- [Full rerun workflow](reproduction/README.md)
-
-### Functional audit references
-
-- [Exact validation-machine report](artifact/VALIDATION_ENVIRONMENT.md)
-- [Safety, resource use, and expected behavior](docs/FUNCTIONAL_REVIEWER_NOTES.md)
-- [Third-party source and modification boundary](artifact/THIRD_PARTY_MODIFICATIONS.md)
-- [Archived-data selection, redaction, and limitations](artifact/paper_plot_inputs.json)
-
-The reduced inputs are `functional_example/sysbench_*.json`, mapped by
-`functional_example/sysbench_suite.json`; full inputs are under
-`reproduction/configs/`. The paper makes no mechanized-proof claim requiring a
-proof checker.
+See the [source map](docs/COMPONENTS.md), [dependency installation](docs/FULL_INSTALL.md),
+[third-party modification boundary](artifact/THIRD_PARTY_MODIFICATIONS.md), and
+[data curation record](artifact/paper_plot_inputs.json). Exact Python locks,
+OS-package inputs, dependency commits, example configurations, and download
+automation are included. The paper makes no mechanized-proof claim; empirical
+quantitative claims are checked by the reproduction and plot-validation scripts
+above.

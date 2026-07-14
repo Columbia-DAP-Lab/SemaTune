@@ -64,24 +64,24 @@ def validate(output: Path, profile: str = "paper") -> tuple[list[str], list[str]
     plot2_csv = output / "retry_indirect_aggregate_improvement_geomean_with_and_without_xapian.csv"
     checks: list[tuple[str, Path, list[tuple[str, str, int, float]]]] = [
         (
-            "plot 1 (main aggregate)",
+            "plot 6 (main aggregate)",
             output / "retry_aggregate_improvement_geomean_with_and_without_xapian.csv",
             [
-                ("tuning", "Tuxbot App Metrics Dual Loop", 13, 59.36),
-                ("stable", "Tuxbot App Metrics Dual Loop", 13, 72.49),
-                ("stable", "Tuxbot App Metrics Dual Loop no Catastrophic", 11, 88.07),
+                ("tuning", "TuxBot App Metrics Dual Loop", 13, 59.36),
+                ("stable", "TuxBot App Metrics Dual Loop", 13, 72.49),
+                ("stable", "TuxBot App Metrics Dual Loop no Catastrophic", 11, 88.07),
                 ("stable", "MLOS", 13, -31.91),
                 ("stable", "MLOS no Catastrophic", 11, 50.52),
             ],
         ),
         (
-            "plot 2 (indirect signals)",
+            "plot 7 (indirect signals)",
             plot2_csv,
             [
-                ("stable", "Tuxbot App Only Dual", 13, 72.49),
-                ("stable", "Tuxbot Indirect Dump Dual", 13, 36.31),
-                ("stable", "Tuxbot IPC Dual", 13, 16.19),
-                ("stable", "Tuxbot Indirect Dump Dual no Catastrophic", 11, 69.82),
+                ("stable", "TuxBot App Only Dual", 13, 72.49),
+                ("stable", "TuxBot Indirect Dump Dual", 13, 36.31),
+                ("stable", "TuxBot IPC Dual", 13, 16.19),
+                ("stable", "TuxBot Indirect Dump Dual no Catastrophic", 11, 69.82),
                 ("stable", "MLOS IPC no Catastrophic", 11, -24.09),
             ],
         ),
@@ -121,10 +121,10 @@ def validate(output: Path, profile: str = "paper") -> tuple[list[str], list[str]
             if int(float(row.get("n_benchmarks") or 0)) != n:
                 errors.append(f"{method} benchmark count mismatch")
         (failed if errors else passed).append(
-            "plot 3 (dual/single cost)" + (": " + "; ".join(errors) if errors else "")
+            "plot 8 (dual/single cost)" + (": " + "; ".join(errors) if errors else "")
         )
     except FileNotFoundError:
-        failed.append("plot 3 (dual/single cost): missing output")
+        failed.append("plot 8 (dual/single cost): missing output")
 
     path = output / "retry_robustness_memory_tuxbot_mlos_1_30_aggregate.csv"
     try:
@@ -147,10 +147,10 @@ def validate(output: Path, profile: str = "paper") -> tuple[list[str], list[str]
             ):
                 errors.append(f"{method} mismatch")
         (failed if errors else passed).append(
-            "plot 4 (robustness command summary)" + (": " + "; ".join(errors) if errors else "")
+            "plot 9 (robustness command summary)" + (": " + "; ".join(errors) if errors else "")
         )
     except FileNotFoundError:
-        failed.append("plot 4 (robustness): missing output")
+        failed.append("plot 9 (robustness): missing output")
 
     path = output / "ablation_param_geomean.csv"
     try:
@@ -175,10 +175,10 @@ def validate(output: Path, profile: str = "paper") -> tuple[list[str], list[str]
             if row is None or any(not close(number(row, key), value) for key, value in zip(keys, expected)):
                 errors.append(f"{count}-parameter point mismatch")
         (failed if errors else passed).append(
-            "plot 5 (parameter scaling)" + (": " + "; ".join(errors) if errors else "")
+            "plot 10 (parameter scaling)" + (": " + "; ".join(errors) if errors else "")
         )
     except FileNotFoundError:
-        failed.append("plot 5 (parameter scaling): missing output")
+        failed.append("plot 10 (parameter scaling): missing output")
 
     path = output / "rag_memory_app_system_geomean.csv"
     try:
@@ -204,16 +204,16 @@ def validate(output: Path, profile: str = "paper") -> tuple[list[str], list[str]
                 errors.append(f"{phase}/{method} mismatch")
             elif int(float(row.get("n_workloads") or 0)) != 3:
                 errors.append(f"{phase}/{method} does not use three workloads")
-        if not (output / "PLOT_6_REGULAR_BASELINE.txt").is_file():
+        if not (output / "PLOT_11_REGULAR_BASELINE.txt").is_file():
             errors.append("missing regular-baseline provenance marker")
         if not (output / "rag_memory_app_system_geomean.pdf").is_file():
             errors.append("missing regenerated memory PDF")
         (failed if errors else passed).append(
-            "plot 6 (memory histories; regular App-only baseline)"
+            "plot 11 (memory histories; regular App-only baseline)"
             + (": " + "; ".join(errors) if errors else "")
         )
     except FileNotFoundError:
-        failed.append("plot 6 (memory): missing regenerated CSV")
+        failed.append("plot 11 (memory): missing regenerated CSV")
 
     path = output / "mlos_motivation_examples_combined.csv"
     try:
@@ -236,11 +236,11 @@ def validate(output: Path, profile: str = "paper") -> tuple[list[str], list[str]
             if actual is None or not math.isclose(actual, expected, abs_tol=0.001):
                 values_match = False
         if len(wiki) == 3 and len(tpcc) == 4 and values_match:
-            passed.append("plot 7 (motivation)")
+            passed.append("plot 12 (motivation)")
         else:
-            failed.append(f"plot 7 (motivation): got {len(wiki)} Wikipedia and {len(tpcc)} TPC-C series; values_match={values_match}")
+            failed.append(f"plot 12 (motivation): got {len(wiki)} Wikipedia and {len(tpcc)} TPC-C series; values_match={values_match}")
     except FileNotFoundError:
-        failed.append("plot 7 (motivation): missing output")
+        failed.append("plot 12 (motivation): missing output")
 
     return passed, failed
 
@@ -248,7 +248,7 @@ def validate(output: Path, profile: str = "paper") -> tuple[list[str], list[str]
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("output_dir", type=Path)
-    parser.add_argument("--plot", type=int, choices=range(1, 8), help="Validate only one plot.")
+    parser.add_argument("--plot", type=int, choices=range(6, 13), help="Validate only one paper plot.")
     parser.add_argument(
         "--profile",
         choices=("paper", "measured"),

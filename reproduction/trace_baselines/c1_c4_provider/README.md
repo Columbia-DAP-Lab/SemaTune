@@ -2,11 +2,11 @@
 
 This portable bundle was extracted from the completed provider-backed scoped
 C1–C4 validation run. It contains the 15 Actor/Speculator response traces used
-by the SemaTune jobs, including roles, decisions, response delays, convergence
+by the TuxBot jobs, including roles, decisions, response delays, convergence
 metadata, token counts, and source-history SHA-256 values. It contains no API
 credential and no replay workload measurements.
 
-`manifest.json` maps every SemaTune job to a trace and authenticates each file.
+`manifest.json` maps every TuxBot job to a trace and authenticates each file.
 `claim_report.json` and `tables/improvement_factors.csv` retain the provider-run
 aggregate and disaggregated baseline used by the replay comparison report.
 

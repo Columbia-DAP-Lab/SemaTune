@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate the four TailBench workloads used by the SemaTune artifact."""
+"""Validate the four TailBench workloads used by the TuxBot artifact."""
 
 from __future__ import annotations
 

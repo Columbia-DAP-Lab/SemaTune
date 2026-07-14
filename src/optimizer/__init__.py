@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-SemaTune optimizer package for OS parameter tuning.
+TuxBot optimizer package for OS parameter tuning.
 
 This package provides tools for optimizing OS kernel parameters
 using various optimization strategies including fixed, LLM-based,

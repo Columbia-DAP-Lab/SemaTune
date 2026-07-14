@@ -175,6 +175,21 @@ def test_sysbench_fourteen_method_suite_and_trace_validate_without_credentials()
             assert config["llm_speculator_model"] == "gemini-2.5-flash-lite"
 
 
+def test_sysbench_preflight_warns_but_passes_without_perf(monkeypatch, capsys):
+    tool = load_module("functional_tpcc_tool_without_perf", FUNCTIONAL / "tpcc_tool.py")
+    monkeypatch.setattr(
+        tool.shutil,
+        "which",
+        lambda command: None if command == "perf" else f"/usr/bin/{command}",
+    )
+    monkeypatch.setattr(tool.os, "sched_getaffinity", lambda _pid: set(range(20)))
+
+    assert tool.preflight(live=False, real_llm=False) == 0
+    output = capsys.readouterr().out
+    assert "SYSBENCH_PREFLIGHT_WARNING: perf is unavailable" in output
+    assert "SYSBENCH_PREFLIGHT: PASS" in output
+
+
 def test_sysbench_fourteen_method_operational_plot(tmp_path):
     suite = json.loads((FUNCTIONAL / "sysbench_suite.json").read_text())
     methods = {}
@@ -374,6 +389,61 @@ def test_trim_prompt_schema_and_runtime_require_complete_active_candidate(monkey
     monkeypatch.setattr(LLMTuner, "suggest_parameters", lambda self, *args, **kwargs: next(replies))
     response = tuner.suggest_parameters(BenchmarkMetrics(), {}, 1)
     assert response.parameters == valid
+
+
+def test_trim_schema_preserves_integer_categories_in_41_knob_config():
+    from optimizer.config import SimpleConfig
+    from optimizer.tuners.llm_trimming import LLMTrimmingTuner
+
+    config_path = (
+        ROOT
+        / "reproduction/configs/parameter_count/silo_hi_p99_final/41_param/"
+        / "silo_hi_p99/llm_trimming.json"
+    )
+    config = SimpleConfig.load(str(config_path))
+    config.llm_replay_file = str(FUNCTIONAL / "traces/sysbench_sematune_trim_trace.json")
+    tuner = LLMTrimmingTuner(config, agent_type="single")
+    schema = tuner._build_response_schema()
+
+    assert tuner.effective_ranges["tcp_mtu_probing"] == [0, 1, 2]
+    assert schema["properties"]["tcp_mtu_probing"] == {
+        "type": "integer",
+        "enum": [0, 1, 2],
+        "description": schema["properties"]["tcp_mtu_probing"]["description"],
+    }
+    range_values = schema["properties"]["suggested_ranges"]["properties"][
+        "tcp_mtu_probing"
+    ]["properties"]["values"]
+    assert range_values["items"] == {"type": "integer", "enum": [0, 1, 2]}
+
+    candidate = {name: allowed[0] for name, allowed in tuner.effective_ranges.items()}
+    parsed, _justification, warnings = tuner._parse_structured_response(
+        {
+            **candidate,
+            "suggested_ranges": {},
+            "eliminated_params": [],
+            "justification": "Complete 41-knob candidate.",
+            "converged": False,
+        }
+    )
+    assert parsed["tcp_mtu_probing"] == 0
+    assert set(parsed) == set(tuner.effective_ranges)
+    assert not tuner._last_candidate_parse_error
+    assert not any("INVALID TRIMMING CANDIDATE" in warning for warning in warnings)
+
+    parsed_from_provider_string, _justification, warnings = tuner._parse_structured_response(
+        {
+            **candidate,
+            "tcp_mtu_probing": "0",
+            "suggested_ranges": {},
+            "eliminated_params": [],
+            "justification": "Provider encoded an allowed integer category as text.",
+            "converged": False,
+        }
+    )
+    assert parsed_from_provider_string["tcp_mtu_probing"] == 0
+    assert not tuner._last_candidate_parse_error
+    assert not any("INVALID TRIMMING CANDIDATE" in warning for warning in warnings)
 
 
 def test_trim_range_changes_are_transactional_for_invalid_candidate():

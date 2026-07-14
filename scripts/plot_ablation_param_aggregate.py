@@ -85,6 +85,13 @@ def parse_args() -> argparse.Namespace:
         help="Parameter counts to plot.",
     )
     p.add_argument(
+        "--mlos-counts",
+        nargs="*",
+        type=int,
+        default=None,
+        help="Optional subset of parameter counts at which measured MLOS data is eligible.",
+    )
+    p.add_argument(
         "--aggregate-stat",
         choices=("geomedian", "geomean", "trimmed-geomean"),
         default="geomedian",
@@ -119,6 +126,15 @@ def parse_args() -> argparse.Namespace:
         "--error-bars",
         action="store_true",
         help="Add +/-1σ error bars across workload-level improvement factors.",
+    )
+    p.add_argument(
+        "--measured-trim-only",
+        action="store_true",
+        help=(
+            "Use only measured TuxBot-Trim histories. Disable the submitted-figure "
+            "count overrides, workload adjustments, and TPC-C proxy fallback while "
+            "preserving the paper plot style."
+        ),
     )
     return p.parse_args()
 
@@ -231,6 +247,8 @@ def compute_count_rows(
     run_aggregate: str,
     aggregate_stat: str,
     trim_fraction: float,
+    measured_trim_only: bool = False,
+    mlos_counts: Optional[set[int]] = None,
 ) -> List[Dict[str, object]]:
     rows: List[Dict[str, object]] = []
     for count in counts:
@@ -266,6 +284,8 @@ def compute_count_rows(
 
             llm_dir = None if workload_dir is None else resolve_tuner_dir(workload_dir, llm_dir_name)
             mlos_dir = None if workload_dir is None else resolve_tuner_dir_multi(workload_dir, f"mlos_50_tuning_only|{mlos_dir_name}")
+            if mlos_counts is not None and count not in mlos_counts:
+                mlos_dir = None
             fixed_tuning = phase_mean(fixed_dir, metric_name, (1, 30), run_aggregate)
             fixed_stable = phase_mean(fixed_dir, metric_name, (31, 50), run_aggregate)
 
@@ -282,12 +302,18 @@ def compute_count_rows(
                     workloads_used.add(workload)
 
             llm_trim_dir = None if workload_dir is None else resolve_tuner_dir_multi(workload_dir, llm_trimming_dir_name)
+            # The eight-knob point belongs to the common/full experiment rather
+            # than the parameter-count directory.  A broader results root can
+            # still contain an unrelated 8_param directory, so fall back when
+            # that directory has no Trim run instead of only when it is absent.
+            if llm_trim_dir is None and count == 8 and full_workload_dir is not None:
+                llm_trim_dir = resolve_tuner_dir_multi(full_workload_dir, llm_trimming_dir_name)
             if llm_trim_dir is not None:
                 llm_trim_tuning = phase_mean(llm_trim_dir, metric_name, (1, 30), run_aggregate)
                 llm_trim_stable = phase_mean(llm_trim_dir, metric_name, (31, 50), run_aggregate)
                 tuning_pct = improvement_pct(fixed_tuning, llm_trim_tuning, goal)
                 stable_pct = improvement_pct(fixed_stable, llm_trim_stable, goal)
-                pct_adjustment = TRIM_WORKLOAD_PCT_ADJUSTMENTS.get((count, workload), 0.0)
+                pct_adjustment = 0.0 if measured_trim_only else TRIM_WORKLOAD_PCT_ADJUSTMENTS.get((count, workload), 0.0)
                 if tuning_pct is not None:
                     tuning_pct += pct_adjustment
                 if stable_pct is not None:
@@ -300,7 +326,12 @@ def compute_count_rows(
                 if sf is not None:
                     factors["llm_trim_stable"].append(sf)
                     workloads_used.add(workload)
-            elif workload == TPCC_TRIM_FALLBACK_WORKLOAD and count != 8 and full_workload_dir is not None:
+            elif (
+                not measured_trim_only
+                and workload == TPCC_TRIM_FALLBACK_WORKLOAD
+                and count != 8
+                and full_workload_dir is not None
+            ):
                 fallback_trim_dir = resolve_tuner_dir_multi(full_workload_dir, llm_trimming_dir_name)
                 if fallback_trim_dir is not None:
                     fallback_trim_tuning = phase_mean(fallback_trim_dir, metric_name, (1, 30), run_aggregate)
@@ -341,7 +372,7 @@ def compute_count_rows(
             row[f"{key}_factor_err_high"] = None if err_factor is None else err_factor[1]
             row[f"{key}_n"] = len(vals)
 
-        if count in TRIM_COUNT_PCT_OVERRIDES:
+        if not measured_trim_only and count in TRIM_COUNT_PCT_OVERRIDES:
             override_pct = TRIM_COUNT_PCT_OVERRIDES[count]
             override_factor = pct_to_factor(override_pct)
             for phase_key in ("llm_trim_tuning", "llm_trim_stable"):
@@ -367,8 +398,9 @@ def _trim_workload_pcts(
     llm_trimming_dir_name: str,
     metric_name: Optional[str],
     run_aggregate: str,
+    measured_trim_only: bool = False,
 ) -> Tuple[Optional[float], Optional[float], str, str]:
-    override_pct = TRIM_COUNT_PCT_OVERRIDES.get(count)
+    override_pct = None if measured_trim_only else TRIM_COUNT_PCT_OVERRIDES.get(count)
     if override_pct is not None:
         return override_pct, override_pct, "hardcoded_count_override", "hardcoded_count_override"
 
@@ -379,7 +411,7 @@ def _trim_workload_pcts(
     if llm_trim_dir is not None:
         tuning_pct = improvement_pct(fixed_tuning, phase_mean(llm_trim_dir, metric_name, (1, 30), run_aggregate), goal)
         stable_pct = improvement_pct(fixed_stable, phase_mean(llm_trim_dir, metric_name, (31, 50), run_aggregate), goal)
-        pct_adjustment = TRIM_WORKLOAD_PCT_ADJUSTMENTS.get((count, workload), 0.0)
+        pct_adjustment = 0.0 if measured_trim_only else TRIM_WORKLOAD_PCT_ADJUSTMENTS.get((count, workload), 0.0)
         tuning_source = "actual"
         stable_source = "actual"
         if tuning_pct is not None and pct_adjustment:
@@ -390,7 +422,12 @@ def _trim_workload_pcts(
             stable_source = f"actual_{pct_adjustment:+.1f}pct_adjustment"
         return tuning_pct, stable_pct, tuning_source, stable_source
 
-    if workload == TPCC_TRIM_FALLBACK_WORKLOAD and count != 8 and full_workload_dir is not None:
+    if (
+        not measured_trim_only
+        and workload == TPCC_TRIM_FALLBACK_WORKLOAD
+        and count != 8
+        and full_workload_dir is not None
+    ):
         fallback_trim_dir = resolve_tuner_dir_multi(full_workload_dir, llm_trimming_dir_name)
         if fallback_trim_dir is not None:
             tuning_pct = improvement_pct(
@@ -409,7 +446,7 @@ def _trim_workload_pcts(
                 stable_pct += TPCC_TRIM_FALLBACK_PCT_DELTA
             return tuning_pct, stable_pct, "tpcc_retry_8param_plus3pct", "tpcc_retry_8param_plus3pct"
 
-    if workload_dir is None and count == 8 and full_workload_dir is not None:
+    if count == 8 and full_workload_dir is not None:
         fallback_trim_dir = resolve_tuner_dir_multi(full_workload_dir, llm_trimming_dir_name)
         if fallback_trim_dir is not None:
             tuning_pct = improvement_pct(
@@ -436,6 +473,8 @@ def compute_count_workload_rows(
     llm_trimming_dir_name: str,
     mlos_dir_name: str,
     run_aggregate: str,
+    measured_trim_only: bool = False,
+    mlos_counts: Optional[set[int]] = None,
 ) -> List[Dict[str, object]]:
     rows: List[Dict[str, object]] = []
     for count in counts:
@@ -495,6 +534,7 @@ def compute_count_workload_rows(
                 llm_trimming_dir_name=llm_trimming_dir_name,
                 metric_name=metric_name,
                 run_aggregate=run_aggregate,
+                measured_trim_only=measured_trim_only,
             )
             row["llm_trim_tuning_pct"] = "" if trim_tuning_pct is None else f"{trim_tuning_pct:.6f}"
             row["llm_trim_tuning_factor"] = "" if trim_tuning_pct is None else f"{pct_to_factor(trim_tuning_pct):.6f}"
@@ -504,6 +544,8 @@ def compute_count_workload_rows(
             row["llm_trim_stable_source"] = trim_stable_source
 
             mlos_dir = None if workload_dir is None else resolve_tuner_dir_multi(workload_dir, f"mlos_50_tuning_only|{mlos_dir_name}")
+            if mlos_counts is not None and count not in mlos_counts:
+                mlos_dir = None
             if mlos_dir is not None and goal is not None:
                 mlos_tuning_pct = improvement_pct(fixed_tuning, phase_mean(mlos_dir, metric_name, (1, 30), run_aggregate), goal)
                 mlos_stable_pct = improvement_pct(fixed_stable, phase_mean(mlos_dir, metric_name, (31, 50), run_aggregate), goal)
@@ -524,7 +566,6 @@ def plot_rows(rows: Sequence[Dict[str, object]], unit: str, output_path: Path, e
     TICK_FS = FS - 1
     AXES_HEIGHT_SCALE = 0.6174
     X_LABEL_PAD = 0.0
-    PCT_YMAX = 325.0
     METHOD_LEGEND_Y = 0.1855555556
     Y_LABEL_DY_PT = -8.0
     LEGEND_DY_PT = 1.0
@@ -660,13 +701,32 @@ def plot_rows(rows: Sequence[Dict[str, object]], unit: str, output_path: Path, e
             FuncFormatter(lambda y, _pos: f"{int(round(y))}x" if abs(y - round(y)) < 1e-9 else f"{y:.1f}x")
         )
     y_label.set_transform(y_label.get_transform() + ScaledTranslation(0.0, Y_LABEL_DY_PT / 72.0, fig.dpi_scale_trans))
-    all_series = np.concatenate([mlos_tuning, tux_tuning, tux_trim_tuning, mlos_stable, tux_stable, tux_trim_stable])
+    plotted_series = [mlos_tuning, tux_tuning, tux_trim_tuning, mlos_stable, tux_stable, tux_trim_stable]
+    all_series = np.concatenate(plotted_series)
     finite_vals = all_series[np.isfinite(all_series)]
     if finite_vals.size:
         if unit == "pct":
-            y_min = float(np.min(finite_vals))
-            ax.set_ylim(min(y_min - 15.0, baseline - 10.0), PCT_YMAX)
-            ax.set_yticks(np.arange(0.0, PCT_YMAX + 1.0, 50.0))
+            bounds = [baseline]
+            error_keys = [
+                "mlos_tuning", "llm_tuning", "llm_trim_tuning",
+                "mlos_stable", "llm_stable", "llm_trim_stable",
+            ]
+            for values, key in zip(plotted_series, error_keys):
+                finite = np.isfinite(values)
+                if not np.any(finite):
+                    continue
+                if error_bars:
+                    errors = err(key)
+                    bounds.extend((values[finite] - errors[0, finite]).tolist())
+                    bounds.extend((values[finite] + errors[1, finite]).tolist())
+                else:
+                    bounds.extend(values[finite].tolist())
+            tick_lo = 50.0 * math.floor((min(bounds) - 10.0) / 50.0)
+            tick_hi = 50.0 * math.ceil((max(bounds) + 10.0) / 50.0)
+            if tick_hi <= tick_lo:
+                tick_hi = tick_lo + 50.0
+            ax.set_ylim(tick_lo, tick_hi)
+            ax.set_yticks(np.arange(tick_lo, tick_hi + 0.1, 50.0))
         else:
             y_min = float(np.min(finite_vals))
             y_max = float(np.max(finite_vals))
@@ -785,6 +845,8 @@ def main() -> None:
         run_aggregate=args.run_aggregate,
         aggregate_stat=args.aggregate_stat,
         trim_fraction=args.trim_fraction,
+        measured_trim_only=args.measured_trim_only,
+        mlos_counts=None if args.mlos_counts is None else set(args.mlos_counts),
     )
     per_workload_rows = compute_count_workload_rows(
         discovered=discovered,
@@ -795,6 +857,8 @@ def main() -> None:
         llm_trimming_dir_name=args.llm_trimming_dir_name,
         mlos_dir_name=args.mlos_dir_name,
         run_aggregate=args.run_aggregate,
+        measured_trim_only=args.measured_trim_only,
+        mlos_counts=None if args.mlos_counts is None else set(args.mlos_counts),
     )
     plot_rows(rows, args.unit, Path(args.plot_output), args.error_bars)
     if args.csv_output:

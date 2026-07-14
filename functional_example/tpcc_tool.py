@@ -153,9 +153,25 @@ def validate(runtime: bool = False) -> int:
 
 def preflight(live: bool, real_llm: bool) -> int:
     errors: list[str] = []
-    for command in ("sysbench", "psql", "pg_isready", "perf", "taskset", "timeout", "setsid"):
+    warnings: list[str] = []
+    for command in ("sysbench", "psql", "pg_isready", "taskset", "timeout", "setsid"):
         if shutil.which(command) is None:
             errors.append(f"missing command: {command} (run scripts/setup.sh --base)")
+    perf_path = shutil.which("perf")
+    if perf_path is None:
+        warnings.append(
+            "perf is unavailable; continuing without hardware counters "
+            "(IPC/cache results are not performance-comparable)"
+        )
+    else:
+        perf = subprocess.run(
+            [perf_path, "--version"], capture_output=True, text=True, check=False
+        )
+        if perf.returncode != 0:
+            warnings.append(
+                "perf is unusable for the running kernel; continuing without hardware "
+                "counters (IPC/cache results are not performance-comparable)"
+            )
     affinity = os.sched_getaffinity(0) if hasattr(os, "sched_getaffinity") else set(range(os.cpu_count() or 0))
     missing = sorted(set(range(20)) - affinity)
     if missing:
@@ -166,6 +182,8 @@ def preflight(live: bool, real_llm: bool) -> int:
         for name in ("SEMATUNE_SYSBENCH_HOST", "SEMATUNE_SYSBENCH_PORT", "SEMATUNE_SYSBENCH_USER", "SEMATUNE_SYSBENCH_PASSWORD", "SEMATUNE_SYSBENCH_DB"):
             if not os.environ.get(name):
                 errors.append(f"missing site environment variable: {name}")
+    for warning in warnings:
+        print(f"SYSBENCH_PREFLIGHT_WARNING: {warning}")
     if errors:
         print("SYSBENCH_PREFLIGHT: FAIL", file=sys.stderr)
         for error in dict.fromkeys(errors):

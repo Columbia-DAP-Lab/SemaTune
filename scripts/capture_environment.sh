@@ -23,7 +23,7 @@ version_or_missing() {
   fi
 }
 
-echo '# SemaTune environment capture'
+echo '# TuxBot environment capture'
 echo 'Identity, addresses, MACs, serial numbers, and credentials are omitted.'
 
 section 'Operating system'

@@ -29,17 +29,17 @@ from plot_retry_aggregate_improvement import plot_summary, write_csv  # noqa: E4
 
 
 FIGURE_6 = (
-    ("Tuxbot App Metrics Dual Loop", "sematune_dual"),
-    ("MLOS + Tuxbot", "sematune_trim"),
+    ("TuxBot App Metrics Dual Loop", "sematune_dual"),
+    ("MLOS + TuxBot", "sematune_trim"),
     ("MLOS", "mlos"),
     ("Bayesian", "bayesian"),
     ("DQN", "dqn"),
     ("Q-Learning", "qlearning"),
 )
 FIGURE_7 = (
-    ("Tuxbot App Only Dual", "sematune_dual"),
-    ("Tuxbot Indirect Dump Dual", "sematune_system"),
-    ("Tuxbot IPC Dual", "sematune_ipc"),
+    ("TuxBot App Only Dual", "sematune_dual"),
+    ("TuxBot Indirect Dump Dual", "sematune_system"),
+    ("TuxBot IPC Dual", "sematune_ipc"),
     ("TuxBot Trim App", "sematune_trim"),
     ("TuxBot Trim IPC", "sematune_trim_ipc"),
     ("TuxBot Trim Cache", "sematune_trim_cache"),
@@ -148,9 +148,9 @@ def render_paper_bar_style(
             "ymin": -75.0,
             "ymax": 100.0,
             "x_label_map": {
-                "Tuxbot App Only Dual": "App",
-                "Tuxbot Indirect Dump Dual": "System",
-                "Tuxbot IPC Dual": "IPC",
+                "TuxBot App Only Dual": "App",
+                "TuxBot Indirect Dump Dual": "System",
+                "TuxBot IPC Dual": "IPC",
                 "TuxBot Trim App": "App",
                 "TuxBot Trim IPC": "IPC",
                 "TuxBot Trim Cache": "Cache",
@@ -159,9 +159,9 @@ def render_paper_bar_style(
                 "MLOS Cache Misses": "Cache",
             },
             "x_group_map": {
-                "Tuxbot App Only Dual": "TuxBot",
-                "Tuxbot Indirect Dump Dual": "TuxBot",
-                "Tuxbot IPC Dual": "TuxBot",
+                "TuxBot App Only Dual": "TuxBot",
+                "TuxBot Indirect Dump Dual": "TuxBot",
+                "TuxBot IPC Dual": "TuxBot",
                 "TuxBot Trim App": "TuxBot-trim",
                 "TuxBot Trim IPC": "TuxBot-trim",
                 "TuxBot Trim Cache": "TuxBot-trim",

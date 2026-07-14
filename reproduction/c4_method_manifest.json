@@ -1,0 +1,554 @@
+{
+  "schema_version": 1,
+  "workflow": "c4-method-parameter-comparison-live",
+  "selection_label": "claim",
+  "base_manifest": "experiment_manifest.json",
+  "reruns_per_configuration": 1,
+  "claims": [
+    "C4"
+  ],
+  "workloads": [
+    "silo_hi_p99",
+    "tpcc_hi_p99",
+    "sysbench_oltp_rw_hi_p99"
+  ],
+  "workload_labels": {
+    "silo_hi_p99": "Silo",
+    "tpcc_hi_p99": "TPC-C",
+    "sysbench_oltp_rw_hi_p99": "Sysbench OLTP-RW"
+  },
+  "knob_counts": [
+    2,
+    8,
+    16,
+    41
+  ],
+  "method_knob_counts": {
+    "sematune_app": [2, 8, 16, 41],
+    "sematune_trim_app": [2, 8, 16],
+    "mlos_app": [2, 8, 16]
+  },
+  "methods": [
+    "sematune_app",
+    "sematune_trim_app",
+    "mlos_app"
+  ],
+  "plots": {
+    "4": {
+      "claim": "Compare all methods through 16 knobs, with TuxBot alone at 41 knobs.",
+      "paper_plot": 10,
+      "jobs": [
+        "common:silo_hi_p99:fixed",
+        "common:silo_hi_p99:mlos_app",
+        "common:silo_hi_p99:sematune_app",
+        "common:silo_hi_p99:sematune_trim_app",
+        "parameter:silo_hi_p99_final:2_param:silo_hi_p99:llm_dual_app_metrics_final_actor",
+        "parameter:silo_hi_p99_final:2_param:silo_hi_p99:llm_trimming",
+        "parameter:silo_hi_p99_final:2_param:silo_hi_p99:mlos",
+        "parameter:silo_hi_p99_final:16_param:silo_hi_p99:llm_dual_app_metrics_final_actor",
+        "parameter:silo_hi_p99_final:16_param:silo_hi_p99:llm_trimming",
+        "parameter:silo_hi_p99_final:16_param:silo_hi_p99:mlos",
+        "parameter:silo_hi_p99_final:41_param:silo_hi_p99:llm_dual_app_metrics_final_actor",
+        "common:tpcc_hi_p99:fixed",
+        "common:tpcc_hi_p99:mlos_app",
+        "common:tpcc_hi_p99:sematune_app",
+        "common:tpcc_hi_p99:sematune_trim_app",
+        "parameter:tpcc_p99_final:2_param:tpcc_hi_p99:llm_dual_app_metrics_final_actor",
+        "parameter:tpcc_p99_final:2_param:tpcc_hi_p99:llm_trimming",
+        "parameter:tpcc_p99_final:2_param:tpcc_hi_p99:mlos",
+        "parameter:tpcc_p99_final:16_param:tpcc_hi_p99:llm_dual_app_metrics_final_actor",
+        "parameter:tpcc_p99_final:16_param:tpcc_hi_p99:llm_trimming",
+        "parameter:tpcc_p99_final:16_param:tpcc_hi_p99:mlos",
+        "parameter:tpcc_p99_final:41_param:tpcc_hi_p99:llm_dual_app_metrics_final_actor",
+        "common:sysbench_oltp_rw_hi_p99:fixed",
+        "common:sysbench_oltp_rw_hi_p99:mlos_app",
+        "common:sysbench_oltp_rw_hi_p99:sematune_app",
+        "common:sysbench_oltp_rw_hi_p99:sematune_trim_app",
+        "parameter:sysbench_oltp_rw_final:2_param:sysbench_oltp_rw_hi_p99:llm_dual_app_metrics_final_actor",
+        "parameter:sysbench_oltp_rw_final:2_param:sysbench_oltp_rw_hi_p99:llm_trimming",
+        "parameter:sysbench_oltp_rw_final:2_param:sysbench_oltp_rw_hi_p99:mlos",
+        "parameter:sysbench_oltp_rw_final:16_param:sysbench_oltp_rw_hi_p99:llm_dual_app_metrics_final_actor",
+        "parameter:sysbench_oltp_rw_final:16_param:sysbench_oltp_rw_hi_p99:llm_trimming",
+        "parameter:sysbench_oltp_rw_final:16_param:sysbench_oltp_rw_hi_p99:mlos",
+        "parameter:sysbench_oltp_rw_final:41_param:sysbench_oltp_rw_hi_p99:llm_dual_app_metrics_final_actor"
+      ]
+    }
+  },
+  "jobs": [
+    {
+      "id": "common:silo_hi_p99:fixed",
+      "plots": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "runtime_overrides": {
+        "max_iterations": 30,
+        "post_tuning_windows": 20
+      },
+      "completion": {
+        "measurement_windows": 50,
+        "tuning_windows": 30,
+        "post_tuning_windows": 20,
+        "optimization_metric": "latency_p99",
+        "allow_iteration_zero": true
+      }
+    },
+    {
+      "id": "common:silo_hi_p99:mlos_app",
+      "plots": [
+        4
+      ],
+      "completion": {
+        "measurement_windows": 50,
+        "tuning_windows": 50,
+        "post_tuning_windows": 0,
+        "optimization_metric": "latency_p99",
+        "allow_iteration_zero": true
+      }
+    },
+    {
+      "id": "common:silo_hi_p99:sematune_app",
+      "plots": [
+        4
+      ],
+      "completion": {
+        "measurement_windows": 50,
+        "tuning_windows": 30,
+        "post_tuning_windows": 20,
+        "optimization_metric": "latency_p99",
+        "allow_iteration_zero": true,
+        "required_mode": "actor-speculator",
+        "require_optimizer_gist": true
+      }
+    },
+    {
+      "id": "common:silo_hi_p99:sematune_trim_app",
+      "plots": [
+        4
+      ],
+      "completion": {
+        "measurement_windows": 50,
+        "tuning_windows": 50,
+        "post_tuning_windows": 0,
+        "optimization_metric": "latency_p99",
+        "allow_iteration_zero": true
+      }
+    },
+    {
+      "id": "parameter:silo_hi_p99_final:2_param:silo_hi_p99:llm_dual_app_metrics_final_actor",
+      "plots": [
+        4
+      ],
+      "completion": {
+        "measurement_windows": 50,
+        "tuning_windows": 30,
+        "post_tuning_windows": 20,
+        "optimization_metric": "latency_p99",
+        "allow_iteration_zero": true,
+        "required_mode": "actor-speculator",
+        "require_optimizer_gist": true
+      }
+    },
+    {
+      "id": "parameter:silo_hi_p99_final:2_param:silo_hi_p99:llm_trimming",
+      "plots": [
+        4
+      ],
+      "completion": {
+        "measurement_windows": 50,
+        "tuning_windows": 50,
+        "post_tuning_windows": 0,
+        "optimization_metric": "latency_p99",
+        "allow_iteration_zero": true
+      }
+    },
+    {
+      "id": "parameter:silo_hi_p99_final:2_param:silo_hi_p99:mlos",
+      "plots": [
+        4
+      ],
+      "completion": {
+        "measurement_windows": 50,
+        "tuning_windows": 50,
+        "post_tuning_windows": 0,
+        "optimization_metric": "latency_p99",
+        "allow_iteration_zero": true
+      }
+    },
+    {
+      "id": "parameter:silo_hi_p99_final:16_param:silo_hi_p99:llm_dual_app_metrics_final_actor",
+      "plots": [
+        4
+      ],
+      "completion": {
+        "measurement_windows": 50,
+        "tuning_windows": 30,
+        "post_tuning_windows": 20,
+        "optimization_metric": "latency_p99",
+        "allow_iteration_zero": true,
+        "required_mode": "actor-speculator",
+        "require_optimizer_gist": true
+      }
+    },
+    {
+      "id": "parameter:silo_hi_p99_final:16_param:silo_hi_p99:llm_trimming",
+      "plots": [
+        4
+      ],
+      "completion": {
+        "measurement_windows": 50,
+        "tuning_windows": 50,
+        "post_tuning_windows": 0,
+        "optimization_metric": "latency_p99",
+        "allow_iteration_zero": true
+      }
+    },
+    {
+      "id": "parameter:silo_hi_p99_final:16_param:silo_hi_p99:mlos",
+      "plots": [
+        4
+      ],
+      "completion": {
+        "measurement_windows": 50,
+        "tuning_windows": 50,
+        "post_tuning_windows": 0,
+        "optimization_metric": "latency_p99",
+        "allow_iteration_zero": true
+      }
+    },
+    {
+      "id": "parameter:silo_hi_p99_final:41_param:silo_hi_p99:llm_dual_app_metrics_final_actor",
+      "plots": [
+        4
+      ],
+      "completion": {
+        "measurement_windows": 50,
+        "tuning_windows": 30,
+        "post_tuning_windows": 20,
+        "optimization_metric": "latency_p99",
+        "allow_iteration_zero": true,
+        "required_mode": "actor-speculator",
+        "require_optimizer_gist": true
+      }
+    },
+    {
+      "id": "common:tpcc_hi_p99:fixed",
+      "plots": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "runtime_overrides": {
+        "max_iterations": 30,
+        "post_tuning_windows": 20
+      },
+      "completion": {
+        "measurement_windows": 50,
+        "tuning_windows": 30,
+        "post_tuning_windows": 20,
+        "optimization_metric": "latency_p99",
+        "allow_iteration_zero": true
+      }
+    },
+    {
+      "id": "common:tpcc_hi_p99:mlos_app",
+      "plots": [
+        4
+      ],
+      "completion": {
+        "measurement_windows": 50,
+        "tuning_windows": 50,
+        "post_tuning_windows": 0,
+        "optimization_metric": "latency_p99",
+        "allow_iteration_zero": true
+      }
+    },
+    {
+      "id": "common:tpcc_hi_p99:sematune_app",
+      "plots": [
+        4
+      ],
+      "completion": {
+        "measurement_windows": 50,
+        "tuning_windows": 30,
+        "post_tuning_windows": 20,
+        "optimization_metric": "latency_p99",
+        "allow_iteration_zero": true,
+        "required_mode": "actor-speculator",
+        "require_optimizer_gist": true
+      }
+    },
+    {
+      "id": "common:tpcc_hi_p99:sematune_trim_app",
+      "plots": [
+        4
+      ],
+      "completion": {
+        "measurement_windows": 50,
+        "tuning_windows": 50,
+        "post_tuning_windows": 0,
+        "optimization_metric": "latency_p99",
+        "allow_iteration_zero": true
+      }
+    },
+    {
+      "id": "parameter:tpcc_p99_final:2_param:tpcc_hi_p99:llm_dual_app_metrics_final_actor",
+      "plots": [
+        4
+      ],
+      "completion": {
+        "measurement_windows": 50,
+        "tuning_windows": 30,
+        "post_tuning_windows": 20,
+        "optimization_metric": "latency_p99",
+        "allow_iteration_zero": true,
+        "required_mode": "actor-speculator",
+        "require_optimizer_gist": true
+      }
+    },
+    {
+      "id": "parameter:tpcc_p99_final:2_param:tpcc_hi_p99:llm_trimming",
+      "plots": [
+        4
+      ],
+      "completion": {
+        "measurement_windows": 50,
+        "tuning_windows": 50,
+        "post_tuning_windows": 0,
+        "optimization_metric": "latency_p99",
+        "allow_iteration_zero": true
+      }
+    },
+    {
+      "id": "parameter:tpcc_p99_final:2_param:tpcc_hi_p99:mlos",
+      "plots": [
+        4
+      ],
+      "completion": {
+        "measurement_windows": 50,
+        "tuning_windows": 50,
+        "post_tuning_windows": 0,
+        "optimization_metric": "latency_p99",
+        "allow_iteration_zero": true
+      }
+    },
+    {
+      "id": "parameter:tpcc_p99_final:16_param:tpcc_hi_p99:llm_dual_app_metrics_final_actor",
+      "plots": [
+        4
+      ],
+      "completion": {
+        "measurement_windows": 50,
+        "tuning_windows": 30,
+        "post_tuning_windows": 20,
+        "optimization_metric": "latency_p99",
+        "allow_iteration_zero": true,
+        "required_mode": "actor-speculator",
+        "require_optimizer_gist": true
+      }
+    },
+    {
+      "id": "parameter:tpcc_p99_final:16_param:tpcc_hi_p99:llm_trimming",
+      "plots": [
+        4
+      ],
+      "completion": {
+        "measurement_windows": 50,
+        "tuning_windows": 50,
+        "post_tuning_windows": 0,
+        "optimization_metric": "latency_p99",
+        "allow_iteration_zero": true
+      }
+    },
+    {
+      "id": "parameter:tpcc_p99_final:16_param:tpcc_hi_p99:mlos",
+      "plots": [
+        4
+      ],
+      "completion": {
+        "measurement_windows": 50,
+        "tuning_windows": 50,
+        "post_tuning_windows": 0,
+        "optimization_metric": "latency_p99",
+        "allow_iteration_zero": true
+      }
+    },
+    {
+      "id": "parameter:tpcc_p99_final:41_param:tpcc_hi_p99:llm_dual_app_metrics_final_actor",
+      "plots": [
+        4
+      ],
+      "completion": {
+        "measurement_windows": 50,
+        "tuning_windows": 30,
+        "post_tuning_windows": 20,
+        "optimization_metric": "latency_p99",
+        "allow_iteration_zero": true,
+        "required_mode": "actor-speculator",
+        "require_optimizer_gist": true
+      }
+    },
+    {
+      "id": "common:sysbench_oltp_rw_hi_p99:fixed",
+      "plots": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "runtime_overrides": {
+        "max_iterations": 30,
+        "post_tuning_windows": 20
+      },
+      "completion": {
+        "measurement_windows": 50,
+        "tuning_windows": 30,
+        "post_tuning_windows": 20,
+        "optimization_metric": "latency_p99",
+        "allow_iteration_zero": true
+      }
+    },
+    {
+      "id": "common:sysbench_oltp_rw_hi_p99:mlos_app",
+      "plots": [
+        4
+      ],
+      "completion": {
+        "measurement_windows": 50,
+        "tuning_windows": 50,
+        "post_tuning_windows": 0,
+        "optimization_metric": "latency_p99",
+        "allow_iteration_zero": true
+      }
+    },
+    {
+      "id": "common:sysbench_oltp_rw_hi_p99:sematune_app",
+      "plots": [
+        4
+      ],
+      "completion": {
+        "measurement_windows": 50,
+        "tuning_windows": 30,
+        "post_tuning_windows": 20,
+        "optimization_metric": "latency_p99",
+        "allow_iteration_zero": true,
+        "required_mode": "actor-speculator",
+        "require_optimizer_gist": true
+      }
+    },
+    {
+      "id": "common:sysbench_oltp_rw_hi_p99:sematune_trim_app",
+      "plots": [
+        4
+      ],
+      "completion": {
+        "measurement_windows": 50,
+        "tuning_windows": 50,
+        "post_tuning_windows": 0,
+        "optimization_metric": "latency_p99",
+        "allow_iteration_zero": true
+      }
+    },
+    {
+      "id": "parameter:sysbench_oltp_rw_final:2_param:sysbench_oltp_rw_hi_p99:llm_dual_app_metrics_final_actor",
+      "plots": [
+        4
+      ],
+      "completion": {
+        "measurement_windows": 50,
+        "tuning_windows": 30,
+        "post_tuning_windows": 20,
+        "optimization_metric": "latency_p99",
+        "allow_iteration_zero": true,
+        "required_mode": "actor-speculator",
+        "require_optimizer_gist": true
+      }
+    },
+    {
+      "id": "parameter:sysbench_oltp_rw_final:2_param:sysbench_oltp_rw_hi_p99:llm_trimming",
+      "plots": [
+        4
+      ],
+      "completion": {
+        "measurement_windows": 50,
+        "tuning_windows": 50,
+        "post_tuning_windows": 0,
+        "optimization_metric": "latency_p99",
+        "allow_iteration_zero": true
+      }
+    },
+    {
+      "id": "parameter:sysbench_oltp_rw_final:2_param:sysbench_oltp_rw_hi_p99:mlos",
+      "plots": [
+        4
+      ],
+      "completion": {
+        "measurement_windows": 50,
+        "tuning_windows": 50,
+        "post_tuning_windows": 0,
+        "optimization_metric": "latency_p99",
+        "allow_iteration_zero": true
+      }
+    },
+    {
+      "id": "parameter:sysbench_oltp_rw_final:16_param:sysbench_oltp_rw_hi_p99:llm_dual_app_metrics_final_actor",
+      "plots": [
+        4
+      ],
+      "completion": {
+        "measurement_windows": 50,
+        "tuning_windows": 30,
+        "post_tuning_windows": 20,
+        "optimization_metric": "latency_p99",
+        "allow_iteration_zero": true,
+        "required_mode": "actor-speculator",
+        "require_optimizer_gist": true
+      }
+    },
+    {
+      "id": "parameter:sysbench_oltp_rw_final:16_param:sysbench_oltp_rw_hi_p99:llm_trimming",
+      "plots": [
+        4
+      ],
+      "completion": {
+        "measurement_windows": 50,
+        "tuning_windows": 50,
+        "post_tuning_windows": 0,
+        "optimization_metric": "latency_p99",
+        "allow_iteration_zero": true
+      }
+    },
+    {
+      "id": "parameter:sysbench_oltp_rw_final:16_param:sysbench_oltp_rw_hi_p99:mlos",
+      "plots": [
+        4
+      ],
+      "completion": {
+        "measurement_windows": 50,
+        "tuning_windows": 50,
+        "post_tuning_windows": 0,
+        "optimization_metric": "latency_p99",
+        "allow_iteration_zero": true
+      }
+    },
+    {
+      "id": "parameter:sysbench_oltp_rw_final:41_param:sysbench_oltp_rw_hi_p99:llm_dual_app_metrics_final_actor",
+      "plots": [
+        4
+      ],
+      "completion": {
+        "measurement_windows": 50,
+        "tuning_windows": 30,
+        "post_tuning_windows": 20,
+        "optimization_metric": "latency_p99",
+        "allow_iteration_zero": true,
+        "required_mode": "actor-speculator",
+        "require_optimizer_gist": true
+      }
+    }
+  ],
+  "aliases": []
+}

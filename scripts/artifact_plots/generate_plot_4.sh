@@ -13,4 +13,4 @@ python3 "$REPO_ROOT/scripts/plot_retry_robustness_aggregate_single.py" \
   --plot-output "$output_dir/retry_robustness_memory_tuxbot_mlos_1_30_aggregate.pdf" \
   --csv-output "$output_dir/retry_robustness_memory_tuxbot_mlos_1_30_aggregate.csv"
 
-validate_plot "$output_dir" 4
+validate_plot "$output_dir" 9

@@ -8,9 +8,9 @@ PYTHON="${PYTHON:-python3}"
 usage() {
   printf '%s\n' \
     'Usage:' \
-    '  reproduction/reproduce_all.sh --dry-run [--plots all|1,2,...]' \
-    '  reproduction/reproduce_all.sh --archived-only --output-dir DIR [--plots all|1,2,...]' \
-    '  reproduction/reproduce_all.sh --run --output-dir DIR [--plots all|1,2,...] [--keep-going]' \
+    '  reproduction/reproduce_all.sh --dry-run [--plots all|6,7,...,12]' \
+    '  reproduction/reproduce_all.sh --archived-only --output-dir DIR [--plots all|6,7,...,12]' \
+    '  reproduction/reproduce_all.sh --run --output-dir DIR [--plots all|6,7,...,12] [--keep-going]' \
     '' \
     '--run performs exactly one rerun per unique selected configuration and requires GEMINI_API_KEY.' \
     'It changes host kernel controls and must run only on the dedicated paper-compatible machine.'

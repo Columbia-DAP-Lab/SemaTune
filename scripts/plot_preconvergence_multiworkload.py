@@ -2,7 +2,7 @@
 """Shared pre-convergence history helpers used by active robustness plots.
 
 The original standalone plotting CLI was removed from the curated artifact;
-these data-selection primitives remain an active dependency of Plot 4.
+these data-selection primitives remain an active dependency of paper Plot 9.
 """
 
 from __future__ import annotations

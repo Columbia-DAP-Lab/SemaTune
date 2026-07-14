@@ -106,9 +106,24 @@ def preflight(live: bool) -> int:
     missing_cpus = sorted(set(range(20)) - affinity)
     if missing_cpus:
         errors.append(f"CPUs 0-19 are required; unavailable to this process: {missing_cpus}")
-    for command in ("python3", "sysbench", "psql", "pg_isready", "perf", "taskset", "timeout", "setsid"):
+    for command in ("python3", "sysbench", "psql", "pg_isready", "taskset", "timeout", "setsid"):
         if shutil.which(command) is None:
             errors.append(f"missing command: {command} (run scripts/setup.sh --base)")
+    perf_path = shutil.which("perf")
+    if perf_path is None:
+        warnings.append(
+            "perf is unavailable; continuing without hardware counters "
+            "(IPC/cache results are not performance-comparable)"
+        )
+    else:
+        perf = subprocess.run(
+            [perf_path, "--version"], capture_output=True, text=True, check=False
+        )
+        if perf.returncode != 0:
+            warnings.append(
+                "perf is unusable for the running kernel; continuing without hardware "
+                "counters (IPC/cache results are not performance-comparable)"
+            )
     if sys.version_info[:2] != (3, 10):
         errors.append(f"Python 3.10 is required; found {platform.python_version()}")
     if live:

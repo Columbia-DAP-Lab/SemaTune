@@ -180,7 +180,7 @@ def validate_response_entity(record: Dict[str, Any], response: Any) -> None:
 def validate_remote_entity(record: Dict[str, Any]) -> None:
     request = urllib.request.Request(
         str(record["url"]),
-        headers={"User-Agent": "SemaTune-artifact-fetch/1"},
+        headers={"User-Agent": "TuxBot-artifact-fetch/1"},
         method="HEAD",
     )
     try:
@@ -225,7 +225,7 @@ def stream_download(record: Dict[str, Any], destination: Path) -> None:
         partial.unlink()
         offset = 0
 
-    headers = {"User-Agent": "SemaTune-artifact-fetch/1"}
+    headers = {"User-Agent": "TuxBot-artifact-fetch/1"}
     if offset:
         headers["Range"] = f"bytes={offset}-"
         if record.get("etag"):

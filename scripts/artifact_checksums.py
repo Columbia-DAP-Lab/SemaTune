@@ -12,7 +12,7 @@ from pathlib import Path
 from typing import Iterable, List, Tuple
 
 CHUNK_SIZE = 8 * 1024 * 1024
-DEFAULT_EXCLUDES = {".git", "SHA256SUMS", "SemaTune.pdf", "ARTIFACT_RELEASE_CHECKLIST.md"}
+DEFAULT_EXCLUDES = {".git", "SHA256SUMS", "TuxBot.pdf", "ARTIFACT_RELEASE_CHECKLIST.md"}
 
 
 def sha256(path: Path) -> str:

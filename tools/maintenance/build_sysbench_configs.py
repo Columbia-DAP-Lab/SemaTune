@@ -21,13 +21,13 @@ METHODS = [
     ("bayesian", "bayesian", "Bayesian", "#9467BD"),
     ("dqn", "dqn", "DQN", "#2CA02C"),
     ("qlearning", "qlearning", "Q-learning", "#D62728"),
-    ("sematune_single", "single_instant", "SemaTune Single", "#56B4E9"),
-    ("sematune_dual", "sematune_app", "SemaTune App", "#0072B2"),
-    ("sematune_system", "sematune_system", "SemaTune System", "#3498DB"),
-    ("sematune_ipc", "sematune_ipc", "SemaTune IPC", "#1F618D"),
-    ("sematune_trim", "sematune_trim_app", "SemaTune-Trim App", "#009E73"),
-    ("sematune_trim_ipc", "sematune_trim_ipc", "SemaTune-Trim IPC", "#27AE60"),
-    ("sematune_trim_cache", "sematune_trim_cache", "SemaTune-Trim Cache", "#117A65"),
+    ("sematune_single", "single_instant", "TuxBot Single", "#56B4E9"),
+    ("sematune_dual", "sematune_app", "TuxBot App", "#0072B2"),
+    ("sematune_system", "sematune_system", "TuxBot System", "#3498DB"),
+    ("sematune_ipc", "sematune_ipc", "TuxBot IPC", "#1F618D"),
+    ("sematune_trim", "sematune_trim_app", "TuxBot-Trim App", "#009E73"),
+    ("sematune_trim_ipc", "sematune_trim_ipc", "TuxBot-Trim IPC", "#27AE60"),
+    ("sematune_trim_cache", "sematune_trim_cache", "TuxBot-Trim Cache", "#117A65"),
 ]
 
 TUNING_WINDOWS = 5

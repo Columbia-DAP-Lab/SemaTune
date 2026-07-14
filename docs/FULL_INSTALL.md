@@ -38,10 +38,10 @@ Individual setup commands:
 
 ```bash
 scripts/setup_tailbench.sh \
-  --data-root /mydata/SemaTune-tailbench/tailbench.inputs
+  --data-root /mydata/TuxBot-tailbench/tailbench.inputs
 
 scripts/setup_sparkbench.sh --with-dataset \
-  --data-root /mydata/SemaTune-sparkbench
+  --data-root /mydata/TuxBot-sparkbench
 ```
 
 `--full` builds Mutilate locally. Paired network arguments additionally create

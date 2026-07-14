@@ -14,4 +14,4 @@ python3 "$REPO_ROOT/scripts/plot_mlos_motivation_examples_combined.py" \
   --output-pdf "$output_dir/mlos_motivation_examples_combined.pdf" \
   --output-csv "$output_dir/mlos_motivation_examples_combined.csv"
 
-validate_plot "$output_dir" 7
+validate_plot "$output_dir" 12

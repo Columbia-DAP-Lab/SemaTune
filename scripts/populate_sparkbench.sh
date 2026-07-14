@@ -7,7 +7,7 @@ DCPERF_DIR="$REPO_ROOT/deps/DCPerf"
 SPARK_DIR="$DCPERF_DIR/benchmarks/spark_standalone"
 SPARK_HOME="$SPARK_DIR/spark-2.4.5-bin-hadoop2.7"
 DATASET_NAME=bpc_t93586_s2_synthetic
-DATA_ROOT="${SEMATUNE_SPARKBENCH_DATA_ROOT:-/mydata/SemaTune-sparkbench}"
+DATA_ROOT="${SEMATUNE_SPARKBENCH_DATA_ROOT:-/mydata/TuxBot-sparkbench}"
 JAVA_HOME="${SEMATUNE_SPARKBENCH_JAVA_HOME:-/usr/lib/jvm/java-8-openjdk-amd64}"
 TIMEOUT_SECONDS="${SEMATUNE_SPARKBENCH_POPULATE_TIMEOUT_SECONDS:-10800}"
 
@@ -40,7 +40,7 @@ if [[ "$(id -u)" -ne 0 ]]; then
 fi
 LOCK_FILE="/tmp/sematune-functional-sysbench-$(id -u).lock"
 exec 9>"$LOCK_FILE"
-flock -n 9 || { echo "Another SemaTune workload owns $LOCK_FILE" >&2; exit 1; }
+flock -n 9 || { echo "Another TuxBot workload owns $LOCK_FILE" >&2; exit 1; }
 pgrep -f 'org.apache.spark|spark_standalone.*runner.py' >/dev/null 2>&1 && {
   echo 'A Spark process is already active; refusing to populate concurrently.' >&2
   exit 1

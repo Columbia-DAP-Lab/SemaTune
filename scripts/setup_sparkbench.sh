@@ -7,7 +7,7 @@ DCPERF_DIR="$REPO_ROOT/deps/DCPerf"
 SPARK_INSTALL="$DCPERF_DIR/benchmarks/spark_standalone"
 DATASET_NAME=bpc_t93586_s2_synthetic
 WITH_DATASET=0
-DATA_ROOT="${SEMATUNE_SPARKBENCH_DATA_ROOT:-/mydata/SemaTune-sparkbench}"
+DATA_ROOT="${SEMATUNE_SPARKBENCH_DATA_ROOT:-/mydata/TuxBot-sparkbench}"
 
 usage() {
   cat <<'EOF'

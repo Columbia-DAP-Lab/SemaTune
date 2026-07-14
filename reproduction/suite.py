@@ -463,6 +463,17 @@ def validate_manifest(manifest: dict[str, Any], *, verify_sources: bool) -> list
 def command_plan(args: argparse.Namespace, manifest: dict[str, Any]) -> int:
     plots = parse_plots(args.plots, manifest)
     selection_label = str(manifest.get("selection_label", "plot"))
+    display_label = selection_label
+    display_numbers = {
+        plot: (
+            int(manifest["plots"][str(plot)].get("paper_plot", plot))
+            if selection_label == "plot"
+            else plot
+        )
+        for plot in plots
+    }
+    if selection_label == "plot" and any(display_numbers[plot] != plot for plot in plots):
+        display_label = "paper plot"
     jobs = select_jobs(manifest, plots)
     by_kind = Counter(job["kind"] for job in jobs)
     windows = 0
@@ -474,7 +485,7 @@ def command_plan(args: argparse.Namespace, manifest: dict[str, Any]) -> int:
         benchmarks[str(cfg.get("benchmark", "unknown"))] += 1
         if str(cfg.get("tuner_type", "")).startswith("llm") or cfg.get("llm_actor_model"):
             llm_jobs += 1
-    print(f"{selection_label}s: {','.join(str(x) for x in sorted(plots))}")
+    print(f"{display_label}s: {','.join(str(display_numbers[x]) for x in sorted(plots))}")
     print(f"unique one-rerun configurations: {len(jobs)}")
     print(f"LLM configurations: {llm_jobs}")
     print(f"total benchmark windows: {windows}")
@@ -483,7 +494,7 @@ def command_plan(args: argparse.Namespace, manifest: dict[str, Any]) -> int:
     for plot in sorted(plots):
         info = manifest["plots"][str(plot)]
         selected_count = sum(1 for job in jobs if plot in job["plots"])
-        print(f"{selection_label} {plot}: {selected_count} configs — {info['claim']}")
+        print(f"{display_label} {display_numbers[plot]}: {selected_count} configs — {info['claim']}")
     if args.verbose:
         for job in jobs:
             print(f"{job['id']}\t{job['config']}\t{job['target_results_dir']}")
@@ -496,7 +507,24 @@ def live_preflight(
     replay_bundle: Path | None = None,
 ) -> list[str]:
     errors: list[str] = []
-    commands = {"perf", "taskset"}
+    commands = {"taskset"}
+    perf_path = shutil.which("perf")
+    if perf_path is None:
+        print(
+            "PREFLIGHT_WARNING: perf is unavailable; continuing without hardware "
+            "counters (IPC/cache results are not performance-comparable)",
+            file=sys.stderr,
+        )
+    else:
+        perf = subprocess.run(
+            [perf_path, "--version"], capture_output=True, text=True, check=False
+        )
+        if perf.returncode != 0:
+            print(
+                "PREFLIGHT_WARNING: perf is unusable for the running kernel; continuing "
+                "without hardware counters (IPC/cache results are not performance-comparable)",
+                file=sys.stderr,
+            )
     benchmarks: set[str] = set()
     needs_llm = False
     tailbench_binaries = {
@@ -903,11 +931,11 @@ def build_parser() -> argparse.ArgumentParser:
     validate.add_argument("--skip-source-checksums", action="store_true")
 
     plan = subparsers.add_parser("plan", help="Print the deduplicated plan.")
-    plan.add_argument("--plots", default="all", help="all or a comma-separated subset of 1-7")
+    plan.add_argument("--plots", default="all", help="all or a comma-separated subset defined by the manifest")
     plan.add_argument("--verbose", action="store_true")
 
     preflight = subparsers.add_parser("preflight", help="Validate live dependencies and connectivity without running a job.")
-    preflight.add_argument("--plots", default="all", help="all or a comma-separated subset of 1-7")
+    preflight.add_argument("--plots", default="all", help="all or a comma-separated subset defined by the manifest")
     preflight_replay = preflight.add_mutually_exclusive_group()
     preflight_replay.add_argument(
         "--replay-from",
@@ -919,7 +947,7 @@ def build_parser() -> argparse.ArgumentParser:
     )
 
     run = subparsers.add_parser("run", help="Execute exactly one run of each selected unique config.")
-    run.add_argument("--plots", default="all", help="all or a comma-separated subset of 1-7")
+    run.add_argument("--plots", default="all", help="all or a comma-separated subset defined by the manifest")
     run.add_argument("--output-dir", default="results/reproduced")
     run.add_argument("--dry-run", action="store_true")
     run.add_argument("--verbose", action="store_true")

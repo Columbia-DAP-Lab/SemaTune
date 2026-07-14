@@ -59,8 +59,8 @@ if [[ "$DRY_RUN" -eq 1 ]]; then
   printf '%s\n' \
     'DRY_RUN: PASS (read-only; no root, database, provider, benchmark, output, or kernel writes)' \
     '  Workload: Sysbench OLTP read/write, 4 × 100,000-row tables, 40 threads' \
-    '  Methods: Fixed; MLOS App/IPC/Cache; Bayesian; DQN; Q-learning; SemaTune Single;' \
-    '           SemaTune App/System/IPC; SemaTune-Trim App/IPC/Cache' \
+    '  Methods: Fixed; MLOS App/IPC/Cache; Bayesian; DQN; Q-learning; TuxBot Single;' \
+    '           TuxBot App/System/IPC; TuxBot-Trim App/IPC/Cache' \
     '  Schedule: 5 tuning + 5 stable windows per method, 10 s/window' \
     '  Search space: the eight OS parameters used in paper Figures 6, 7, and 8' \
     '  Functional model: Gemini 2.5 Flash-Lite for every LLM role (cost-limited operational check)' \
@@ -83,7 +83,7 @@ source "$SCRIPT_DIR/site.env"
 LOCK_FILE="/tmp/sematune-functional-sysbench-$(id -u).lock"
 exec 9>"$LOCK_FILE"
 if ! flock -n 9; then
-  echo 'Another SemaTune Sysbench Functional suite is already running on this host.' >&2
+  echo 'Another TuxBot Sysbench Functional suite is already running on this host.' >&2
   echo "Wait for it to finish (lock: $LOCK_FILE); do not overlap trace and real runs." >&2
   exit 1
 fi

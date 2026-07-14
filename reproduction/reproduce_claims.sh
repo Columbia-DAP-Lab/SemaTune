@@ -10,20 +10,35 @@ else
   DEFAULT_PYTHON=python3
 fi
 PYTHON="${PYTHON:-$DEFAULT_PYTHON}"
-MANIFEST="$SCRIPT_DIR/claim_manifest.json"
+BASE_MANIFEST="$SCRIPT_DIR/claim_manifest.json"
+EXTENDED_MANIFEST="$SCRIPT_DIR/extended_claim_manifest.json"
+FULL_MANIFEST="$SCRIPT_DIR/full_claim_manifest.json"
+MANIFEST="$BASE_MANIFEST"
 
 usage() {
   printf '%s\n' \
     'Usage:' \
-    '  reproduction/reproduce_claims.sh --dry-run [--full]' \
+    '  reproduction/reproduce_claims.sh --dry-run [--extended|--full]' \
     '  reproduction/reproduce_claims.sh --dry-run --trace-replay-from DIR' \
     '  reproduction/reproduce_claims.sh --dry-run --trace-replay-bundle DIR' \
     '  reproduction/reproduce_claims.sh --archived-only --output-dir DIR [--clean]' \
-    '  reproduction/reproduce_claims.sh --run --output-dir DIR [--clean] [--trace-replay-from DIR|--trace-replay-bundle DIR] [--full] [--keep-going] [--rerun-existing]' \
+    '  reproduction/reproduce_claims.sh --run --output-dir DIR [--clean] [--trace-replay-from DIR|--trace-replay-bundle DIR] [--extended|--full] [--keep-going] [--rerun-existing]' \
     '' \
     'The live workflow regenerates archived C1-C4 evidence first, then performs one fresh' \
-    'repetition over Silo, TPC-C, and Sysbench. --full uses all paper Plot 1/2/5 inputs.' \
+    'repetition over Silo, TPC-C, and Sysbench. Use the default for faster validation;' \
+    'if evaluation time permits, --extended fully populates Plots 6/7/10 on those' \
+    'workloads. --full expands Plots 6/7 to all 11 workloads.' \
+    'Both omit TuxBot-Trim and MLOS at 41 knobs; no 4-knob run is selected.' \
     'Live provider execution requires GEMINI_API_KEY; trace replay forbids provider calls.'
+}
+
+need_value() {
+  local option="$1" value="${2:-}"
+  [[ -n "$value" && "$value" != --* ]] || {
+    echo "Missing value for $option." >&2
+    usage >&2
+    exit 2
+  }
 }
 
 MODE=""
@@ -31,6 +46,7 @@ OUTPUT_DIR="$REPO_ROOT/results/reproduced_core"
 KEEP_GOING=0
 RERUN_EXISTING=0
 FULL=0
+EXTENDED=0
 CLEAN=0
 TRACE_REPLAY_FROM=""
 TRACE_REPLAY_BUNDLE=""
@@ -41,18 +57,28 @@ while [[ $# -gt 0 ]]; do
       MODE="${1#--}"
       shift
       ;;
-    --output-dir) OUTPUT_DIR="${2:-}"; shift 2 ;;
+    --output-dir) need_value "$1" "${2:-}"; OUTPUT_DIR="$2"; shift 2 ;;
     --keep-going) KEEP_GOING=1; shift ;;
     --rerun-existing) RERUN_EXISTING=1; shift ;;
+    --extended) EXTENDED=1; shift ;;
     --full) FULL=1; shift ;;
     --clean) CLEAN=1; shift ;;
-    --trace-replay-from) TRACE_REPLAY_FROM="${2:-}"; shift 2 ;;
-    --trace-replay-bundle) TRACE_REPLAY_BUNDLE="${2:-}"; shift 2 ;;
+    --trace-replay-from) need_value "$1" "${2:-}"; TRACE_REPLAY_FROM="$2"; shift 2 ;;
+    --trace-replay-bundle) need_value "$1" "${2:-}"; TRACE_REPLAY_BUNDLE="$2"; shift 2 ;;
     -h|--help) usage; exit 0 ;;
     *) echo "Unknown option: $1" >&2; usage >&2; exit 2 ;;
   esac
 done
 [[ -n "$MODE" ]] || { usage >&2; exit 2; }
+if [[ "$EXTENDED" -eq 1 && "$FULL" -eq 1 ]]; then
+  echo 'Select only one tier: --extended or --full.' >&2
+  exit 2
+fi
+if [[ "$EXTENDED" -eq 1 ]]; then
+  MANIFEST="$EXTENDED_MANIFEST"
+elif [[ "$FULL" -eq 1 ]]; then
+  MANIFEST="$FULL_MANIFEST"
+fi
 if [[ "$MODE" == "dry-run" && "$CLEAN" -eq 1 ]]; then
   echo '--clean cannot be combined with --dry-run because a dry run is read-only.' >&2
   exit 2
@@ -65,8 +91,8 @@ if [[ -n "$TRACE_REPLAY_FROM$TRACE_REPLAY_BUNDLE" && "$MODE" == "archived-only" 
   echo 'Trace replay is only valid with --dry-run or --run.' >&2
   exit 2
 fi
-if [[ -n "$TRACE_REPLAY_FROM$TRACE_REPLAY_BUNDLE" && "$FULL" -eq 1 ]]; then
-  echo 'Trace replay currently supports only the scoped C1-C4 manifest, not --full.' >&2
+if [[ -n "$TRACE_REPLAY_FROM$TRACE_REPLAY_BUNDLE" && ( "$EXTENDED" -eq 1 || "$FULL" -eq 1 ) ]]; then
+  echo 'Trace replay currently supports only the default C1-C4 tier.' >&2
   exit 2
 fi
 if [[ -n "$TRACE_REPLAY_BUNDLE" ]]; then
@@ -77,22 +103,23 @@ if [[ -n "$TRACE_REPLAY_FROM" ]]; then
   TRACE_REPLAY_RAW="$TRACE_REPLAY_FROM/fresh/raw"
 fi
 
-if [[ "$FULL" -eq 1 ]]; then
-  "$PYTHON" "$SCRIPT_DIR/suite.py" validate
-else
-  "$PYTHON" "$SCRIPT_DIR/suite.py" --manifest "$MANIFEST" validate
-fi
+"$PYTHON" "$SCRIPT_DIR/suite.py" --manifest "$MANIFEST" validate
 if [[ "$MODE" == "dry-run" ]]; then
+  DRY_ARGS=(--manifest "$MANIFEST" run --dry-run --output-dir "$OUTPUT_DIR")
+  [[ -n "$TRACE_REPLAY_FROM" ]] && DRY_ARGS+=(--replay-from "$TRACE_REPLAY_RAW")
+  [[ -n "$TRACE_REPLAY_BUNDLE" ]] && DRY_ARGS+=(--replay-bundle "$TRACE_REPLAY_BUNDLE")
+  "$PYTHON" "$SCRIPT_DIR/suite.py" "${DRY_ARGS[@]}"
   if [[ "$FULL" -eq 1 ]]; then
-    "$PYTHON" "$SCRIPT_DIR/suite.py" run --dry-run --plots 1,2,5 --output-dir "$OUTPUT_DIR/full"
     printf '%s\n' \
-      'FULL CLAIM WORKFLOW: 232 unique configurations and 13430 benchmark windows.' \
-      'Nominal benchmark-window time is 18.65 hours; allow one to several days overall.'
+      'WARNING: --full runs the complete Plot 6/7 matrix on all 11 workloads.' \
+      'FULL CLAIM WORKFLOW: 164 unique configurations and 9480 benchmark windows.' \
+      'This can take several days and can consume substantial hosted-model quota.'
+  elif [[ "$EXTENDED" -eq 1 ]]; then
+    printf '%s\n' \
+      'EXTENDED CLAIM WORKFLOW: 60 unique configurations and 3360 benchmark windows.' \
+      'Plot 6 includes Bayes/DQN/Q-Learning; Plot 7 includes every signal variant.' \
+      'Plot 10 uses 2/8/16/41 for TuxBot and 2/8/16 for Trim/MLOS.'
   else
-    DRY_ARGS=(--manifest "$MANIFEST" run --dry-run --output-dir "$OUTPUT_DIR")
-    [[ -n "$TRACE_REPLAY_FROM" ]] && DRY_ARGS+=(--replay-from "$TRACE_REPLAY_RAW")
-    [[ -n "$TRACE_REPLAY_BUNDLE" ]] && DRY_ARGS+=(--replay-bundle "$TRACE_REPLAY_BUNDLE")
-    "$PYTHON" "$SCRIPT_DIR/suite.py" "${DRY_ARGS[@]}"
     if [[ -n "$TRACE_REPLAY_FROM$TRACE_REPLAY_BUNDLE" ]]; then
       printf '%s\n' \
         'Nominal benchmark time: 1050 windows x 5 seconds = 1.46 hours.' \
@@ -118,19 +145,24 @@ if [[ -n "$TRACE_REPLAY_FROM" && "$TRACE_REPLAY_FROM" == "$OUTPUT_DIR" && "$CLEA
   exit 2
 fi
 
+if [[ "$FULL" -eq 1 ]]; then
+  printf '%s\n' \
+    'WARNING: --full runs every Plot 6/7 method on all 11 selected workloads.' \
+    'It selects 164 configurations and 9480 benchmark windows, can take several' \
+    'days, and can consume substantial hosted-model quota. Use a dedicated host.'
+elif [[ "$EXTENDED" -eq 1 ]]; then
+  echo 'WARNING: --extended selects 60 configurations and 3360 benchmark windows.'
+fi
+
 if [[ "$MODE" == "run" ]]; then
   SITE_ENV="$REPO_ROOT/functional_example/site.env"
   [[ -f "$SITE_ENV" ]] || { echo "Missing $SITE_ENV; run scripts/setup.sh --base." >&2; exit 2; }
   # shellcheck disable=SC1090
   source "$SITE_ENV"
-  if [[ "$FULL" -eq 1 ]]; then
-    "$PYTHON" "$SCRIPT_DIR/suite.py" preflight --plots 1,2,5
-  else
-    PREFLIGHT_ARGS=(--manifest "$MANIFEST" preflight)
-    [[ -n "$TRACE_REPLAY_FROM" ]] && PREFLIGHT_ARGS+=(--replay-from "$TRACE_REPLAY_RAW")
-    [[ -n "$TRACE_REPLAY_BUNDLE" ]] && PREFLIGHT_ARGS+=(--replay-bundle "$TRACE_REPLAY_BUNDLE")
-    "$PYTHON" "$SCRIPT_DIR/suite.py" "${PREFLIGHT_ARGS[@]}"
-  fi
+  PREFLIGHT_ARGS=(--manifest "$MANIFEST" preflight)
+  [[ -n "$TRACE_REPLAY_FROM" ]] && PREFLIGHT_ARGS+=(--replay-from "$TRACE_REPLAY_RAW")
+  [[ -n "$TRACE_REPLAY_BUNDLE" ]] && PREFLIGHT_ARGS+=(--replay-bundle "$TRACE_REPLAY_BUNDLE")
+  "$PYTHON" "$SCRIPT_DIR/suite.py" "${PREFLIGHT_ARGS[@]}"
 fi
 
 if [[ "$CLEAN" -eq 1 && -e "$OUTPUT_DIR" ]]; then
@@ -166,25 +198,10 @@ mkdir -p "$OUTPUT_DIR/archived/plots"
 "$SCRIPT_DIR/plot_all.sh" \
   --results-dir "$REPO_ROOT/all_results/paper_evaluation" \
   --output-dir "$OUTPUT_DIR/archived/plots" \
-  --plots 1,2,5 --validation measured
+  --plots 6,7,10 --validation measured
 
 if [[ "$MODE" == "archived-only" ]]; then
   echo "CLAIMS_ARCHIVED: PASS ($OUTPUT_DIR/archived/plots)"
-  exit 0
-fi
-
-if [[ "$FULL" -eq 1 ]]; then
-  echo 'WARNING: --full selects all canonical Plot 1, 2, and 5 dependencies.'
-  echo 'It runs 232 unique configurations and can take one to several days.'
-  FULL_ARGS=(--run --plots 1,2,5 --output-dir "$OUTPUT_DIR/full")
-  [[ "$KEEP_GOING" -eq 1 ]] && FULL_ARGS+=(--keep-going)
-  [[ "$RERUN_EXISTING" -eq 1 ]] && FULL_ARGS+=(--rerun-existing)
-  "$SCRIPT_DIR/reproduce_all.sh" "${FULL_ARGS[@]}"
-  printf '%s\n' \
-    "REPRODUCE_CLAIMS_FULL: PASS ($OUTPUT_DIR)" \
-    "  fresh full plots: $OUTPUT_DIR/full/plots" \
-    "  fresh full results: $OUTPUT_DIR/full/raw" \
-    "  archived plots: $OUTPUT_DIR/archived/plots"
   exit 0
 fi
 
@@ -235,12 +252,41 @@ RUN_ARGS=(--manifest "$MANIFEST" run --output-dir "$FRESH_DIR")
 restore_host
 trap - EXIT INT TERM
 
-"$PYTHON" "$SCRIPT_DIR/plot_claims.py" \
-  --results-dir "$FRESH_DIR/raw" \
-  --output-dir "$FRESH_DIR" \
-  --report-dir "$OUTPUT_DIR" \
-  --archived-plots-dir "$OUTPUT_DIR/archived/plots" \
-  --manifest "$MANIFEST"
+if [[ "$EXTENDED" -eq 1 || "$FULL" -eq 1 ]]; then
+  "$PYTHON" "$SCRIPT_DIR/plot_three_app_paper.py" \
+    --results-dir "$FRESH_DIR/raw" \
+    --output-dir "$FRESH_DIR" \
+    --report-dir "$OUTPUT_DIR" \
+    --manifest "$MANIFEST"
+  "$PYTHON" "$SCRIPT_DIR/plot_c4_methods.py" \
+    --results-dir "$FRESH_DIR/raw" \
+    --output-dir "$FRESH_DIR" \
+    --report-dir "$OUTPUT_DIR" \
+    --manifest "$MANIFEST"
+else
+  "$PYTHON" "$SCRIPT_DIR/plot_claims.py" \
+    --results-dir "$FRESH_DIR/raw" \
+    --output-dir "$FRESH_DIR" \
+    --report-dir "$OUTPUT_DIR" \
+    --archived-plots-dir "$OUTPUT_DIR/archived/plots" \
+    --manifest "$MANIFEST"
+  PAPER_PLOT_ARGS=(
+    --results-dir "$FRESH_DIR/raw"
+    --output-dir "$FRESH_DIR"
+    --report-dir "$OUTPUT_DIR"
+    --manifest "$MANIFEST"
+  )
+  [[ -n "$TRACE_REPLAY_FROM$TRACE_REPLAY_BUNDLE" ]] && PAPER_PLOT_ARGS+=(--allow-replay)
+  "$PYTHON" "$SCRIPT_DIR/plot_three_app_paper.py" "${PAPER_PLOT_ARGS[@]}"
+  C4_PLOT_ARGS=(
+    --results-dir "$FRESH_DIR/raw"
+    --output-dir "$FRESH_DIR"
+    --report-dir "$OUTPUT_DIR"
+    --manifest "$MANIFEST"
+  )
+  [[ -n "$TRACE_REPLAY_FROM$TRACE_REPLAY_BUNDLE" ]] && C4_PLOT_ARGS+=(--execution-mode trace-replay)
+  "$PYTHON" "$SCRIPT_DIR/plot_c4_methods.py" "${C4_PLOT_ARGS[@]}"
+fi
 
 if [[ -n "$TRACE_REPLAY_FROM" ]]; then
   "$PYTHON" "$SCRIPT_DIR/compare_replay.py" \
@@ -254,9 +300,16 @@ elif [[ -n "$TRACE_REPLAY_BUNDLE" ]]; then
     --manifest "$MANIFEST"
 fi
 
+PASS_MARKER="REPRODUCE_CLAIMS"
+[[ "$EXTENDED" -eq 1 ]] && PASS_MARKER="REPRODUCE_CLAIMS_EXTENDED"
+[[ "$FULL" -eq 1 ]] && PASS_MARKER="REPRODUCE_CLAIMS_FULL"
+REPORT_PATH="$OUTPUT_DIR/claim_report.md"
+if [[ "$EXTENDED" -eq 1 || "$FULL" -eq 1 ]]; then
+  REPORT_PATH="$OUTPUT_DIR/three_app_plots_6_7_report.md"
+fi
 printf '%s\n' \
-  "REPRODUCE_CLAIMS: PASS ($OUTPUT_DIR)" \
-  "  report: $OUTPUT_DIR/claim_report.md" \
+  "$PASS_MARKER: PASS ($OUTPUT_DIR)" \
+  "  report: $REPORT_PATH" \
   "  fresh plots: $FRESH_DIR/plots" \
   "  fresh tables: $FRESH_DIR/tables" \
   "  archived plots: $OUTPUT_DIR/archived/plots"

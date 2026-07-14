@@ -1,4 +1,4 @@
-# SemaTune Sysbench OLTP-RW Functional example
+# TuxBot Sysbench OLTP-RW Functional example
 
 > **Safety warning:** live runs change scheduler, busy-poll, Intel P-state, CPU
 > idle, and IRQ-affinity controls. Use only a dedicated/disposable bare-metal
@@ -9,6 +9,13 @@ uses the paper's ordered eight-control search space. The reduced suite is for
 fast functional validation; the canonical command below retains the paper
 configuration and is longer.
 
+Paper claims are not validated from this reduced Functional run. For C1–C4,
+use the base `reproduction/reproduce_claims.sh` workflow in the root
+[README](../README.md#results-reproduced-10-hours); add `--extended` to populate
+more of Plots 6, 7, and 10. Fresh PDFs are written to
+`results/reproduced_core/fresh/plots/`; full commands and pass criteria are in
+[INSTRUCTIONS.md](../INSTRUCTIONS.md#results-reproduced-paper-plots-6-7-and-10).
+
 ## Evaluator workflow
 
 From the repository root:
@@ -17,7 +24,6 @@ From the repository root:
 scripts/setup.sh --base
 functional_example/run.sh --dry-run
 
-export GEMINI_API_KEY='<provided-key>'
 mkdir -p results
 FUNCTIONAL_DIR="$(mktemp -d -p "$PWD/results" functional_sysbench_real_XXXXXXXX)"
 functional_example/run.sh --quick --real-llm \
@@ -35,9 +41,14 @@ Mutilate setup and reduced real-provider Mutilate Functional check.
 The dry run performs no root, database, benchmark, provider, output-directory,
 or kernel write. The expected evaluator run uses real hosted-model decisions
 and takes about 35 minutes on the supplied host. The live suite supports
-Fixed; MLOS App/IPC/Cache; Bayesian; DQN; Q-learning; SemaTune Single;
-SemaTune App/System/IPC; and SemaTune-Trim App/IPC/Cache. A single method can
+Fixed; MLOS App/IPC/Cache; Bayesian; DQN; Q-learning; TuxBot Single;
+TuxBot App/System/IPC; and TuxBot-Trim App/IPC/Cache. A single method can
 be selected with `--method ID`; use `--resume` to retain completed methods.
+
+`perf` hardware counters are optional for execution. If matching kernel tools
+are unavailable, setup and preflight emit a warning and the suite continues.
+In that mode, IPC/cache variants validate orchestration only; their signal and
+performance values are not comparable and must not be used for paper claims.
 
 Provider-free `--trace-replay` is an optional diagnostic. It automatically uses
 the method-specific, committed Gemini 2.5
@@ -45,10 +56,9 @@ Flash-Lite response histories in `functional_example/traces/`. These traces
 were extracted from the completed Functional real-provider run and contain no
 API key. No trace-path configuration is required from the evaluator.
 
-For real Gemini decisions:
+For real Gemini decisions (with the API key already exported):
 
 ```bash
-export GEMINI_API_KEY='<provided-key>'
 functional_example/run.sh --quick --real-llm \
   --output-dir "$FUNCTIONAL_DIR"
 ```
@@ -56,7 +66,7 @@ functional_example/run.sh --quick --real-llm \
 The key is read only from the process environment. It is never read from a
 file, printed, placed on a command line, or serialized.
 
-All Functional SemaTune calls deliberately use Gemini 2.5 Flash-Lite. Both the
+All Functional TuxBot calls deliberately use Gemini 2.5 Flash-Lite. Both the
 Actor and Speculator use Flash-Lite in every dual-loop variant. This degraded
 model choice reduces API cost and avoids overcharging during evaluation. The
 suite proves that the selected tuners and signal paths are operational; its
@@ -67,7 +77,6 @@ performance outputs are not used for result validation.
 To validate the original Sysbench setup rather than the reduced 5+5 schedule:
 
 ```bash
-export GEMINI_API_KEY='your-key-from-Google-AI-Studio'
 functional_example/run_original_sysbench.sh \
   --output-dir results/functional_sysbench_original_real
 ```
@@ -99,8 +108,8 @@ the raw history and log. Approximate runtime is 5-10 minutes on the validation
 machine, subject to provider latency.
 
 To run the complete single-workload comparison used for the Functional
-demonstration—including all classical baselines, SemaTune Single/App/System/IPC,
-MLOS IPC, and SemaTune-Trim—use:
+demonstration—including all classical baselines, TuxBot Single/App/System/IPC,
+MLOS IPC, and TuxBot-Trim—use:
 
 ```bash
 functional_example/run_sysbench_paper_suite.sh \
@@ -168,13 +177,13 @@ functional_example/run_sysbench_dual_replay.sh \
 ```
 
 The command byte-verifies restoration after every replay and emits
-`plots/sysbench_real_vs_action_replay.{pdf,png,csv,json}`. SemaTune Single is
+`plots/sysbench_real_vs_action_replay.{pdf,png,csv,json}`. TuxBot Single is
 shown for real-LLM context but has no dual-loop replay bar.
 
 ## Reduced suite and outputs
 
 Every reduced method runs 5 tuning and 5 frozen stable windows at 10 seconds
-each. The original SemaTune paper configuration uses 30 tuning plus 20 stable windows.
+each. The original TuxBot paper configuration uses 30 tuning plus 20 stable windows.
 The Functional suite tunes only the same ordered eight OS parameters used in
 Figures 6, 7, and 8. The Results-Reproduced workflow evaluates additional
 parameter counts and larger search spaces.
@@ -206,7 +215,7 @@ functional_example/plot.sh \
   --output-dir results/functional_sysbench_trace/plots
 ```
 
-Results are host-dependent and the validator does not require SemaTune to beat
+Results are host-dependent and the validator does not require TuxBot to beat
 Fixed in a short run. Full paper campaigns use five repeats and are documented
 separately in `../reproduction/README.md`.
 
