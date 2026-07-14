@@ -131,13 +131,10 @@ echo 'Building TailBench Masstree...'
 )
 
 echo 'Building TailBench Silo...'
-(
-  cd "$SUITE_DIR/silo/masstree"
-  if [[ ! -f config.h ]]; then
-    ./configure --disable-assertions --disable-invariants \
-      --disable-preconditions --enable-max-key-len=1024 --with-malloc=jemalloc
-  fi
-)
+# Silo's Makefile does not serialize every object that includes config.h with
+# the rule that generates it.  Materialize that target before the parallel
+# build so a clean checkout cannot compile while configure is replacing it.
+make -C "$SUITE_DIR/silo" MODE=perf masstree/config.h
 make -C "$SUITE_DIR/silo" MODE=perf -j"$jobs" \
   out-perf.masstree/benchmarks/dbtest_integrated
 
@@ -150,14 +147,18 @@ echo 'Building TailBench Sphinx...'
   mkdir -p "$prefix"
 
   cd sphinxbase-5prealpha
+  # Regenerate the old Automake 1.13 release with Ubuntu 22.04's host tools.
+  # --install also supplies auxiliary files required by current Automake.
+  autoreconf --force --install
   ./configure --prefix="$prefix" --without-python
   make -j"$jobs"
   make install
   test -f "$prefix/lib/pkgconfig/sphinxbase.pc"
 
   cd ../pocketsphinx-5prealpha
-  PKG_CONFIG_PATH="$prefix/lib/pkgconfig" \
-    CPPFLAGS="-I$prefix/include" LDFLAGS="-L$prefix/lib" \
+  autoreconf --force --install
+  PKG_CONFIG_PATH="$prefix/lib/pkgconfig" CPPFLAGS="-I$prefix/include" \
+    LDFLAGS="-L$prefix/lib" \
     ./configure --prefix="$prefix" --without-python
   PKG_CONFIG_PATH="$prefix/lib/pkgconfig" make -j"$jobs"
   PKG_CONFIG_PATH="$prefix/lib/pkgconfig" make install
