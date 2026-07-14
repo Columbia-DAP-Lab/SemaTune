@@ -93,7 +93,6 @@ def materialize(
             "max_iterations": TUNING_WINDOWS,
             "post_tuning_windows": STABLE_WINDOWS,
             "window_duration": WINDOW_SECONDS,
-            "respect_config_window_duration": True,
             "experiment_profile": None,
             "mutilate_client_host": client_ip,
             "mutilate_target": f"{server_ip}:11211",

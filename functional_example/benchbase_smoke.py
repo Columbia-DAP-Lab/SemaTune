@@ -77,7 +77,6 @@ def materialize(workload: str, output: Path, results_dir: Path) -> int:
         "max_iterations": 1,
         "post_tuning_windows": 0,
         "experiment_profile": None,
-        "respect_config_window_duration": True,
         "results_dir": str(results_dir.resolve()),
         "llm_api_key": None,
         "openrouter_api_key": None,

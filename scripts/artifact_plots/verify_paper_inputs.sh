@@ -10,6 +10,4 @@ if [[ ! -f "$manifest" ]]; then
   exit 2
 fi
 
-cd "$repo_root"
-sha256sum --check --quiet "$manifest"
-echo "PASS: paper plot input checksums verified"
+python3 "$repo_root/tools/maintenance/build_paper_input_manifest.py" --check

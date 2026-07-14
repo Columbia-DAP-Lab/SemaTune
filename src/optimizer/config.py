@@ -20,9 +20,6 @@ from .model_versions import (
 
 logger = logging.getLogger(__name__)
 
-# TEMPORARY: Override window_duration for all experiments (set to None to use config value)
-WINDOW_DURATION_OVERRIDE = None
-
 @dataclass
 class SimpleConfig:
     """Simplified configuration for OS parameter tuning."""
@@ -53,7 +50,7 @@ class SimpleConfig:
     
     # BenchBase/TPCC settings
     benchbase_jar_path: str = "deps/benchbase/target/benchbase-postgres/benchbase.jar"
-    benchbase_config_file: str = "config/benchbase/tpcc_config_template.xml"
+    benchbase_config_file: str = "config/benchbase/postgres/sample_tpcc_hi.xml"
     # BenchBase execution guardrails
     benchbase_timeout_buffer_seconds: int = 40  # Per-window timeout = window_duration + buffer
     benchbase_timeout_retries: int = 1  # Retry count when a window times out
@@ -142,9 +139,6 @@ class SimpleConfig:
     # Tuner requests stop after max_iterations; these windows keep the last applied params fixed.
     post_tuning_windows: int = 20
     window_duration: int = 60  # Window duration in seconds
-    # If True, keep window_duration from config and skip global WINDOW_DURATION_OVERRIDE.
-    # Default False preserves historical behavior for existing runs.
-    respect_config_window_duration: bool = False
     continuous_apply: bool = False  # If True, continuously resubmit tuner requests and apply immediately. If False, send at most one request per window.
     tuning_mode: str = "outside-of-window"  # "outside-of-window" or "in-window" - when to call the tuner
     experiment_profile: Optional[str] = None  # Optional hardcoded experiment profile applied on config load
@@ -276,6 +270,12 @@ class SimpleConfig:
     @classmethod
     def from_dict(cls, data: Dict[str, Any]) -> 'SimpleConfig':
         """Create config from dictionary."""
+        # Historical experiment inputs carry this key from a temporary global
+        # duration-override mechanism. Configured durations are now always
+        # honored, but accepting and discarding the legacy key keeps those
+        # immutable paper inputs loadable.
+        data.pop('respect_config_window_duration', None)
+
         # Filter out tuner-specific parameters and other non-dataclass fields
         # These will be stored as attributes on the config object
         tuner_specific_params = [
@@ -355,14 +355,6 @@ class SimpleConfig:
         config = cls.from_dict(data)
         config._resolve_llm_model_aliases()
         config._apply_experiment_profile()
-        if WINDOW_DURATION_OVERRIDE is not None:
-            # Skip override for DCPerf benchmarks (they run to completion)
-            if (
-                not (config.benchmark and config.benchmark.startswith("dcperf"))
-                and not getattr(config, 'respect_config_window_duration', False)
-            ):
-                config.window_duration = WINDOW_DURATION_OVERRIDE
-                logger.info(f"Temporary override: window_duration set to {WINDOW_DURATION_OVERRIDE}s")
         return config
 
     def _apply_experiment_profile(self) -> None:

@@ -29,7 +29,6 @@ tables, 16 threads, and a 5,000 transaction/s cap:
   "max_iterations": 2,
   "post_tuning_windows": 1,
   "window_duration": 10,
-  "respect_config_window_duration": true,
   "tuning_mode": "in-window",
   "continuous_apply": false,
   "pin_to_cores": "0-9",
@@ -69,7 +68,6 @@ sudo --preserve-env=SEMATUNE_SYSBENCH_HOST,SEMATUNE_SYSBENCH_PORT,SEMATUNE_SYSBE
 | `optimization_metric` / `optimization_goal` | Objective and direction. |
 | `max_iterations` / `post_tuning_windows` | Tuning and frozen measurement windows. |
 | `window_duration` | Nominal seconds per optimizer window. |
-| `respect_config_window_duration` | Prevents compatibility overrides of the duration. |
 | `tuning_mode` / `continuous_apply` | Controls when and how often suggestions are requested. |
 | `pin_to_cores` | Parameter/perf cores; OLTP itself currently uses CPUs 10–19. |
 | `bind_network_irqs` | Allows or prevents NIC IRQ rebinding. |

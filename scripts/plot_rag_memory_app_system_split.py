@@ -133,9 +133,12 @@ def parse_args() -> argparse.Namespace:
     )
     p.add_argument(
         "--discover-under",
-        default="all_results/results_rag",
+        default="all_results/paper_evaluation/results_rag",
         metavar="DIR",
-        help="Discover benchmark roots under DIR (default: all_results/results_rag).",
+        help=(
+            "Discover benchmark roots under DIR "
+            "(default: all_results/paper_evaluation/results_rag)."
+        ),
     )
     p.add_argument("--output-dir", required=True, help="Output directory for PDF/CSV.")
     p.add_argument("--tuning-window", default="1-30", help="Inclusive tuning START-END.")

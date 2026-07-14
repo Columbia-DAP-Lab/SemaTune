@@ -16,7 +16,7 @@ import numpy as np
 from matplotlib.patches import Patch
 from matplotlib.ticker import MultipleLocator
 
-from plot_agentic_memory_comparison import (
+from robustness_helpers import (
     ROBUSTNESS_ERROR_KEYS,
     ROBUSTNESS_METRICS,
     benchmark_label,

@@ -43,7 +43,6 @@ SAFE_CONFIG_KEYS = {
     "max_iterations",
     "post_tuning_windows",
     "window_duration",
-    "respect_config_window_duration",
     "continuous_apply",
     "tuning_mode",
     "experiment_profile",

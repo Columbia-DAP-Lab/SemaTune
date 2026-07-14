@@ -61,3 +61,9 @@ The root modules in `src/optimizer/` implement the shared optimization runtime:
 | `qlearning.py` | Tabular Q-learning tuner. |
 
 Third-party sources remain separate under `deps/`; see [`deps/README.md`](../deps/README.md).
+
+## Maintainer utilities
+
+`tools/maintenance/` contains provenance-preserving utilities used to derive
+the reduced Functional Sysbench configurations and credential-free replay
+traces. Evaluators do not need these utilities for the documented workflows.
