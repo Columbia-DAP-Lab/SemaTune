@@ -31,6 +31,15 @@ def test_only_retained_tailbench_workloads_are_built_and_validated():
     assert '--without-python' in setup
 
 
+def test_legacy_tailbench_builds_are_serialized_and_use_host_automake():
+    setup = (ROOT / "scripts/setup_tailbench.sh").read_text(encoding="utf-8")
+    silo_config = 'make -C "$SUITE_DIR/silo" MODE=perf masstree/config.h'
+    silo_binary = 'make -C "$SUITE_DIR/silo" MODE=perf -j"$jobs"'
+    assert silo_config in setup
+    assert setup.index(silo_config) < setup.index(silo_binary)
+    assert setup.count("autoreconf --force --install") == 2
+
+
 def test_inputs_default_under_mydata_with_explicit_software_only_mode():
     setup = (ROOT / "scripts/setup_tailbench.sh").read_text(encoding="utf-8")
     installer = (ROOT / "scripts/install_tailbench_inputs.py").read_text(encoding="utf-8")
