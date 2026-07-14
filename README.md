@@ -249,6 +249,118 @@ claim as `COMPLETE` or incomplete and its fresh direction as `CONSISTENT` or
    `DIVERGENT` result is reported rather than hidden; reviewers should inspect
    its workload rows and logs instead of requiring the exact paper percentage.
 
+#### Optional live C1–C3 family extension
+
+To extend the provider-backed observation to every paper workload implemented
+through BenchBase, Sysbench, and TailBench—without running the C4 knob sweep—use:
+
+```bash
+reproduction/reproduce_c123_families.sh --dry-run
+reproduction/reproduce_c123_families.sh --run \
+  --output-dir results/reproduced_core --keep-going
+```
+
+Add `--clean` when a completely new 44-configuration run is desired. The
+existing output is moved under `results/archive/` before the canonical result
+directory is recreated, so the plotting paths never mix old and new histories.
+`--clean` and `--seed-live-from` are intentionally mutually exclusive.
+
+The plan contains 44 configurations and 2,200 windows across Masstree, Silo,
+Sphinx, Xapian, SIbench, TPC-C, Twitter, Wikipedia, YCSB, Sysbench CPU, and
+Sysbench OLTP-RW. When the three-workload provider run is already present, 12
+configurations resume and only the 32 missing configurations execute. Reinvoke
+the same command after an interruption; valid 50-window histories are never
+repeated. The complete plan has 3.06 nominal benchmark-window hours; extending
+the saved three-workload provider run adds 2.22 nominal hours. Allow additional
+time for database creation, JVM/process startup, hosted-model responses, and
+the bounded BenchBase window retry.
+
+If `results/reproduced_core` currently contains a trace replay, first seed the
+extension from the safely archived provider-backed result. The wrapper verifies
+that the seed contains no replay configuration, archives the current output,
+and restores the provider result before running anything:
+
+```bash
+reproduction/reproduce_c123_families.sh --run \
+  --output-dir results/reproduced_core \
+  --seed-live-from results/archive/PROVIDER_RUN_DIRECTORY \
+  --keep-going
+```
+
+The resulting [`c123_family_report.md`](results/reproduced_core/c123_family_report.md)
+reports C1–C3 separately for all 11 workloads and for the 10-workload aggregate
+excluding Xapian, matching the original with/without-Xapian convention. Exact
+per-workload factors are in `fresh/tables/c123_improvement_factors.csv`. The
+shared `fresh/run_status.json` can also retain completed provider-baseline jobs
+outside this extension; the C1–C3 report and `c123_*.csv` files are scoped to
+exactly the manifest's 44 configurations. This workflow requires live provider
+access and deliberately has no trace-replay.
+Its two PDFs reproduce evaluation Plots 1 and 2 rather than creating one plot
+per claim. They retain the paper's complete method order, page dimensions, bar
+widths, labels, colors, typography, and with/without-Xapian layout. Methods not
+selected by this scoped run remain as empty bar positions.
+
+#### Queued C4 method comparison
+
+C4 remains scoped to Silo, TPC-C, and Sysbench OLTP-RW; the additional C1–C3
+workloads do not receive a knob sweep. After the C1–C3 family run validates,
+compare SemaTune and TuxBot-Trim at 2, 8, 16, and 41 knobs, with MLOS at 2, 8,
+and 16 knobs, using:
+
+```bash
+reproduction/reproduce_c4_methods.sh --dry-run
+reproduction/reproduce_c4_methods.sh --run \
+  --output-dir results/reproduced_core --keep-going
+```
+
+To queue it behind a C1–C3 process that is already running, use its wrapper PID:
+
+```bash
+nohup reproduction/queue_c4_methods.sh \
+  --wait-for-pid "$C123_PID" \
+  --output-dir results/reproduced_core --keep-going \
+  > results/reproduced_core/c4_methods_queue.log 2>&1 &
+```
+
+The queue refuses to start C4 unless the final C1–C3 report, histories, tables,
+and plots pass strict validation. The C4 plan has 36 configurations and 1,800
+windows. It resumes 18 completed Fixed/SemaTune/MLOS configurations from the
+provider baseline and measures the 18 missing MLOS and TuxBot-Trim
+configurations (900 windows). MLOS is provider-free; each TuxBot-Trim run
+uses ten Gemini-assisted search-space trimming cycles before/in conjunction
+with its MLOS optimization windows.
+The output uses the actual paper Plot 5 implementation and exact style. Its
+fresh mode disables the submitted figure's historical Trim overrides and proxy
+fallbacks, so every populated value is measured. MLOS@41 is intentionally not
+scheduled and remains empty in the plot and CSV. Results are written to
+`c4_method_report.{md,json}`, `fresh/plots/ablation_param_geomean.pdf`, and
+disaggregated `fresh/tables/ablation_param_geomean*.csv` files.
+
+#### Exact three-application Plots 1 and 2
+
+To reproduce the paper Plot 1/2 method matrix on the same Silo, TPC-C, and
+Sysbench OLTP-RW applications, run this after the C4 command:
+
+```bash
+reproduction/reproduce_three_app_plot12.sh --dry-run
+reproduction/reproduce_three_app_plot12.sh --run \
+  --output-dir results/reproduced_core --keep-going
+```
+
+The 30-configuration manifest contains Fixed plus TuxBot App/System/IPC,
+TuxBot-Trim App/IPC/Cache, and MLOS App/IPC/Cache for each application. After
+the C4 workflow, 15 strict 50-window histories resume and the 15 signal jobs
+that C4 does not cover execute once. Plot 1 uses TuxBot App, TuxBot-Trim App,
+and MLOS App; Plot 2 uses every requested signal variant. Bayesian, DQN, and
+Q-Learning are outside this scoped run and retain empty Plot 1 slots so the
+paper bar widths and layout do not change.
+
+The outputs replace the canonical paper-equivalent Plot 1/2 PDFs only after
+all 30 histories pass strict completion checks. Exact page dimensions, method
+order, bar geometry, labels, colors, and typography come from the paper plot
+program. See `three_app_plot12_report.{md,json}` and the two
+`fresh/plots/retry_*.csv` files for claim and disaggregated aggregate values.
+
 #### Provider-free trace replay
 
 Hosted-model availability is external to the artifact: a supplied API key can
