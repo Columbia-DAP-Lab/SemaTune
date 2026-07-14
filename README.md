@@ -107,6 +107,8 @@ Detailed pointers:
 
 - [Functional reviewer instructions](INSTRUCTIONS.md#artifact-functional-evaluator-instructions): expected terminal output, manual checks, resume, and fresh-host procedure.
 - [Functional example reference](functional_example/README.md): all methods, schedules, model choices, configurations, and output schema.
+- [Validation environment](artifact/VALIDATION_ENVIRONMENT.md): exact hardware, OS, software, storage, NICs, and dependency commits.
+- [Functional reviewer notes](docs/FUNCTIONAL_REVIEWER_NOTES.md): database safety, resource planning, and expected messages.
 - [Component and source map](docs/COMPONENTS.md): implementation directories and retained source files.
 - [Installation guide](docs/FULL_INSTALL.md): base setup plus optional TailBench, SparkBench, and Mutilate dependencies.
 - [Plot generation](docs/PLOTTING.md): Functional plot programs and paper-plot wrappers.
@@ -443,11 +445,13 @@ C1–C4 workflow.
 - `reproduction/`: full experiment configurations and rerun orchestration.
 - `all_results/paper_evaluation/`: archived paper-result histories.
 - `scripts/artifact_plots/`: paper-plot wrappers and validators.
-- `deps/`: pinned third-party benchmark sources, separate from authored code.
+- `deps/`: complete pinned third-party source snapshots, separate from authored
+  code and retained intact with their build files and license notices.
 
 See the concise [component and source map](docs/COMPONENTS.md) for every
 retained file under `src/optimizer/`. Third-party versions and relationships
-are in [`deps/README.md`](deps/README.md).
+are in [`deps/README.md`](deps/README.md); exact upstream bases and fork deltas
+are in the [third-party modification map](artifact/THIRD_PARTY_MODIFICATIONS.md).
 
 ### Environment and safety
 
@@ -460,6 +464,11 @@ logical CPUs, and the same CPU family.
 > P-state, CPU-idle, and IRQ-affinity controls. Use only a dedicated/disposable
 > bare-metal host with administrator access. The runner restores and
 > byte-verifies the captured settings on exit.
+
+> **Database warning:** setup creates or updates the local `admin` role and
+> `benchdb`; workload preparation may recreate test tables or disposable smoke
+> databases. Never point the artifact at a valuable or shared database. See
+> the [complete safety notes](docs/FUNCTIONAL_REVIEWER_NOTES.md#safety-and-destructive-operations).
 
 Evaluators already have a configured host. Otherwise instantiate the
 [parameterized CloudLab `small-lan` profile](https://www.cloudlab.us/p/PortalProfiles/small-lan&rerun_paramset=77c05171-9bff-4316-8832-cc0b265f4bdb)
@@ -483,6 +492,8 @@ needed for the minimal workflow.
 
 For TailBench, SparkBench, the local Mutilate build, storage requirements, and
 component commands, see [full dependency installation](docs/FULL_INSTALL.md).
+Reviewer time, RAM, and disk planning is summarized in the
+[Functional resource table](docs/FUNCTIONAL_REVIEWER_NOTES.md#resource-planning).
 
 ### Two-node Mutilate Functional check
 
@@ -568,12 +579,13 @@ used 1.6 GB allocated.
 - [Paper claims, exact inputs, and provenance](artifact/PAPER_CLAIMS_AND_PLOTS.md)
 - [Full rerun workflow](reproduction/README.md)
 
-### Remaining Functional TODOs
+### Functional audit references
 
-- [ ] Before release, exclude obsolete, duplicate, unrelated, generated, and
-  local-only files from the published payload.
-- [ ] Measure setup time, peak RAM, and total installed disk usage for the
-  minimal workflow on the validation machine.
+- [Exact validation-machine report](artifact/VALIDATION_ENVIRONMENT.md)
+- [Safety, resource use, and expected behavior](docs/FUNCTIONAL_REVIEWER_NOTES.md)
+- [Third-party source and modification boundary](artifact/THIRD_PARTY_MODIFICATIONS.md)
+- [Archived-data selection, redaction, and limitations](artifact/paper_plot_inputs.json)
+
 The reduced inputs are `functional_example/sysbench_*.json`, mapped by
 `functional_example/sysbench_suite.json`; full inputs are under
 `reproduction/configs/`. The paper makes no mechanized-proof claim requiring a

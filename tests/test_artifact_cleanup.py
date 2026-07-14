@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import importlib.util
 import json
+import os
 import sys
 from pathlib import Path
 
@@ -131,3 +132,22 @@ def test_obsolete_entrypoints_are_removed_and_maintenance_tools_are_grouped() ->
         "extract_recorded_traces.py",
     ):
         assert (ROOT / "tools" / "maintenance" / name).is_file()
+
+
+def test_functional_audit_documents_are_present_and_todos_are_resolved() -> None:
+    expected = (
+        ROOT / "artifact" / "VALIDATION_ENVIRONMENT.md",
+        ROOT / "artifact" / "THIRD_PARTY_MODIFICATIONS.md",
+        ROOT / "docs" / "FUNCTIONAL_REVIEWER_NOTES.md",
+    )
+    for path in expected:
+        assert path.is_file()
+
+    capture = ROOT / "scripts" / "capture_environment.sh"
+    assert capture.is_file() and os.access(capture, os.X_OK)
+
+    readme = (ROOT / "README.md").read_text(encoding="utf-8")
+    assert "Remaining Functional TODOs" not in readme
+    assert "artifact/VALIDATION_ENVIRONMENT.md" in readme
+    assert "docs/FUNCTIONAL_REVIEWER_NOTES.md" in readme
+    assert "artifact/THIRD_PARTY_MODIFICATIONS.md" in readme
