@@ -29,6 +29,7 @@ The root modules in `src/optimizer/` implement the shared optimization runtime:
 | `dcperf.py` | Runs DCPerf SparkBench. |
 | `mutilate_benchmark.py` | Coordinates Memcached and the remote load generator. |
 | `mutilate_client.py` | Runs on the remote Mutilate load-generator node. |
+| `mutilate_protocol.py` | Implements buffered, framed coordination messages. |
 | `ADD_BENCHMARK_README.md` | Explains how to register another adapter. |
 | `MUTILATE_README.md` | Documents distributed Mutilate execution. |
 | `MUTILATE_INTERNAL_NETWORK_SETUP.md` | Documents the two-node network layout. |

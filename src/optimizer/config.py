@@ -59,8 +59,9 @@ class SimpleConfig:
     benchbase_timeout_retries: int = 1  # Retry count when a window times out
     
     # Mutilate settings
-    mutilate_client_host: Optional[str] = None  # IP address of remote client (for server to connect to)
+    mutilate_client_host: Optional[str] = None  # Expected source IP of the remote load generator
     mutilate_target: str = "127.0.0.1:11211"  # Memcached target (server:port)
+    mutilate_control_port: int = 19876  # Server/client coordination port
     mutilate_threads: int = 8  # Mutilate worker threads
     mutilate_clients: int = 8  # Mutilate client connections
     mutilate_qps: int = 500000  # Target QPS
@@ -547,6 +548,8 @@ class SimpleConfig:
             raise ValueError("dcperf_online_start_timeout_seconds must be > 0")
         if self.dcperf_online_log_poll_seconds <= 0:
             raise ValueError("dcperf_online_log_poll_seconds must be > 0")
+        if not 1 <= self.mutilate_control_port <= 65535:
+            raise ValueError("mutilate_control_port must be between 1 and 65535")
         
         if self.tuner_type == "llm":
             # Validate Gemini model names (non-Gemini models are OpenRouter and skip validation)
