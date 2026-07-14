@@ -290,6 +290,52 @@ needed for the minimal workflow.
 For TailBench, SparkBench, the local Mutilate build, storage requirements, and
 component commands, see [full dependency installation](docs/FULL_INSTALL.md).
 
+### Two-node Mutilate Functional check
+
+Mutilate uses a memcached/SemaTune server and a separate load generator. From
+the same repository revision on both Ubuntu 22.04 nodes, pass allocation
+addresses explicitly; no address is compiled into the client or benchmark:
+
+```bash
+# SemaTune + memcached server (10.10.1.2)
+scripts/setup.sh --memcached-server \
+  --server-ip 10.10.1.2 --client-ip 10.10.1.3
+
+# Mutilate load generator (10.10.1.3)
+scripts/setup.sh --memcached-client \
+  --server-ip 10.10.1.2 --client-ip 10.10.1.3
+```
+
+The client command builds the pinned Mutilate revision and enables the
+`sematune-mutilate-client.service` system service. It may run first: the
+service waits and reconnects whenever there is no active server experiment.
+Inspect it with `systemctl status sematune-mutilate-client` or
+`journalctl -u sematune-mutilate-client -f` on the load generator.
+
+On the server, validate the generated deployment and then perform one short
+real-provider run:
+
+```bash
+functional_example/run_mutilate.sh --dry-run
+
+export GEMINI_API_KEY='<provided-key>'
+functional_example/run_mutilate.sh --quick --real-llm \
+  --output-dir results/functional_mutilate_real
+```
+
+This runs one default baseline, three tuning windows, and two frozen stable
+windows at five seconds each. Both LLM roles use Gemini 2.5 Flash-Lite. Success
+requires real Actor and Speculator API evidence, byte-verified host restoration,
+and at least two finite, positive Mutilate samples—including throughput and
+average/p95/p99 latency—in every window. Per-window values are written to
+`mutilate_summary.{json,csv}` and printed at completion.
+
+`--memcached-server` is standalone and includes the base SemaTune environment;
+`--memcached-client` installs only the load-generator closure. `--base` remains
+unchanged. `--full --server-ip IP --client-ip IP` performs the same server
+configuration after the broader full installation; without the addresses,
+`--full` retains its software-only behavior.
+
 ### What does the Functional run do?
 
 It runs Sysbench OLTP read/write with Fixed; MLOS App/IPC/Cache; Bayesian; DQN;
@@ -334,10 +380,6 @@ used 1.6 GB allocated.
   local-only files from the published payload.
 - [ ] Measure setup time, peak RAM, and total installed disk usage for the
   minimal workflow on the validation machine.
-- [ ] Automate and validate the two-node Mutilate deployment, generated network
-  configuration, and end-to-end smoke test. The pinned local binary already
-  builds with `scripts/setup.sh --full`.
-
 The reduced inputs are `functional_example/sysbench_*.json`, mapped by
 `functional_example/sysbench_suite.json`; full inputs are under
 `reproduction/configs/`. The paper makes no mechanized-proof claim requiring a

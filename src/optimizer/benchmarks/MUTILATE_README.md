@@ -1,358 +1,129 @@
-# Mutilate Benchmark Setup and Usage Guide
+# Mutilate benchmark setup and usage
 
-This guide explains how to set up and run the distributed mutilate benchmark with the SemaTune OS parameter tuner.
+Mutilate is a two-node benchmark. The **server** runs SemaTune and a memcached
+process whose operating-system controls are tuned. The **client** runs the
+pinned Mutilate load generator and returns measured latency and throughput over
+an internal control connection.
 
-## Overview
+Both hosts must be Ubuntu 22.04 x86-64 machines with non-interactive sudo and
+the same SemaTune revision. Live tuning is intended only for dedicated or
+disposable bare-metal hosts.
 
-The mutilate benchmark is a distributed benchmark that requires:
-- **Server side** (where tuning happens): Runs memcached, applies OS parameters, collects power/CPU metrics, coordinates with client
-- **Client side** (remote server): Generates load using mutilate, measures performance, sends metrics back
+## Automated role setup
 
-The client connects once at the start and stays connected, restarting load generation per optimization window.
-
-## Prerequisites
-
-### Server Side
-- Python 3.6+
-- memcached installed and accessible in PATH
-- Root/sudo access (for parameter tuning and metrics collection)
-- Network access to receive client connections on port 19876
-- mutilate repository available (for NIC IRQ pinning utilities, optional)
-
-### Client Side
-- Python 3.6+
-- mutilate binary compiled and available
-- Network access to connect to server on port 19876
-- Ability to reach server's memcached instance (default: port 11211)
-
-## Setup Steps
-
-### 1. Server Side Setup
-
-No special setup required beyond installing the SemaTune optimizer dependencies. The server will:
-- Start memcached automatically
-- Listen for client connections on port 19876
-- Apply OS parameters automatically
-- Collect power, C-state, CPU, and perf metrics
-
-### 2. Client Side Setup
-
-#### Step 2.1: Deploy the Client Script
-
-Copy `src/optimizer/benchmarks/mutilate_client.py` to the remote client machine.
-
-#### Step 2.2: Configure Server IP
-
-Edit `mutilate_client.py` and update the `SERVER_HOST` variable at the top of the file:
-
-```python
-SERVER_HOST = "128.105.144.26"  # Change this to your server IP
-# For internal network (10.x.x.x), use the server's internal IP:
-# SERVER_HOST = "10.10.1.1"  # Example for internal network
-```
-
-#### Step 2.3: Ensure mutilate Binary is Available
-
-Make sure the mutilate binary is accessible. The default path is `~/mutilate/mutilate`, but you can:
-- Set the path in the server configuration (see Configuration section)
-- Or modify the default in `mutilate_client.py` if needed
-
-#### Step 2.4: Test Client Connection (Optional)
-
-You can test the client connection by running:
+Pass both allocation addresses on both machines. For a server at `10.10.1.2`
+and load generator at `10.10.1.3`:
 
 ```bash
-python3 mutilate_client.py
+# On 10.10.1.2
+scripts/setup.sh --memcached-server \
+  --server-ip 10.10.1.2 --client-ip 10.10.1.3
+
+# On 10.10.1.3
+scripts/setup.sh --memcached-client \
+  --server-ip 10.10.1.2 --client-ip 10.10.1.3
 ```
 
-It should connect to the server and wait for windows. You can interrupt it with Ctrl+C.
+The server mode includes the normal base SemaTune installation and installs
+memcached, but leaves the distribution service disabled because the benchmark
+adapter starts and stops its own instance. The client mode installs only the
+pinned Mutilate build closure and creates
+`sematune-mutilate-client.service`. Both modes verify that their role address
+is assigned locally and that the peer is routable.
 
-## Configuration
+The generated `functional_example/mutilate.env` is local, ignored by Git, and
+contains no credential. Rerun the same setup command after changing addresses,
+moving the checkout, or updating the client service code.
 
-### Using Internal Network (10.x.x.x)
-
-If you want to use an internal network interface (e.g., 10.10.1.x) instead of the external network:
-
-1. **Server Configuration**: Set both `mutilate_client_host` and `mutilate_target` to use internal IPs:
-   - `mutilate_client_host`: Client's internal IP (e.g., `10.10.1.2`)
-   - `mutilate_target`: Server's internal IP with port (e.g., `10.10.1.1:11211`)
-
-2. **Client Script**: Update `SERVER_HOST` in `mutilate_client.py` to the server's internal IP (e.g., `10.10.1.1`)
-
-**Example for internal network setup:**
-- Server (node0): `10.10.1.1`
-- Client (node1): `10.10.1.2`
-
-```json
-{
-  "benchmark": "mutilate",
-  "mutilate_client_host": "10.10.1.2",
-  "mutilate_target": "10.10.1.1:11211",
-  ...
-}
-```
-
-And in `mutilate_client.py`:
-```python
-SERVER_HOST = "10.10.1.1"
-```
-
-**Note**: The TCP server (port 19876) and memcached (port 11211) bind to `0.0.0.0` by default, so they will accept connections on all interfaces including the internal network.
-
-### Server Configuration File
-
-Add the following mutilate-specific settings to your configuration file (e.g., `config/simple_config.json`):
-
-```json
-{
-  "benchmark": "mutilate",
-  
-  "mutilate_client_host": "128.105.144.30",
-  "mutilate_target": "127.0.0.1:11211",
-  "mutilate_threads": 8,
-  "mutilate_clients": 8,
-  "mutilate_qps": 500000,
-  "mutilate_iadist": "fixed:0",
-  "mutilate_depth": 1,
-  "mutilate_bin_path": "~/mutilate/mutilate",
-  "mutilate_memcached_bin": "memcached",
-  
-  "pin_to_cores": null,
-  "window_duration": 60,
-  "max_iterations": 10,
-  ...
-}
-```
-
-### Configuration Parameters
-
-- **`mutilate_client_host`** (required): IP address of the remote client machine (use internal IP if using internal network)
-- **`mutilate_target`** (default: "127.0.0.1:11211"): Memcached server address (server:port). **Important**: For distributed setup, this should be the server's IP address (not localhost). Use internal IP if using internal network (e.g., "10.10.1.1:11211")
-- **`mutilate_threads`** (default: 8): Number of mutilate worker threads
-- **`mutilate_clients`** (default: 8): Number of mutilate client connections
-- **`mutilate_qps`** (default: 500000): Target queries per second
-- **`mutilate_iadist`** (default: "fixed:0"): Request inter-arrival distribution (e.g., "exponential:10", "fixed:0")
-- **`mutilate_depth`** (default: 1): Pipeline depth
-- **`mutilate_bin_path`** (default: "~/mutilate/mutilate"): Path to mutilate binary on client
-- **`mutilate_memcached_bin`** (default: "memcached"): Path to memcached binary on server
-
-### CPU Pinning (Optional)
-
-If you want to pin memcached to specific cores, set `pin_to_cores` in the config:
-
-```json
-{
-  "pin_to_cores": "0-7",
-  ...
-}
-```
-
-or
-
-```json
-{
-  "pin_to_cores": "0,1,2,3",
-  ...
-}
-```
-
-## Running the Benchmark
-
-**IMPORTANT**: The optimizer must be started **FIRST** on the server before the client connects. The optimizer starts the TCP server during initialization.
-
-### Step 1: Start the Optimizer (Server)
-
-On the server machine, run the optimizer first:
+Full benchmark installation can configure the server role at the same time:
 
 ```bash
-# Single-loop optimizer
-PYTHONPATH=src python3 -m optimizer.main -c config/simple_config.json
-
-# Or dual-loop optimizer
-PYTHONPATH=src python3 -m optimizer.dual_loop_main -c config/simple_config.json
+scripts/setup.sh --full \
+  --server-ip 10.10.1.2 --client-ip 10.10.1.3
 ```
 
-The optimizer will:
-1. Start memcached
-2. **Start listening on port 19876 for client connection**
-3. Wait for client to connect (this is where it will pause)
-4. Once connected, run optimization windows
-5. Collect metrics from both server and client
-6. Apply parameter adjustments
-7. Clean up when done
+Without the paired addresses, `--full` keeps its historical software-only
+behavior. The base installation never installs Mutilate or memcached.
 
-**You should see a message like**: `"Waiting for client connection on port 19876..."`
+## Client service
 
-### Step 2: Start the Client
-
-**After** the optimizer is running and waiting for connection, start the client script on the remote client machine:
+The load-generator service is enabled and started by setup. It binds the
+control connection to the configured client address, advertises its checkout's
+absolute Mutilate binary path, and reconnects after every completed or failed
+experiment. It is safe to start the client before the optimizer.
 
 ```bash
-python3 mutilate_client.py
+systemctl status sematune-mutilate-client --no-pager
+journalctl -u sematune-mutilate-client -f
 ```
 
-The client will:
-1. Connect to the server
-2. Wait for configuration
-3. Display configuration received
-4. Wait for windows to start
+For foreground diagnosis, stop the service and run its wrapper:
 
-**Keep both running** - the client will automatically handle each optimization window.
+```bash
+sudo systemctl stop sematune-mutilate-client
+scripts/run_mutilate_client.sh
+```
 
-### Order Summary
+Rerun the client setup command to restore and restart the managed service.
 
-1. ✅ Start optimizer on **server** (it will wait for client)
-2. ✅ Start client on **remote machine** (it will connect)
-3. ✅ Both run together until optimization completes
+## Reduced real-provider Functional run
 
-## Execution Flow
+On the server:
 
-For each optimization window:
+```bash
+functional_example/run_mutilate.sh --dry-run
 
-1. **Server side**:
-   - Starts system metrics collection (power, C-state, CPU, perf)
-   - Signals client to start load generation
-   - Waits for window duration
-   - Signals client to stop
-   - Receives performance data from client
-   - Parses and aggregates all metrics
+export GEMINI_API_KEY='<provided-key>'
+functional_example/run_mutilate.sh --quick --real-llm \
+  --output-dir results/functional_mutilate_real
+```
 
-2. **Client side**:
-   - Receives start signal
-   - Runs mutilate epochs continuously (~1 second each)
-   - Collects performance samples (latency, throughput)
-   - Monitors for end signal
-   - Sends aggregated performance data to server
+The runner materializes a deployment-specific copy of the canonical Mutilate
+SemaTune-App configuration. It uses one default baseline, three tuning, and two
+stable five-second windows. Actor and Speculator both use Gemini 2.5
+Flash-Lite. The canonical reproduction JSON is not modified.
 
-## Metrics Collected
+The runner captures all host controls before launching the optimizer and
+restores and byte-verifies them after success, failure, timeout, or a signal.
+It accepts a run only when:
 
-### Server-Side Metrics
-- **Power**: RAPL socket and DRAM power (Watts)
-- **C-state residency**: POLL, C1, C1E, C6 percentages (focused cores)
-- **CPU utilization**: Load percentage (focused cores and socket 0)
-- **Perf stat**: Cycles, instructions, cache misses, branch misses, IPC, etc.
+- the optimizer records all six expected windows;
+- every window contains at least two valid samples;
+- throughput, goodput, and average/p95/p99 latency are finite and positive;
+- both Actor and Speculator contain real API token evidence and no replay file
+  was used; and
+- host restoration passes without byte mismatches.
 
-### Client-Side Metrics
-- **Latency**: Average, p95, p99 (in microseconds, converted to milliseconds)
-- **Throughput**: Queries per second
-- **Goodput**: Assumed equal to throughput (all requests successful)
+Successful output includes the raw optimizer history, generated config, logs,
+machine and restoration records, and `mutilate_summary.json` plus
+`mutilate_summary.csv`.
 
-All metrics are saved in the optimization history JSON file.
+## Runtime configuration
+
+The benchmark retains these configuration fields for custom runs:
+
+- `mutilate_client_host`: expected source address of the load generator;
+- `mutilate_target`: memcached server and port, such as
+  `10.10.1.2:11211`;
+- `mutilate_control_port`: coordination port, default `19876`;
+- `mutilate_threads`, `mutilate_clients`, `mutilate_qps`,
+  `mutilate_iadist`, and `mutilate_depth`: load shape; and
+- `mutilate_memcached_bin`: server executable. The client service advertises
+  its local pinned `mutilate` path during handshake.
+
+Memcached binds only to the host in `mutilate_target`; the control listener
+binds to the same internal host and rejects peers other than
+`mutilate_client_host`. TCP ports `11211` and `19876` therefore need to be
+reachable only across the private link.
 
 ## Troubleshooting
 
-### Client Cannot Connect to Server
+If the optimizer times out waiting for a client, inspect the client unit and
+confirm both checkouts contain the same generated addresses. From the client,
+`ping <server-ip>` must succeed. The Functional server log is
+`logs/mutilate_sematune_app.log` beneath the selected output directory.
 
-**Problem**: Client fails to connect with "Connection refused" or timeout.
-
-**Solutions**:
-1. **Make sure optimizer is running FIRST on server** - The optimizer must be started before the client attempts to connect
-2. Verify server IP address in `mutilate_client.py` is correct
-3. Check firewall: ensure port 19876 is open on server
-4. Verify server is running and listening: `netstat -tlnp | grep 19876` (should show LISTEN state)
-5. Test network connectivity: `ping <server_ip>`
-6. Check server logs - you should see "Waiting for client connection on port 19876..." before client connects
-
-### Memcached Fails to Start
-
-**Problem**: Server logs show "Memcached failed to start!"
-
-**Solutions**:
-1. Check if memcached is installed: `which memcached`
-2. Check if another memcached instance is running: `ps aux | grep memcached`
-3. Try manually starting memcached: `memcached -u root -t 4 -m 1024 -l 0.0.0.0 -p 11211`
-4. Check if port 11211 is already in use: `netstat -tlnp | grep 11211`
-
-### Client Cannot Reach Memcached
-
-**Problem**: Client shows errors or zero throughput.
-
-**Solutions**:
-1. Verify `mutilate_target` in config matches server's memcached address
-2. Test connectivity from client: `telnet <server_ip> 11211`
-3. Check firewall: ensure port 11211 is open on server
-4. Verify memcached is listening on correct interface: `netstat -tlnp | grep 11211`
-
-### No Performance Metrics Received
-
-**Problem**: Server shows "Received 0 performance samples from client".
-
-**Solutions**:
-1. Check client logs for mutilate execution errors
-2. Verify mutilate binary path is correct on client
-3. Test mutilate manually on client:
-   ```bash
-   ~/mutilate/mutilate -s <server_ip>:11211 --noload -T 4 -c 4 -q 10000 -t 1
-   ```
-4. Check network latency between client and server
-
-### Client Disconnects During Execution
-
-**Problem**: Server logs show "Client disconnected" errors.
-
-**Solutions**:
-1. Check network stability between client and server
-2. Increase socket timeout in `mutilate_benchmark.py` if needed
-3. Check for firewall or NAT timeout issues
-4. Verify client script is still running
-
-### Permission Errors
-
-**Problem**: "Permission denied" errors when starting memcached or collecting metrics.
-
-**Solutions**:
-1. Run optimizer with sudo: `sudo --preserve-env=PYTHONPATH python3 -m optimizer.main ...`
-2. Ensure memcached can run as root (or configure user appropriately)
-3. Check file permissions for metrics collection paths
-
-## Example Configuration File
-
-Here's a complete example configuration file for mutilate:
-
-```json
-{
-  "benchmark": "mutilate",
-  "pin_to_cores": null,
-  "mutilate_client_host": "10.10.1.2",  // For internal network, use client's internal IP (e.g., "10.10.1.2")
-  "mutilate_target": "10.10.1.1:11211",  // For distributed setup, use server IP (e.g., "10.10.1.1:11211" for internal network)
-  "mutilate_threads": 8,
-  "mutilate_clients": 8,
-  "mutilate_qps": 500000,
-  "mutilate_iadist": "fixed:0",
-  "mutilate_depth": 1,
-  "mutilate_bin_path": "~/mutilate/mutilate",
-  "mutilate_memcached_bin": "memcached",
-  "tuner_type": "llm",
-  "parameter_ranges": {
-    "min_granularity_ns": [100000, 50000000]
-  },
-  "fixed_parameters": {
-    "latency_ns": 24000000,
-    "wakeup_granularity_ns": 4000000
-  },
-  "optimization_metric": "throughput",
-  "optimization_goal": "maximize",
-  "max_iterations": 10,
-  "window_duration": 60,
-  "results_dir": "results",
-  "llm_api_key": null,
-  "llm_model_name": "gemini-2.5-pro"
-}
-```
-
-## Notes
-
-- **The optimizer must be started FIRST** on the server - it will wait for the client to connect
-- Once connected, the client will automatically restart load generation for each window
-- All metrics are collected automatically - no manual intervention needed
-- The optimizer will clean up memcached and close client connection when done
-- Results are saved in the `results_dir` specified in the configuration
-- Set `GEMINI_API_KEY` in the environment for LLM runs; do not store a key in
-  the configuration.
-- If connection fails, verify the optimizer is running and waiting for connections before starting the client
-
-## Support
-
-For issues or questions, refer to the main project documentation or check the logs:
-- Server logs: `optimizer.log` or `dual_loop_optimizer.log`
-- Client output: printed to stdout
+If loading or measurement fails, the client journal includes the exact
+Mutilate exit status. Failed or unparsable epochs are counted separately;
+zero-filled measurements are never passed to the optimizer. Setup can be
+rerun safely on either node to rebuild the pinned binary and refresh the unit.

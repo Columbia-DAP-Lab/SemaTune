@@ -29,8 +29,8 @@ installs the hash-locked Python environment, Sysbench, PostgreSQL and the local
 `admin`/`benchdb` database, Java 21, and pinned BenchBase. Use `--full` only
 when preparing the additional Mutilate, TailBench, and DCPerf/SparkBench
 software dependencies and datasets; the Functional Sysbench workflow does not
-need them. Full-install storage, timing, per-component commands, and the
-remaining distributed Mutilate TODO are documented in the root README.
+need them. The root README separately documents the role-specific two-node
+Mutilate setup and reduced real-provider Mutilate Functional check.
 
 The dry run performs no root, database, benchmark, provider, output-directory,
 or kernel write. The expected evaluator run uses real hosted-model decisions

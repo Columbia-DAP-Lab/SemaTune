@@ -16,5 +16,7 @@ Functional workflow. `scripts/setup.sh --full` additionally materializes all
 four pinned source trees, installs the retained native dependency closure,
 builds Mutilate plus the four retained TailBench workloads and their inputs,
 and installs the verified Spark runtime, dataset, storage layout, and populated
-warehouse. The distributed Mutilate deployment remains an explicit two-node
-step; see the root README and machine-readable provenance.
+warehouse. The standalone `--memcached-server` and `--memcached-client` modes
+materialize only the dependencies needed by each Mutilate role and generate
+allocation-specific configuration from explicit network arguments; see the
+root README and machine-readable provenance.
