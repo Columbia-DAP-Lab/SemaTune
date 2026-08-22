@@ -325,28 +325,8 @@ class BenchBaseBenchmark(BenchmarkInterface):
 
                 window_end_time = time.time()
 
-                # Wait for perf stat process to complete (should be quick since it times out on its own)
-                if perf_info and 'perf_process' in perf_info:
-                    perf_process = perf_info['perf_process']
-                    perf_output_handle = perf_info.get('perf_output_handle')
-
-                    try:
-                        perf_process.wait(timeout=5)
-                    except subprocess.TimeoutExpired:
-                        logger.warning("Perf stat timed out, terminating...")
-                        perf_process.terminate()
-                        try:
-                            perf_process.wait(timeout=2)
-                        except subprocess.TimeoutExpired:
-                            perf_process.kill()
-                            perf_process.wait()
-
-                    # Close the output file handle
-                    if perf_output_handle:
-                        try:
-                            perf_output_handle.close()
-                        except Exception as e:
-                            logger.warning(f"Error closing perf output handle: {e}")
+                # Wait, parse, and persist perf metrics for _populate_system_metrics.
+                self.finalize_perf_metrics(window_number, perf_info)
 
                 if process.returncode == 0:
                     break

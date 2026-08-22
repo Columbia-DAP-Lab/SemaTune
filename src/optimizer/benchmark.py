@@ -16,8 +16,29 @@ import os
 import logging
 import threading
 import json
+import math
 
 logger = logging.getLogger(__name__)
+
+
+# Do not rely on perf's host/version-dependent default event set.  These are
+# the events consumed by the artifact's IPC/cache signal configurations and by
+# the existing perf output parser.
+PERF_EVENTS = (
+    "task-clock",
+    "context-switches",
+    "cpu-migrations",
+    "page-faults",
+    "cycles",
+    "instructions",
+    "branches",
+    "branch-misses",
+    "cache-references",
+    "cache-misses",
+)
+REQUIRED_PERF_OPTIMIZATION_METRICS = frozenset(
+    {"instructions_per_cycle", "cache_misses"}
+)
 
 
 def get_repo_root() -> str:
@@ -213,9 +234,14 @@ class BenchmarkInterface(ABC):
         perf_start_time = time.time() + 1.0
         perf_end_time = perf_start_time + perf_duration_seconds
         
-        # Build perf stat command with --timeout
-        # perf stat with --timeout runs system-wide and doesn't need a command
-        perf_cmd = ["perf", "stat", "--timeout", str(perf_timeout_ms)]
+        # Build perf stat command with --timeout.  Request every consumed event
+        # explicitly because perf's default event set differs across hosts.
+        # perf stat with --timeout runs system-wide and doesn't need a command.
+        perf_cmd = [
+            "perf", "stat",
+            "-e", ",".join(PERF_EVENTS),
+            "--timeout", str(perf_timeout_ms),
+        ]
         if self.pin_to_cores:
             # Restrict perf stat to the same cores as the benchmark
             perf_cmd.extend(["--cpu", self.pin_to_cores])
@@ -286,7 +312,13 @@ sleep 1 &&
             try:
                 perf_process.wait(timeout=perf_duration + 5)
             except subprocess.TimeoutExpired:
-                logger.warning("Perf stat process did not finish in time")
+                logger.warning("Perf stat process did not finish in time; terminating it")
+                perf_process.terminate()
+                try:
+                    perf_process.wait(timeout=2)
+                except subprocess.TimeoutExpired:
+                    perf_process.kill()
+                    perf_process.wait(timeout=2)
         
         # Close file handle
         if perf_output_handle and not perf_output_handle.closed:
@@ -294,6 +326,19 @@ sleep 1 &&
         
         # Parse the output
         perf_metrics = self._parse_perf_stat_output(perf_output_file)
+
+        # IPC and cache experiments cannot proceed meaningfully without their
+        # requested hardware counter.  Fail on the first bad window instead of
+        # silently optimizing a fabricated zero for all iterations.
+        optimization_metric = str(getattr(self.config, "optimization_metric", ""))
+        if optimization_metric in REQUIRED_PERF_OPTIMIZATION_METRICS:
+            metric_value = perf_metrics.get(optimization_metric)
+            if not isinstance(metric_value, (int, float)) or not math.isfinite(metric_value):
+                returncode = getattr(perf_process, "returncode", None)
+                raise RuntimeError(
+                    f"perf did not produce required optimization metric "
+                    f"{optimization_metric!r} (exit={returncode}; output={perf_output_file})"
+                )
         
         # Save perf info (including parsed metrics) to a JSON file for later retrieval
         perf_info_file = os.path.join(self.results_dir, f"window_{window_number}_perf_info.json")
@@ -509,6 +554,21 @@ sleep 1 &&
                             pass
         except Exception as e:
             logger.warning(f"Error parsing perf stat output: {e}")
+
+        # Some perf versions omit the human-readable "insn per cycle" comment
+        # when an explicit event list is used.  The underlying counters are
+        # sufficient to calculate the same metric deterministically.
+        if "instructions_per_cycle" not in perf_metrics:
+            instructions = perf_metrics.get("instructions")
+            cycles = perf_metrics.get("cycles")
+            if (
+                isinstance(instructions, (int, float))
+                and isinstance(cycles, (int, float))
+                and math.isfinite(instructions)
+                and math.isfinite(cycles)
+                and cycles > 0
+            ):
+                perf_metrics["instructions_per_cycle"] = instructions / cycles
         
         logger.debug(f"Parsed {len(perf_metrics)} perf metrics from {perf_output_file}")
         if perf_metrics:
@@ -1115,4 +1175,3 @@ sleep 1 &&
         except Exception as e:
             logger.warning(f"Error parsing metrics file for window {window_number}: {e}")
             return {}
-

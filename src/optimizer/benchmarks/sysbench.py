@@ -325,7 +325,7 @@ class SysbenchBenchmark(BenchmarkInterface):
         
         print(f"Running sysbench command: {' '.join(final_cmd)}")
         
-        self.collect_perf_metrics(window_number, duration)
+        perf_info = self.collect_perf_metrics(window_number, duration)
         
         # Capture all output to log file
         stderr_content = []
@@ -355,6 +355,8 @@ class SysbenchBenchmark(BenchmarkInterface):
             stderr_thread.join()
         
         window_end_time = time.time()
+
+        self.finalize_perf_metrics(window_number, perf_info)
         
         if process.returncode != 0:
             stderr_output = ''.join(stderr_content) if stderr_content else "No stderr output"
@@ -746,10 +748,12 @@ class SysbenchContinuousBenchmark(SysbenchBenchmark):
         checkpoint_json = os.path.join(window_dir, "latest_checkpoint.json")
         
         window_start_time = self.start_system_measurement(window_number, duration)
-        self.collect_perf_metrics(window_number, duration)
+        perf_info = self.collect_perf_metrics(window_number, duration)
         
         # Wait for window duration
         time.sleep(duration)
+
+        self.finalize_perf_metrics(window_number, perf_info)
         
         # Parse the latest checkpoint from the continuous log
         # The checkpoint should have been written at the end of the window
